@@ -2,7 +2,7 @@
 name = "bexley"
 version = "0.1.0"
 edition = "2021"
-description = "Bexley: pairs savers who want dollar-stable value with risk-takers who want leveraged upside."
+description = "Bexley pool: bxUSD stablecoin and xNEAR leveraged token from one pool of NEAR, with a Stability Pool, Steady vaults and exit orders."
 
 [lib]
 crate-type = ["cdylib", "rlib"]

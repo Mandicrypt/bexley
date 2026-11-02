@@ -1,11 +1,10 @@
 use super::*;
+use near_contract_standards::fungible_token::receiver::FungibleTokenReceiver;
 use near_sdk::test_utils::VMContextBuilder;
 use near_sdk::testing_env;
 
-const T: u128 = 1_000_000_000_000_000_000_000_000; // 1 token (24 decimals)
-const PRICE: u128 = 5_000_000; // $5.00
-const HOUR: u64 = 3_600;
-const DAY: u64 = 86_400;
+const T: u128 = ONE;
+const P: u128 = 4_000_000; // $4.00
 const NS: u64 = 1_000_000_000;
 const START: u64 = 1_000 * NS;
 
@@ -13,337 +12,378 @@ fn acc(s: &str) -> AccountId {
     s.parse().unwrap()
 }
 
-fn as_(who: &str, ts: u64) {
+fn ctx(who: &str, ts: u64, deposit: u128) {
     testing_env!(VMContextBuilder::new()
         .predecessor_account_id(acc(who))
-        .current_account_id(acc("app.test"))
+        .current_account_id(acc("pool.test"))
+        .attached_deposit(NearToken::from_yoctonear(deposit))
         .block_timestamp(ts)
         .build());
 }
 
 fn setup() -> Contract {
-    as_("owner.test", START);
-    let mut c = Contract::new(
-        acc("tnear.test"),
-        24,
-        acc("agent.test"),
-        acc("feeder.test"),
-        1_000, // 10% fee on risk-taker profit
-        U128(T / 10),
-        vec![HOUR, DAY, 7 * DAY],
-    );
-    as_("feeder.test", START);
-    c.set_price(U128(PRICE));
+    ctx("owner.test", START, 0);
+    let mut c = Contract::new(acc("tnear.test"), acc("xnear.test"), acc("guardian.test"), acc("feeder.test"));
+    price(&mut c, P);
     c
 }
 
-fn save(c: &mut Contract, who: &str, amount: u128, dur: u64, min_rate: u32, ts: u64) -> u64 {
-    as_("tnear.test", ts);
-    let msg = format!(r#"{{"type":"save","duration_secs":{},"min_rate_bps":{}}}"#, dur, min_rate);
-    let _ = c.ft_on_transfer(acc(who), U128(amount), msg);
-    c.get_stats().saves - 1
-}
-
-fn offer(c: &mut Contract, who: &str, margin: u128, rate: u32, durs: &[u64], cover: u32, ts: u64) -> u64 {
-    as_("tnear.test", ts);
-    let d: Vec<String> = durs.iter().map(|x| x.to_string()).collect();
-    let msg = format!(
-        r#"{{"type":"offer","rate_bps":{},"durations":[{}],"max_cover":{}}}"#,
-        rate,
-        d.join(","),
-        cover
-    );
-    let _ = c.ft_on_transfer(acc(who), U128(margin), msg);
-    c.get_stats().offers - 1
-}
-
-fn price_at(c: &mut Contract, p: u128, ts: u64) {
-    as_("feeder.test", ts);
+fn price(c: &mut Contract, p: u128) {
+    ctx("feeder.test", START, 0);
     c.set_price(U128(p));
 }
 
-fn balance(c: &Contract, who: &str) -> u128 {
-    c.get_account(acc(who)).balance.0
+fn send(c: &mut Contract, token: &str, from: &str, amount: u128, msg: &str) {
+    ctx(token, START, 0);
+    let _ = c.ft_on_transfer(acc(from), U128(amount), msg.to_string());
 }
 
-/// One standard deal: saver 30 tokens for 7 days, risk-taker 10% APR,
-/// cover 3 (so margin 10). Returns deal id.
-fn standard_deal(c: &mut Contract) -> u64 {
-    let s = save(c, "saver.test", 30 * T, 7 * DAY, 500, START);
-    let o = offer(c, "rt.test", 100 * T, 1_000, &[DAY, 7 * DAY], 3, START);
-    as_("agent.test", START);
-    c.match_deal(s, o)
+fn mint_x(c: &mut Contract, who: &str, t: u128) {
+    send(c, "tnear.test", who, t, r#"{"type":"mint_x"}"#);
+}
+
+fn mint_bx(c: &mut Contract, who: &str, t: u128) {
+    send(c, "tnear.test", who, t, r#"{"type":"mint_bx"}"#);
+}
+
+fn bx_of(c: &Contract, who: &str) -> u128 {
+    c.ft_balance_of(acc(who)).0
+}
+
+/// Within 0.01% (rounding).
+fn close(a: u128, b: u128) -> bool {
+    let d = a.abs_diff(b);
+    d * 10_000 <= b.max(1)
+}
+
+/// A pool with 100 tNEAR of xNEAR and 150 tNEAR worth of bxUSD:
+/// TVL $1000, bxUSD ~$600, backing ~167%, xNEAR ~2.5x.
+fn seeded() -> Contract {
+    let mut c = setup();
+    mint_x(&mut c, "risk.test", 100 * T); // $400 of xNEAR
+    mint_bx(&mut c, "saver.test", 150 * T); // $600 of bxUSD
+    c
+}
+
+// ---------- Basics ----------
+
+#[test]
+fn first_xnear_mints_at_one_dollar() {
+    let mut c = setup();
+    mint_x(&mut c, "risk.test", 10 * T);
+    let p = c.get_pool();
+    // 10 tNEAR = $40, minus 0.5% fee = $39.80 of xNEAR at $1.
+    assert_eq!(p.x_supply.0, 3980 * T / 100);
+    assert_eq!(p.collateral.0, 10 * T);
+    assert_eq!(p.mode, Mode::Healthy);
+    assert_eq!(c.x_external, 3980 * T / 100);
 }
 
 #[test]
-fn save_creates_open_order() {
-    let mut c = setup();
-    let id = save(&mut c, "saver.test", 5 * T, DAY, 500, START);
-    let s = c.get_save(id).unwrap();
-    assert_eq!(s.status, SaveStatus::Open);
-    assert_eq!(s.amount.0, 5 * T);
-    assert_eq!(c.get_open_saves(None, None).len(), 1);
-    assert_eq!(c.get_stats().users, 1);
-    assert_eq!(c.get_stats().total_saved.0, 5 * T);
+fn bxusd_mints_at_price_minus_fee() {
+    let c = seeded();
+    // 150 tNEAR * $4 = $600, minus 0.2% = $598.80.
+    assert_eq!(bx_of(&c, "saver.test"), 59880 * T / 100);
 }
 
 #[test]
-#[should_panic(expected = "only accepts its pool token")]
-fn rejects_other_tokens() {
+fn bxusd_needs_xnear_backing_first() {
     let mut c = setup();
-    as_("scam.test", START);
-    let _ = c.ft_on_transfer(acc("saver.test"), U128(T), r#"{"type":"save","duration_secs":3600,"min_rate_bps":0}"#.into());
+    let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| mint_bx(&mut c, "saver.test", 10 * T)));
+    assert!(r.is_err(), "bxUSD with no xNEAR behind it must be refused");
 }
 
 #[test]
-#[should_panic(expected = "deal length is not offered")]
-fn rejects_unknown_duration() {
-    let mut c = setup();
-    save(&mut c, "saver.test", T, 123, 0, START);
+fn ratios_and_leverage() {
+    let c = seeded();
+    let p = c.get_pool();
+    // TVL $1000, bxUSD ~$600 -> CR ~167%, leverage ~2.5x.
+    assert!(p.cr_bps.0 >= 16_500 && p.cr_bps.0 <= 16_800, "cr {}", p.cr_bps.0);
+    assert!(p.leverage_bps.0 >= 24_500 && p.leverage_bps.0 <= 25_500, "lev {}", p.leverage_bps.0);
 }
 
 #[test]
-#[should_panic(expected = "below the minimum deposit")]
-fn rejects_tiny_deposit() {
-    let mut c = setup();
-    save(&mut c, "saver.test", T / 100, DAY, 0, START);
+fn minting_does_not_move_xnear_price_except_fees() {
+    let mut c = seeded();
+    let nav0 = c.get_pool().x_price.0;
+    mint_x(&mut c, "other.test", 50 * T);
+    let nav1 = c.get_pool().x_price.0;
+    // Fees only ever add value to existing holders.
+    assert!(nav1 >= nav0);
+    assert!(close(nav1, nav0) || nav1 - nav0 < nav0 / 100);
 }
 
 #[test]
-#[should_panic(expected = "Could not read the deposit message")]
-fn rejects_bad_message() {
-    let mut c = setup();
-    as_("tnear.test", START);
-    let _ = c.ft_on_transfer(acc("saver.test"), U128(T), "hello".into());
+fn xnear_is_leveraged() {
+    let mut c = seeded();
+    let nav0 = c.get_pool().x_price.0;
+    price(&mut c, P * 110 / 100); // NEAR +10%
+    let nav1 = c.get_pool().x_price.0;
+    let gain_bps = (nav1 - nav0) * 10_000 / nav0;
+    // About 2.5x leverage -> about +25%.
+    assert!(gain_bps > 2_300 && gain_bps < 2_700, "xNEAR gained {gain_bps} bps");
 }
 
 #[test]
-fn agent_matches_and_locks_margin() {
-    let mut c = setup();
-    let id = standard_deal(&mut c);
-    let d = c.get_deal(id).unwrap();
-    assert_eq!(d.saver_amount.0, 30 * T);
-    assert_eq!(d.margin.0, 10 * T); // 30 / cover 3
-    assert_eq!(d.entry_price.0, PRICE);
-    assert_eq!(d.end_at.0, START + 7 * DAY * NS);
-    assert_eq!(c.get_offer(0).unwrap().margin_available.0, 90 * T);
-    assert_eq!(c.get_save(0).unwrap().status, SaveStatus::Matched);
-    assert_eq!(c.get_stats().matched_volume.0, 40 * T);
-    assert!(c.get_open_saves(None, None).is_empty());
+fn bxusd_holds_one_dollar_through_a_drop() {
+    let mut c = seeded();
+    price(&mut c, P * 80 / 100); // NEAR -20%: TVL $800, above the ~$600 owed
+    ctx("saver.test", START, 1);
+    let got = c.redeem_bx(U128(100 * T), None).0;
+    // $100 less 0% fee in Caution, at $3.20 per NEAR = 31.25 tNEAR.
+    let expected = 100 * T * MICRO / (P * 80 / 100);
+    assert!(close(got, expected), "got {got} expected {expected}");
 }
 
 #[test]
-#[should_panic(expected = "Only the Bexley agent")]
-fn only_agent_can_match() {
-    let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, DAY, 0, START);
-    let o = offer(&mut c, "rt.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("random.test", START);
-    c.match_deal(s, o);
+#[should_panic(expected = "below 130% backing")]
+fn xnear_exit_cannot_break_backing() {
+    let mut c = seeded();
+    let x = c.x_external;
+    send(&mut c, "xnear.test", "risk.test", x, r#"{"type":"redeem_x"}"#);
 }
 
 #[test]
-#[should_panic(expected = "less than the saver's minimum rate")]
-fn agent_cannot_break_saver_minimum() {
+fn small_xnear_exit_works() {
     let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, DAY, 2_000, START);
-    let o = offer(&mut c, "rt.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("agent.test", START);
-    c.match_deal(s, o);
+    mint_x(&mut c, "risk.test", 100 * T);
+    mint_bx(&mut c, "saver.test", 50 * T);
+    let x = c.x_external / 10;
+    let before = c.collateral;
+    send(&mut c, "xnear.test", "risk.test", x, r#"{"type":"redeem_x"}"#);
+    assert!(c.collateral < before);
+    assert!(c.cr_bps() >= STABILIZE_CR_BPS);
 }
 
 #[test]
-#[should_panic(expected = "does not accept that deal length")]
-fn agent_cannot_break_offer_duration() {
-    let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, HOUR, 0, START);
-    let o = offer(&mut c, "rt.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("agent.test", START);
-    c.match_deal(s, o);
+fn modes_follow_backing() {
+    let mut c = seeded(); // ~167%
+    price(&mut c, P * 88 / 100); // ~147%
+    assert_eq!(c.get_pool().mode, Mode::Caution);
+    assert_eq!(c.get_pool().fees_bps.mint_x, 0);
+    assert_eq!(c.get_pool().fees_bps.redeem_bx, 0);
+    price(&mut c, P * 75 / 100); // ~125%
+    let p = c.get_pool();
+    assert_eq!(p.mode, Mode::Stabilize);
+    assert!(!p.fees_bps.mint_bx_open);
+    assert!(!p.fees_bps.redeem_x_open);
 }
 
 #[test]
-#[should_panic(expected = "not have enough margin")]
-fn offer_needs_enough_margin() {
-    let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, DAY, 0, START);
-    let o = offer(&mut c, "rt.test", 5 * T, 1_000, &[DAY], 3, START);
-    as_("agent.test", START);
-    c.match_deal(s, o);
+#[should_panic(expected = "New bxUSD is paused")]
+fn no_new_bxusd_in_stabilize() {
+    let mut c = seeded();
+    price(&mut c, P * 75 / 100);
+    mint_bx(&mut c, "saver2.test", T);
+}
+
+#[test]
+fn guardian_fee_levels_multiply_fees() {
+    let mut c = seeded();
+    ctx("guardian.test", START, 0);
+    c.set_fee_level(2, "NEAR is swinging hard; fees x3 for now.".into());
+    assert_eq!(c.get_pool().fees_bps.mint_x, 150);
+    assert_eq!(c.get_notes(None)[0].kind, "fees");
+}
+
+#[test]
+#[should_panic(expected = "Only the Pool Guardian")]
+fn only_guardian_sets_fees() {
+    let mut c = seeded();
+    ctx("random.test", START, 0);
+    c.set_fee_level(2, "x".into());
 }
 
 #[test]
 #[should_panic(expected = "price is out of date")]
-fn stale_price_blocks_matching() {
+fn stale_price_blocks_minting() {
     let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, DAY, 0, START);
-    let o = offer(&mut c, "rt.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("agent.test", START + 2 * HOUR * NS);
-    c.match_deal(s, o);
+    ctx("tnear.test", START + 2 * 3600 * NS, 0);
+    let _ = c.ft_on_transfer(acc("risk.test"), U128(T), r#"{"type":"mint_x"}"#.into());
 }
 
 #[test]
-#[should_panic(expected = "cannot match with yourself")]
-fn no_self_match() {
+#[should_panic(expected = "only accepts tNEAR and xNEAR")]
+fn rejects_other_tokens() {
     let mut c = setup();
-    let s = save(&mut c, "same.test", 30 * T, DAY, 0, START);
-    let o = offer(&mut c, "same.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("agent.test", START);
-    c.match_deal(s, o);
+    send(&mut c, "scam.test", "risk.test", T, r#"{"type":"mint_x"}"#);
+}
+
+// ---------- Stability Pool ----------
+
+#[test]
+fn stability_pool_earns_fees() {
+    let mut c = seeded();
+    ctx("saver.test", START, 1);
+    c.sp_deposit(U128(100 * T));
+    let before = c.get_sp_position(acc("saver.test")).value.0;
+    mint_x(&mut c, "other.test", 100 * T); // pays a 0.5% fee, 80% to the pool
+    let after = c.get_sp_position(acc("saver.test")).value.0;
+    assert!(after > before, "pool value should grow from fees");
+    // 100 tNEAR * $4 * 0.5% * 80% = $1.60
+    assert!(close(after - before, 16 * T / 10), "earned {}", after - before);
 }
 
 #[test]
-fn saver_can_take_offer_without_agent() {
+fn stabilize_converts_pool_bxusd_to_xnear() {
+    let mut c = seeded();
+    ctx("saver.test", START, 1);
+    c.sp_deposit(U128(300 * T));
+    price(&mut c, P * 75 / 100); // backing ~125%
+    assert_eq!(c.mode(), Mode::Stabilize);
+    let nav0 = c.x_price();
+    ctx("guardian.test", START, 0);
+    c.stabilize();
+    assert!(c.cr_bps() >= 13_990, "cr {}", c.cr_bps());
+    assert!(c.sp_x > 0);
+    // Converting at fair value leaves xNEAR's price alone.
+    assert!(close(c.x_price(), nav0));
+    // The depositor's value is unchanged by the conversion itself.
+    assert_eq!(c.get_notes(None)[0].kind, "protect");
+}
+
+#[test]
+fn stability_pool_withdraw_returns_both_tokens() {
+    let mut c = seeded();
+    ctx("saver.test", START, 1);
+    c.sp_deposit(U128(300 * T));
+    price(&mut c, P * 75 / 100);
+    c.stabilize();
+    ctx("saver.test", START, 1);
+    let bx_before = bx_of(&c, "saver.test");
+    c.sp_withdraw(None);
+    assert!(bx_of(&c, "saver.test") > bx_before);
+    assert_eq!(c.sp_total_shares, 0);
+    assert_eq!(c.sp_x, 0);
+}
+
+#[test]
+#[should_panic(expected = "Nothing to stabilize")]
+fn stabilize_only_when_needed() {
+    let mut c = seeded();
+    c.stabilize();
+}
+
+// ---------- Steady vaults ----------
+
+#[test]
+fn steady_vault_hits_target_leverage() {
+    let mut c = seeded(); // xNEAR ~2.5x
+    send(&mut c, "tnear.test", "v.test", 50 * T, r#"{"type":"vault_deposit","vault":0}"#);
+    let v = &c.get_vaults()[0];
+    let lev = v.leverage_bps.0;
+    assert!(lev > 19_000 && lev < 21_000, "Steady 2x at {lev}");
+    assert!(!v.needs_rebalance);
+}
+
+#[test]
+fn steady_vault_rebalances_after_a_move() {
+    let mut c = seeded();
+    send(&mut c, "tnear.test", "v.test", 50 * T, r#"{"type":"vault_deposit","vault":0}"#);
+    price(&mut c, P * 93 / 100); // xNEAR gets more levered as NEAR falls
+    let drifted = c.get_vaults()[0].leverage_bps.0;
+    assert!(c.get_vaults()[0].needs_rebalance, "drifted to {drifted}");
+    ctx("guardian.test", START, 0);
+    assert!(c.rebalance(0));
+    let v = &c.get_vaults()[0];
+    let lev = v.leverage_bps.0;
+    assert!(lev > 19_000 && lev < 21_000, "back to {lev}; xNEAR lev {} t {} x {}", c.leverage_bps(), v.t.0 / T, v.x.0 / T);
+    assert_eq!(c.get_notes(None)[0].kind, "rebalance");
+}
+
+#[test]
+fn steady_vault_caps_at_xnear_leverage() {
+    // If xNEAR itself is less levered than the target, the vault goes all
+    // in xNEAR and sits at xNEAR's leverage.
+    let mut c = seeded();
+    send(&mut c, "tnear.test", "v.test", 50 * T, r#"{"type":"vault_deposit","vault":1}"#);
+    let v = &c.get_vaults()[1];
+    assert_eq!(v.t.0, 0);
+    assert!(v.leverage_bps.0 < 30_000);
+}
+
+#[test]
+fn steady_vault_withdraw_pays_out() {
+    let mut c = seeded();
+    send(&mut c, "tnear.test", "v.test", 50 * T, r#"{"type":"vault_deposit","vault":1}"#);
+    let pos = c.get_vault_positions(acc("v.test"))[1].value.0;
+    assert!(close(pos, 50 * T) || pos > 49 * T);
+    ctx("v.test", START, 1);
+    c.vault_withdraw(1, None);
+    assert_eq!(c.get_vault_positions(acc("v.test"))[1].shares.0, 0);
+    assert_eq!(c.vaults[1].total_shares, 0);
+}
+
+// ---------- Orders ----------
+
+#[test]
+fn stop_loss_executes_only_at_its_price() {
     let mut c = setup();
-    let s = save(&mut c, "saver.test", 30 * T, DAY, 0, START);
-    let o = offer(&mut c, "rt.test", 100 * T, 1_000, &[DAY], 3, START);
-    as_("saver.test", START);
-    let id = c.take_offer(s, o);
-    assert_eq!(c.get_deal(id).unwrap().matched_by, acc("saver.test"));
+    mint_x(&mut c, "risk.test", 100 * T);
+    mint_bx(&mut c, "saver.test", 50 * T);
+    let x = c.x_external / 4;
+    send(&mut c, "xnear.test", "risk.test", x, r#"{"type":"order","stop_price":"3600000"}"#);
+    assert_eq!(c.order_x, x);
+    assert!(c.get_triggered_orders(None).is_empty());
+    price(&mut c, 3_500_000);
+    assert_eq!(c.get_triggered_orders(None).len(), 1);
+    ctx("guardian.test", START, 0);
+    let out = c.execute_order(0).0;
+    assert!(out > 0);
+    assert_eq!(c.orders.get(&0).unwrap().status, OrderStatus::Executed);
+    assert_eq!(c.order_x, 0);
+    assert_eq!(c.get_notes(None)[0].kind, "order");
 }
 
 #[test]
-#[should_panic(expected = "still running")]
-fn cannot_settle_early_when_safe() {
+#[should_panic(expected = "has not been reached")]
+fn order_waits_for_price() {
     let mut c = setup();
-    let id = standard_deal(&mut c);
-    price_at(&mut c, PRICE, START + DAY * NS);
-    as_("anyone.test", START + DAY * NS);
-    c.settle(id);
+    mint_x(&mut c, "risk.test", 100 * T);
+    send(&mut c, "xnear.test", "risk.test", T, r#"{"type":"order","take_price":"5000000"}"#);
+    c.execute_order(0);
 }
 
 #[test]
-fn flat_price_saver_gets_rate() {
+fn take_profit_and_cancel() {
     let mut c = setup();
-    let id = standard_deal(&mut c);
-    let end = START + 7 * DAY * NS;
-    price_at(&mut c, PRICE, end);
-    as_("anyone.test", end);
-    c.settle(id);
-    // 30 tokens * (1 + 10% * 7/365)
-    let expected = 30 * T + 30 * T * 1_000 * 7 / (10_000 * 365);
-    let d = c.get_deal(id).unwrap();
-    assert_eq!(d.saver_payout.unwrap().0, expected);
-    assert_eq!(d.risk_taker_payout.unwrap().0, 40 * T - expected);
-    assert_eq!(d.fee.unwrap().0, 0); // risk-taker lost, no fee
-    assert_eq!(balance(&c, "saver.test"), expected);
-    assert_eq!(c.get_stats().deals_settled, 1);
+    mint_x(&mut c, "risk.test", 100 * T);
+    send(&mut c, "xnear.test", "risk.test", T, r#"{"type":"order","take_price":"5000000"}"#);
+    ctx("risk.test", START, 1);
+    c.cancel_order(0);
+    assert_eq!(c.orders.get(&0).unwrap().status, OrderStatus::Cancelled);
+    assert_eq!(c.order_x, 0);
 }
 
 #[test]
-fn price_up_risk_taker_wins_saver_keeps_dollars() {
+#[should_panic(expected = "stop price must be below the take price")]
+fn order_prices_must_make_sense() {
     let mut c = setup();
-    let id = standard_deal(&mut c);
-    let end = START + 7 * DAY * NS;
-    price_at(&mut c, 6_000_000, end); // +20%
-    as_("anyone.test", end);
-    c.settle(id);
-    let d = c.get_deal(id).unwrap();
-    let saver = d.saver_payout.unwrap().0;
-    // Saver's dollars: 30 tokens * $5 = $150, grown by the rate, now at $6.
-    let owed = saver_owed(30 * T, PRICE, 6_000_000, 1_000, 7 * DAY);
-    assert_eq!(saver, owed);
-    let dollars_out = saver * 6 / T; // whole dollars
-    assert!(dollars_out >= 150, "saver keeps at least $150, got {dollars_out}");
-    // Risk-taker gets the rest minus 10% of profit.
-    let gross = 40 * T - saver;
-    let fee = (gross - 10 * T) * 1_000 / 10_000;
-    assert_eq!(d.fee.unwrap().0, fee);
-    assert_eq!(d.risk_taker_payout.unwrap().0, gross - fee);
-    assert!(gross > 10 * T, "risk-taker profits when price rises");
-    assert_eq!(balance(&c, "owner.test"), fee);
-    // Nothing is created or lost.
-    assert_eq!(saver + gross, 40 * T);
+    mint_x(&mut c, "risk.test", 100 * T);
+    send(&mut c, "xnear.test", "risk.test", T, r#"{"type":"order","stop_price":"5000000","take_price":"4000000"}"#);
+}
+
+// ---------- Accounting ----------
+
+#[test]
+fn every_token_is_accounted_for() {
+    let mut c = seeded();
+    ctx("saver.test", START, 1);
+    c.sp_deposit(U128(100 * T));
+    send(&mut c, "tnear.test", "v.test", 30 * T, r#"{"type":"vault_deposit","vault":0}"#);
+    let x = c.x_external / 10;
+    send(&mut c, "xnear.test", "risk.test", x, r#"{"type":"order","stop_price":"1000000"}"#);
+    let vx: u128 = c.vaults.iter().map(|v| v.x).sum();
+    assert_eq!(c.x_supply(), c.x_external + c.sp_x + c.order_x + vx);
+    assert_eq!(c.bx_supply(), c.bx.total_supply + c.sp_bx);
+    // xNEAR price * supply + bxUSD = pool value.
+    let lhs = c.x_supply() * c.x_price() / MICRO + c.bx_supply();
+    assert!(close(lhs, c.tvl()), "{lhs} vs {}", c.tvl());
 }
 
 #[test]
-fn price_crash_saver_protected_early() {
-    let mut c = setup();
-    let id = standard_deal(&mut c);
-    let t = START + DAY * NS;
-    price_at(&mut c, 3_500_000, t); // -30%
-    let q = c.quote(id).unwrap();
-    assert!(q.at_risk);
-    assert!(q.can_settle);
-    as_("anyone.test", t);
-    c.settle(id);
-    let d = c.get_deal(id).unwrap();
-    assert!(d.settled_early);
-    // Saver is owed more than the pot, so takes the whole pot.
-    assert_eq!(d.saver_payout.unwrap().0, 40 * T);
-    assert_eq!(d.risk_taker_payout.unwrap().0, 0);
-}
-
-#[test]
-fn cancel_save_makes_deposit_withdrawable() {
-    let mut c = setup();
-    let id = save(&mut c, "saver.test", 5 * T, DAY, 0, START);
-    as_("saver.test", START);
-    c.cancel_save(id);
-    assert_eq!(c.get_save(id).unwrap().status, SaveStatus::Cancelled);
-    assert_eq!(balance(&c, "saver.test"), 5 * T);
-}
-
-#[test]
-#[should_panic(expected = "not your saving")]
-fn cannot_cancel_someone_elses_save() {
-    let mut c = setup();
-    let id = save(&mut c, "saver.test", 5 * T, DAY, 0, START);
-    as_("thief.test", START);
-    c.cancel_save(id);
-}
-
-#[test]
-fn close_offer_returns_only_free_margin() {
-    let mut c = setup();
-    standard_deal(&mut c);
-    as_("rt.test", START);
-    c.close_offer(0);
-    assert_eq!(balance(&c, "rt.test"), 90 * T); // 10 still locked in the deal
-    assert!(c.get_active_offers(None, None).is_empty());
-}
-
-#[test]
-fn withdraw_clears_balance() {
-    let mut c = setup();
-    let id = save(&mut c, "saver.test", 5 * T, DAY, 0, START);
-    as_("saver.test", START);
-    c.cancel_save(id);
-    let _ = c.withdraw();
-    assert_eq!(balance(&c, "saver.test"), 0);
-}
-
-#[test]
-#[should_panic(expected = "nothing to withdraw")]
-fn withdraw_needs_balance() {
-    let mut c = setup();
-    as_("saver.test", START);
-    let _ = c.withdraw();
-}
-
-#[test]
-#[should_panic(expected = "Only the price feeder")]
-fn only_feeder_sets_price() {
-    let mut c = setup();
-    as_("random.test", START);
-    c.set_price(U128(1));
-}
-
-#[test]
-fn saver_owed_one_year_ten_percent() {
-    let owed = saver_owed(100 * T, PRICE, PRICE, 1_000, SECONDS_PER_YEAR);
-    assert_eq!(owed, 110 * T);
-}
-
-#[test]
-fn big_amounts_do_not_overflow() {
-    // A billion tokens at $1,000 each, price drops 10x, 500% rate for a year.
-    let owed = saver_owed(1_000_000_000 * T, 1_000_000_000, 100_000_000, 50_000, SECONDS_PER_YEAR);
-    assert_eq!(owed, 60_000_000_000 * T);
-}
-
-#[test]
-fn margin_rounds_up() {
-    assert_eq!(required_margin(10, 3), 4);
-    assert_eq!(required_margin(9, 3), 3);
+fn whole_formats() {
+    assert_eq!(whole(1234 * T / 100), "12.34");
+    assert_eq!(times(21_500), "2.15");
+    assert_eq!(dollars(3_905_250), "3.905");
 }

@@ -1,0 +1,15 @@
+[package]
+name = "xtoken"
+version = "0.1.0"
+edition = "2021"
+description = "Bexley leveraged token (xNEAR). Only the Bexley pool can mint or burn it."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+near-contract-standards = { workspace = true }
+
+[dev-dependencies]
+near-sdk = { workspace = true, features = ["unit-testing"] }
