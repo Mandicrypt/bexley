@@ -18,7 +18,7 @@ Work in progress. This README only describes what works today.
 | Bexley core contract (`contracts/bexley`) | Live on testnet at [`app.bexley.testnet`](https://testnet.nearblocks.io/address/app.bexley.testnet). 26 unit tests pass. |
 | Test NEAR faucet token (`contracts/faucet-token`) | Live on testnet at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). 4 unit tests pass. |
 | Matching agent (`agent/`) | Live as `agent.bexley.testnet`. Runs on GitHub every 15 minutes. 9 logic tests pass. |
-| Web app | Not started |
+| Web app (`app/`) | Save, Take risk, My deals and Market screens. Published on GitHub Pages. |
 | Price feed | The agent posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 
 ## How a deal works
@@ -66,10 +66,26 @@ The decision log for each tick is on the GitHub Actions run page.
 
 An early version used a test USDC token at `usdc.bexley.testnet`. The final design holds deals in tNEAR, so that account is retired.
 
+## The app
+
+React + Vite, wallets through NEAR Connect (Meteor, MyNearWallet, Intear and others on testnet).
+
+- **Save**: pick an amount, a deal length and your lowest rate. Shows the dollar value you lock in and the best offer available now.
+- **Take risk**: margin, rate, accepted lengths and exposure (2x to 11x).
+- **My deals**: withdraw, take the best offer yourself, cancel, close offers, settle when a deal ends. Live "if settled now" amounts.
+- **Market**: open offers, waiting savings, recent deals and who matched them.
+- **Get 100 tNEAR**: free test tokens once an hour.
+
+```bash
+cd app && npm install && npm run dev
+```
+
 ## Run the tests
 
 ```bash
-cargo test --workspace
+cargo test --workspace          # contracts
+cd agent && npm test             # agent decisions
+cd app && npm test               # app number formatting
 ```
 
 ## Deploy
