@@ -45,4 +45,4 @@ jobs:
           (cd contracts/test-usdc && cargo near build non-reproducible-wasm)
           WASM=$(find target/near -name 'test_usdc.wasm' | head -1)
           echo "Built: $WASM"
-          node scripts/deploy.mjs usdc "$WASM" new '{}' 3
+          node scripts/deploy.mjs usdc "$WASM" new '{}' 2
