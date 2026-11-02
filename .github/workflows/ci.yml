@@ -17,9 +17,12 @@ jobs:
         run: cargo test --workspace
       - name: Install cargo-near
         run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
-      - name: Build test USDC contract
-        working-directory: contracts/test-usdc
-        run: cargo near build non-reproducible-wasm
+      - name: Build contracts
+        run: |
+          for c in faucet-token bexley; do
+            (cd contracts/$c && cargo near build non-reproducible-wasm)
+          done
+          ls -l target/near/*/*.wasm
       - uses: actions/upload-artifact@v4
         with:
           name: contracts-wasm

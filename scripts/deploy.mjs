@@ -8,12 +8,12 @@
 //   NEAR_ACCOUNT_ID   owner account, e.g. bexley.testnet
 //   NEAR_PRIVATE_KEY  owner's private key, "ed25519:..." (from a GitHub secret)
 //   NEAR_RPC_URL      optional, defaults to testnet RPC
-// Args: <subaccount prefix> <wasm path> [init method] [init args JSON] [NEAR to fund]
+// Args: <subaccount prefix> <wasm path> [init method or '-'] [init args JSON] [NEAR to fund or 'auto']
 
 import { readFileSync } from 'node:fs';
 import { Account, JsonRpcProvider, KeyPair, actions, nearToYocto, teraToGas } from 'near-api-js';
 
-const [prefix, wasmPath, initMethod = 'new', initArgs = '{}', fundNear = '3'] = process.argv.slice(2);
+const [prefix, wasmPath, initMethod = 'new', initArgs = '{}', fundNear = 'auto'] = process.argv.slice(2);
 const ownerId = process.env.NEAR_ACCOUNT_ID;
 const privateKey = process.env.NEAR_PRIVATE_KEY;
 const rpcUrl = process.env.NEAR_RPC_URL || 'https://rpc.testnet.near.org';
@@ -55,11 +55,17 @@ if (await exists(contractId)) {
   const initActions = initMethod === '-' ? [] : [
     actions.functionCall(initMethod, JSON.parse(initArgs), teraToGas('100'), 0n),
   ];
+  // 'auto': just enough for the code's storage (1 NEAR per 100 KB) plus
+  // 0.5 NEAR for the contract's own data.
+  const fund = fundNear === 'auto'
+    ? BigInt(code.length) * 10n ** 19n + nearToYocto('0.5')
+    : nearToYocto(fundNear);
+  console.log(`Code size ${code.length} bytes, funding ${Number(fund / 10n ** 21n) / 1000} NEAR`);
   await owner.signAndSendTransaction({
     receiverId: contractId,
     actions: [
       actions.createAccount(),
-      actions.transfer(nearToYocto(fundNear)),
+      actions.transfer(fund),
       actions.addFullAccessKey(keyPair.getPublicKey()),
       actions.deployContract(code),
       ...initActions,

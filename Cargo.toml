@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["contracts/test-usdc"]
+members = ["contracts/test-usdc", "contracts/faucet-token", "contracts/bexley"]
 
 [workspace.dependencies]
 near-sdk = "5.30.0"

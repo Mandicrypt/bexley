@@ -1,0 +1,16 @@
+[package]
+name = "bexley"
+version = "0.1.0"
+edition = "2021"
+description = "Bexley: pairs savers who want dollar-stable value with risk-takers who want leveraged upside."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+near-contract-standards = { workspace = true }
+uint = { version = "0.10.2", default-features = false }
+
+[dev-dependencies]
+near-sdk = { workspace = true, features = ["unit-testing"] }

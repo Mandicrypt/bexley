@@ -1,0 +1,15 @@
+[package]
+name = "faucet-token"
+version = "0.1.0"
+edition = "2021"
+description = "Configurable faucet test token for Bexley on NEAR testnet. No real value."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+near-contract-standards = { workspace = true }
+
+[dev-dependencies]
+near-sdk = { workspace = true, features = ["unit-testing"] }
