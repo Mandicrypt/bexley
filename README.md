@@ -17,7 +17,7 @@ Work in progress. This README only describes what works today.
 |---|---|
 | Bexley core contract (`contracts/bexley`) | Live on testnet at [`app.bexley.testnet`](https://testnet.nearblocks.io/address/app.bexley.testnet). 26 unit tests pass. |
 | Test NEAR faucet token (`contracts/faucet-token`) | Live on testnet at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). 4 unit tests pass. |
-| Matching agent (`agent/`) | Written, 9 logic tests pass. Runs on GitHub every 15 minutes once set up. |
+| Matching agent (`agent/`) | Live as `agent.bexley.testnet`. Runs on GitHub every 15 minutes. 9 logic tests pass. |
 | Web app | Not started |
 | Price feed | The agent posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 
