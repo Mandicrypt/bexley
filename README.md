@@ -15,8 +15,8 @@ Work in progress. This README only describes what works today.
 
 | Part | Status |
 |---|---|
-| Bexley core contract (`contracts/bexley`) | Written, 26 unit tests pass. Testnet launch ready, not yet run. |
-| Test NEAR faucet token (`contracts/faucet-token`) | Written, 4 unit tests pass. Testnet launch ready, not yet run. |
+| Bexley core contract (`contracts/bexley`) | Live on testnet at [`app.bexley.testnet`](https://testnet.nearblocks.io/address/app.bexley.testnet). 26 unit tests pass. |
+| Test NEAR faucet token (`contracts/faucet-token`) | Live on testnet at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). 4 unit tests pass. |
 | AI matching agent | Not started |
 | Web app | Not started |
 | Price feed | On testnet the owner account posts the NEAR/USD price. Not decentralized yet. |
