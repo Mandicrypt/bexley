@@ -1,0 +1,15 @@
+{
+  "name": "bexley-agent",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "start": "node run.mjs"
+  },
+  "dependencies": {
+    "near-api-js": "7.4.0",
+    "@noble/curves": "2.2.0",
+    "@noble/hashes": "2.2.0",
+    "bs58": "4.0.1"
+  }
+}

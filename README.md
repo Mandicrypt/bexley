@@ -17,9 +17,9 @@ Work in progress. This README only describes what works today.
 |---|---|
 | Bexley core contract (`contracts/bexley`) | Live on testnet at [`app.bexley.testnet`](https://testnet.nearblocks.io/address/app.bexley.testnet). 26 unit tests pass. |
 | Test NEAR faucet token (`contracts/faucet-token`) | Live on testnet at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). 4 unit tests pass. |
-| AI matching agent | Not started |
+| Matching agent (`agent/`) | Written, 9 logic tests pass. Runs on GitHub every 15 minutes once set up. |
 | Web app | Not started |
-| Price feed | On testnet the owner account posts the NEAR/USD price. Not decentralized yet. |
+| Price feed | The agent posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 
 ## How a deal works
 
@@ -43,11 +43,24 @@ Balances are credited inside Bexley and sent to your wallet with `withdraw`.
 
 Deal lengths on testnet: 10 minutes, 1 hour, 1 day, 7, 14 and 30 days. The short ones let testers see a full deal in one sitting.
 
+## The agent
+
+Every tick, the agent:
+
+1. **Prices**: reads NEAR/USD from CoinGecko, Coinbase and Kraken, takes the median, and posts it when it moved 0.1% or is 20 minutes old. Deals only open or settle with a price under an hour old.
+2. **Settles**: settles every deal that has ended, or whose saver needs protecting.
+3. **Matches**: gives each open saving (oldest first) its best offer: highest rate, then the most margin per token (safest for the saver), then the oldest offer. It never over-commits an offer's margin and never matches someone with themselves.
+
+**Locked-down by design.** The agent account `agent.bexley.testnet` has no full-access key. Its only key can call `match_deal`, `set_price` and `settle` on the Bexley contract, with a small gas allowance. It cannot send tokens or NEAR. The contract also re-checks every match rule, so even a buggy agent cannot make an unfair match.
+
+The decision log for each tick is on the GitHub Actions run page.
+
 ## Accounts on testnet
 
 | Account | What it is |
 |---|---|
-| `bexley.testnet` | Owner. For now also the agent and price feeder. |
+| `bexley.testnet` | Owner. |
+| `agent.bexley.testnet` | The agent and price feeder. Limited key only. |
 | `tnear.bexley.testnet` | tNEAR, the test token deals are held in. Anyone can `claim()` 100 tNEAR per hour. No real value. |
 | `app.bexley.testnet` | Bexley core contract. |
 
