@@ -1,4 +1,4 @@
-name: Bexley agent
+name: Bexley Pool Guardian
 
 # The agent runs on its own every 15 minutes (GitHub may start it a few
 # minutes late), and can be run by hand from the Actions tab.
@@ -27,8 +27,10 @@ jobs:
     timeout-minutes: 5
     env:
       NEAR_ACCOUNT_ID: bexley.testnet
-      APP_ID: app.bexley.testnet
-      AGENT_ID: agent.bexley.testnet
+      APP_ID: pool.bexley.testnet
+      AGENT_ID: guardian.bexley.testnet
+      POOL_ID: pool.bexley.testnet
+      GUARDIAN_ID: guardian.bexley.testnet
       # The agent's limited key is derived from this; the agent itself
       # never uses the owner's full access.
       NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
@@ -43,7 +45,7 @@ jobs:
       - name: Test the decision logic
         working-directory: agent
         run: npm test
-      - name: Set up the agent account
+      - name: Set up the Guardian account
         if: inputs.mode == 'setup'
         working-directory: agent
         run: node setup.mjs

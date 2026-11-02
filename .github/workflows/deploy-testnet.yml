@@ -9,13 +9,13 @@ on:
       target:
         description: What to deploy
         required: true
-        default: everything
+        default: pool-v2
         type: choice
         options:
-          - everything
+          - pool-v2
+          - pool-code-only
           - tnear
-          - core
-          - retire-usdc
+          - balance
 
 jobs:
   deploy:
@@ -24,7 +24,9 @@ jobs:
       NEAR_ACCOUNT_ID: bexley.testnet
       NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
       TNEAR_ID: tnear.bexley.testnet
-      APP_ID: app.bexley.testnet
+      XNEAR_ID: xnear.bexley.testnet
+      POOL_ID: pool.bexley.testnet
+      GUARDIAN_ID: guardian.bexley.testnet
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -37,8 +39,9 @@ jobs:
         with:
           node-version: 22
       - name: Install deploy scripts
-        working-directory: scripts
-        run: npm ci
+        run: |
+          (cd scripts && npm ci)
+          (cd agent && npm ci)
       - name: Check the secret is set
         run: |
           if [ -z "$NEAR_PRIVATE_KEY" ]; then
@@ -46,30 +49,49 @@ jobs:
             exit 1
           fi
 
-      # The first design used a test USDC token. Deals are now held in tNEAR,
-      # so the USDC account is retired and its NEAR returned to the owner.
-      - name: Retire test USDC
-        if: inputs.target == 'everything' || inputs.target == 'retire-usdc'
-        run: node scripts/retire.mjs usdc
+      - name: Owner balance
+        run: node scripts/balance.mjs
 
-      - name: Build and deploy tNEAR (test NEAR faucet token)
-        if: inputs.target == 'everything' || inputs.target == 'tnear'
+      # v1 (one-to-one deals) is replaced by the pool. Its account is deleted
+      # and its NEAR returned to the owner to pay for the new contracts.
+      - name: Retire the v1 deals contract
+        if: inputs.target == 'pool-v2'
+        run: node scripts/retire.mjs app
+
+      - name: Build and deploy xNEAR
+        if: inputs.target == 'pool-v2'
         run: |
-          (cd contracts/faucet-token && cargo near build non-reproducible-wasm)
-          WASM=$(find target/near -name 'faucet_token.wasm' | head -1)
-          node scripts/deploy.mjs tnear "$WASM" new \
-            '{"name":"Bexley Test NEAR","symbol":"tNEAR","decimals":24,"faucet_amount":"100000000000000000000000000"}'
+          (cd contracts/xtoken && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'xtoken.wasm' | head -1)
+          INIT=$(jq -nc --arg c "$POOL_ID" '{controller:$c, name:"Bexley Leveraged NEAR", symbol:"xNEAR", decimals:24}')
+          node scripts/deploy.mjs xnear "$WASM" new "$INIT"
 
-      - name: Build and deploy Bexley core
-        if: inputs.target == 'everything' || inputs.target == 'core'
+      - name: Build and deploy the Bexley pool (bxUSD)
+        if: inputs.target == 'pool-v2' || inputs.target == 'pool-code-only'
         run: |
           (cd contracts/bexley && cargo near build non-reproducible-wasm)
           WASM=$(find target/near -name 'bexley.wasm' | head -1)
-          # Deal lengths: 10 min, 1 hour, 1 day, 7 days, 14 days, 30 days.
-          INIT=$(jq -nc --arg asset "$TNEAR_ID" --arg owner "$NEAR_ACCOUNT_ID" \
-            '{asset:$asset, asset_decimals:24, agent:$owner, price_feeder:$owner, fee_bps:1000,
-              min_deposit:"100000000000000000000000", durations:[600,3600,86400,604800,1209600,2592000]}')
-          echo "Init: $INIT"
-          node scripts/deploy.mjs app "$WASM" new "$INIT"
-          # Let the core contract hold tNEAR.
-          node scripts/call.mjs "$TNEAR_ID" register "{\"account_id\":\"$APP_ID\"}"
+          INIT=$(jq -nc --arg a "$TNEAR_ID" --arg x "$XNEAR_ID" --arg g "$GUARDIAN_ID" \
+            '{asset:$a, xtoken:$x, guardian:$g, price_feeder:$g}')
+          node scripts/deploy.mjs pool "$WASM" new "$INIT"
+
+      - name: Let the pool hold tNEAR and xNEAR
+        if: inputs.target == 'pool-v2'
+        run: |
+          node scripts/call.mjs "$TNEAR_ID" register "{\"account_id\":\"$POOL_ID\"}"
+          node scripts/call.mjs "$XNEAR_ID" register "{\"account_id\":\"$POOL_ID\"}"
+
+      - name: Set up the Pool Guardian account
+        if: inputs.target == 'pool-v2'
+        working-directory: agent
+        env:
+          APP_ID: pool.bexley.testnet
+          AGENT_ID: guardian.bexley.testnet
+        run: node setup.mjs
+
+      - name: Build and deploy tNEAR (code only)
+        if: inputs.target == 'tnear'
+        run: |
+          (cd contracts/faucet-token && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'faucet_token.wasm' | head -1)
+          node scripts/deploy.mjs tnear "$WASM" -

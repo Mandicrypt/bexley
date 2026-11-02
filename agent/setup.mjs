@@ -1,23 +1,25 @@
-// One-time setup of the agent account, run by the owner.
+// One-time setup of the Pool Guardian account, run by the owner.
 //
-// Creates agent.bexley.testnet with NO full-access key. Its only key is a
-// function-call key that can call match_deal, set_price and settle on the
-// Bexley contract, with a small gas allowance. So even if the agent's key
-// leaked, it could not send anyone's money anywhere.
+// Creates guardian.bexley.testnet with NO full-access key. Its only key is a
+// function-call key that can call the Guardian's methods on the Bexley pool
+// (prices, fee level, notes, stabilize, rebalance, execute orders), with a
+// small gas allowance. So even if its key leaked, it could not send anyone's
+// money anywhere: none of those methods move funds to the caller, and the
+// contract checks every rule itself.
 //
-// Then makes that account the contract's agent and price feeder.
+// Then makes that account the pool's Guardian and price feeder.
 // Safe to run again: it skips what is already done.
 
 import { Account, JsonRpcProvider, PublicKey, actions, nearToYocto } from 'near-api-js';
 import { deriveAgentKey } from './key.mjs';
 
 const OWNER_ID = process.env.NEAR_ACCOUNT_ID || 'bexley.testnet';
-const APP_ID = process.env.APP_ID || 'app.bexley.testnet';
-const AGENT_ID = process.env.AGENT_ID || `agent.${OWNER_ID}`;
+const APP_ID = process.env.APP_ID || 'pool.bexley.testnet';
+const AGENT_ID = process.env.AGENT_ID || `guardian.${OWNER_ID}`;
 const RPC = process.env.NEAR_RPC_URL || 'https://rpc.testnet.near.org';
 const OWNER_KEY = process.env.NEAR_PRIVATE_KEY?.trim();
 const FUND = process.env.AGENT_FUND_NEAR || '0.5';
-const ALLOWED = ['match_deal', 'set_price', 'settle'];
+const ALLOWED = ['set_price', 'set_fee_level', 'post_note', 'stabilize', 'rebalance', 'execute_order'];
 
 if (!OWNER_KEY) {
   console.error('Missing NEAR_PRIVATE_KEY');
@@ -68,12 +70,12 @@ if (keys.keys.some((k) => k.access_key.permission === 'FullAccess')) {
 }
 
 const config = await provider.callFunction({ contractId: APP_ID, method: 'get_config', args: {} });
-if (config.agent !== AGENT_ID) {
-  await owner.callFunction({ contractId: APP_ID, methodName: 'set_agent', args: { agent: AGENT_ID } });
-  console.log(`Set agent to ${AGENT_ID}.`);
+if (config.guardian !== AGENT_ID) {
+  await owner.callFunction({ contractId: APP_ID, methodName: 'set_guardian', args: { guardian: AGENT_ID } });
+  console.log(`Set guardian to ${AGENT_ID}.`);
 }
 if (config.price_feeder !== AGENT_ID) {
   await owner.callFunction({ contractId: APP_ID, methodName: 'set_price_feeder', args: { price_feeder: AGENT_ID } });
   console.log(`Set price feeder to ${AGENT_ID}.`);
 }
-console.log('Agent setup done.');
+console.log('Guardian setup done.');

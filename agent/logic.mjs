@@ -1,100 +1,102 @@
-// Bexley agent: the decision logic. Pure functions, no network, so they can
-// be tested on their own. The contract re-checks every rule, so a mistake
-// here can only cause a refused call, never an unfair match.
-
-/** Margin an offer must lock for a deposit: deposit / cover, rounded up. */
-export function requiredMargin(amount, maxCover) {
-  const a = BigInt(amount);
-  const c = BigInt(maxCover);
-  return (a + c - 1n) / c;
-}
-
-/** Can this offer take this saving right now? */
-export function eligible(save, offer, freeMargin) {
-  return (
-    save.owner !== offer.owner &&
-    offer.durations.includes(save.duration_secs) &&
-    offer.rate_bps >= save.min_rate_bps &&
-    freeMargin >= requiredMargin(save.amount, offer.max_cover)
-  );
-}
+// Pool Guardian: decision logic. Pure functions, no network, so they can be
+// tested on their own. The contract re-checks everything the Guardian does,
+// so a mistake here can only cause a refused call, never a loss.
 
 /**
- * Rank the eligible offers for one saving, best first.
- * 1. Highest rate: the saver earns the most.
- * 2. Lowest cover: more margin per token deposited, so the saver is safer.
- * 3. Oldest offer: first come, first served.
- */
-export function rankOffers(save, offers, freeMargins) {
-  return offers
-    .filter((o) => eligible(save, o, freeMargins.get(o.id)))
-    .sort(
-      (a, b) =>
-        b.rate_bps - a.rate_bps ||
-        a.max_cover - b.max_cover ||
-        Number(BigInt(a.created_at) - BigInt(b.created_at)) ||
-        a.id - b.id,
-    );
-}
-
-/**
- * Plan matches for all open savings, oldest saving first. Offers' free margin
- * is used up as matches are planned, so one offer is never over-committed.
- * Returns [{saveId, offerId, rateBps, reason, alternatives}] and the savings
- * left unmatched with why.
- */
-export function planMatches(saves, offers) {
-  const freeMargins = new Map(offers.map((o) => [o.id, BigInt(o.margin_available)]));
-  const ordered = [...saves].sort(
-    (a, b) => Number(BigInt(a.created_at) - BigInt(b.created_at)) || a.id - b.id,
-  );
-  const matches = [];
-  const unmatched = [];
-  for (const save of ordered) {
-    const ranked = rankOffers(save, offers, freeMargins);
-    if (ranked.length === 0) {
-      unmatched.push({ saveId: save.id, reason: whyNoMatch(save, offers, freeMargins) });
-      continue;
-    }
-    const best = ranked[0];
-    freeMargins.set(best.id, freeMargins.get(best.id) - requiredMargin(save.amount, best.max_cover));
-    matches.push({
-      saveId: save.id,
-      offerId: best.id,
-      rateBps: best.rate_bps,
-      reason: `best of ${ranked.length} eligible offer(s): ${(best.rate_bps / 100).toFixed(2)}% a year, cover ${best.max_cover}`,
-      alternatives: ranked.length - 1,
-    });
-  }
-  return { matches, unmatched };
-}
-
-function whyNoMatch(save, offers, freeMargins) {
-  const others = offers.filter((o) => o.owner !== save.owner);
-  if (others.length === 0) return 'no offers from other people';
-  const length = others.filter((o) => o.durations.includes(save.duration_secs));
-  if (length.length === 0) return 'no offer accepts this deal length';
-  const rate = length.filter((o) => o.rate_bps >= save.min_rate_bps);
-  if (rate.length === 0) return 'no offer meets the minimum rate';
-  return 'offers do not have enough free margin';
-}
-
-/**
- * Post a new price when there is none, it has moved by at least `moveBps`,
- * or the last post is older than `maxAgeMs` (the contract refuses prices
- * older than an hour, so this keeps it fresh).
+ * Post a new price when there is none, it moved by at least `moveBps`, or the
+ * last post is older than `maxAgeMs` (the pool refuses prices over an hour old).
  */
 export function shouldPostPrice(onchain, newPrice, nowMs, { moveBps = 10, maxAgeMs = 20 * 60_000 } = {}) {
   const current = BigInt(onchain.price);
   if (current === 0n) return true;
-  const ageMs = nowMs - Number(BigInt(onchain.updated_at) / 1_000_000n);
+  const ageMs = nowMs - Number(BigInt(onchain.price_updated_at ?? onchain.updated_at) / 1_000_000n);
   if (ageMs >= maxAgeMs) return true;
   const diff = newPrice > current ? newPrice - current : current - newPrice;
   return diff * 10_000n >= current * BigInt(moveBps);
 }
 
-/** Dollars (number) to the contract's micro-dollars (bigint). */
+/** Dollars (number) to micro-dollars (bigint). */
 export function toMicroUsd(usd) {
   if (!(usd > 0) || !Number.isFinite(usd)) throw new Error(`Bad price: ${usd}`);
   return BigInt(Math.round(usd * 1_000_000));
+}
+
+/**
+ * Fee level from how much NEAR moved in the last 24 hours:
+ * under 5% calm (normal fees), 5-10% volatile (2x), over 10% stormy (3x).
+ * Higher fees in rough markets slow down churn and pay the Stability Pool
+ * more for the extra risk it carries.
+ */
+export function feeLevelFor(change24hPct) {
+  const m = Math.abs(Number(change24hPct) || 0);
+  if (m >= 10) return 2;
+  if (m >= 5) return 1;
+  return 0;
+}
+
+const LEVEL_WORDS = ['calm', 'volatile', 'stormy'];
+
+export function feeReason(level, change24hPct) {
+  const c = Number(change24hPct || 0).toFixed(1);
+  if (level === 0) return `NEAR moved ${c}% in 24h. Markets are calm, so fees are back to normal.`;
+  return `NEAR moved ${c}% in 24h, so the market is ${LEVEL_WORDS[level]}. Fees are now ${level + 1}x to slow churn and pay the Stability Pool more for the extra risk.`;
+}
+
+/** "167%" from basis points (string or bigint). */
+export function pct(bps) {
+  return `${(Number(BigInt(bps)) / 100).toFixed(0)}%`;
+}
+
+export function times(bps) {
+  return `${(Number(BigInt(bps)) / 10_000).toFixed(2)}x`;
+}
+
+/**
+ * What to do this tick, from the pool's state. Returns a list of actions in
+ * order: price first (everything else needs a fresh price), then protection,
+ * then vaults and orders.
+ */
+export function plan({ pool, vaults, triggered, newPrice, change24h, nowMs }) {
+  const actions = [];
+  if (newPrice != null && shouldPostPrice(pool, newPrice, nowMs)) {
+    actions.push({ type: 'set_price', price: newPrice });
+  }
+  if (change24h != null) {
+    const level = feeLevelFor(change24h);
+    if (level !== pool.fee_level) actions.push({ type: 'set_fee_level', level, reason: feeReason(level, change24h) });
+  }
+  if (pool.mode === 'Stabilize' && BigInt(pool.stability_pool.bx) > 0n) {
+    actions.push({ type: 'stabilize' });
+  }
+  for (const v of vaults) {
+    if (v.needs_rebalance) actions.push({ type: 'rebalance', vault: v.id });
+  }
+  for (const o of triggered) actions.push({ type: 'execute_order', order_id: o.id });
+  return actions;
+}
+
+/** A plain-English pool check, posted when the mode changes or every few hours. */
+export function statusNote(pool, change24h) {
+  const backing = BigInt(pool.cr_bps) === 0n ? 'no bxUSD yet' : `backing ${pct(pool.cr_bps)}`;
+  const lev = BigInt(pool.x_supply) === 0n ? 'no xNEAR yet' : `xNEAR at ${times(pool.leverage_bps)}`;
+  const price = `NEAR $${(Number(BigInt(pool.price)) / 1e6).toFixed(3)}${change24h != null ? ` (${change24h >= 0 ? '+' : ''}${Number(change24h).toFixed(1)}% today)` : ''}`;
+  const state = {
+    Healthy: 'All healthy.',
+    Caution: 'Caution: fees now favor minting xNEAR and redeeming bxUSD to rebuild backing.',
+    Stabilize: 'Protecting bxUSD: new bxUSD and xNEAR exits are paused, and the Stability Pool is absorbing risk.',
+  }[pool.mode];
+  return `Pool check: ${price}, ${backing}, ${lev}. ${state}`;
+}
+
+/** Post a status note if the mode changed since the last one, or it is old. */
+export function shouldPostStatus(notes, mode, nowMs, everyMs = 6 * 3600_000) {
+  const last = notes.find((n) => n.kind === 'watch');
+  if (!last) return true;
+  const ageMs = nowMs - Number(BigInt(last.at) / 1_000_000n);
+  if (ageMs >= everyMs) return true;
+  return !last.text.includes(modeWord(mode));
+}
+
+function modeWord(mode) {
+  return { Healthy: 'All healthy', Caution: 'Caution', Stabilize: 'Protecting bxUSD' }[mode];
 }
