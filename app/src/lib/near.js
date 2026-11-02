@@ -1,16 +1,22 @@
 // Talking to NEAR: reading contract data and sending transactions.
 
 import { NearConnector } from '@hot-labs/near-connect';
-import { JsonRpcProvider } from 'near-api-js';
+import { FailoverRpcProvider, JsonRpcProvider } from 'near-api-js';
 
 export const NETWORK = 'testnet';
 export const APP_ID = 'app.bexley.testnet';
 export const TOKEN_ID = 'tnear.bexley.testnet';
-export const RPC_URL = 'https://rpc.testnet.near.org';
+// Several public testnet RPCs: the NEAR-run one rate-limits busy pages, so
+// the app tries FastNEAR first and falls back to the others.
+export const RPC_URLS = [
+  'https://test.rpc.fastnear.com',
+  'https://near-testnet.lava.build',
+  'https://rpc.testnet.near.org',
+];
 export const EXPLORER = 'https://testnet.nearblocks.io';
 
 const TGAS = 1_000_000_000_000n;
-const provider = new JsonRpcProvider({ url: RPC_URL });
+const provider = new FailoverRpcProvider(RPC_URLS.map((url) => new JsonRpcProvider({ url })));
 
 export const view = (contractId, method, args = {}) => provider.callFunction({ contractId, method, args });
 export const viewApp = (method, args) => view(APP_ID, method, args);
@@ -47,6 +53,7 @@ export function getConnector() {
   if (!connector) {
     connector = new NearConnector({
       network: NETWORK,
+      providers: { testnet: RPC_URLS },
       features: { testnet: true, signAndSendTransaction: true },
       footerBranding: null,
     });

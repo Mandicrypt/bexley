@@ -8,7 +8,7 @@ import {
 } from './lib/format.mjs';
 import { rankOffers } from '../../agent/logic.mjs';
 
-const REFRESH_MS = 10_000;
+const REFRESH_MS = 15_000;
 
 export default function App() {
   const [market, setMarket] = useState(null);
@@ -162,7 +162,7 @@ function Header({ accountId, me, onConnect, onDisconnect, run, busy }) {
               title={canClaim ? 'Get 100 free test tNEAR' : `You can claim again in ${me ? timeLeft(me.nextClaimAt) : '…'}`}
               onClick={() => run('claim', claimTokens, '100 tNEAR added to your wallet.')}
             >
-              {busy === 'claim' ? 'Claiming…' : canClaim ? 'Get 100 tNEAR' : `Next claim ${me ? timeLeft(me.nextClaimAt) : ''}`}
+              {busy === 'claim' ? 'Claiming…' : !me ? 'Get 100 tNEAR' : canClaim ? 'Get 100 tNEAR' : `Next claim in ${timeLeft(me.nextClaimAt)}`}
             </button>
             <button className="btn ghost small" onClick={onDisconnect} title="Disconnect wallet">
               {shortAccount(accountId)}
@@ -220,7 +220,7 @@ function Stats({ market, error }) {
         <div className="k">NEAR price</div>
         <div className="v num">{p && BigInt(p.price) > 0n ? formatUsd(p.price, 3) : '—'}</div>
         <div className="s">
-          <span className={`dot${fresh ? '' : ' off'}`} />
+          <span className={`dot${fresh && !error ? '' : ' off'}`} />
           {error ? error : fresh ? 'Live, posted by the agent' : 'Waiting for a fresh price'}
         </div>
       </div>
@@ -311,6 +311,7 @@ function SavePanel({ market, me, accountId, onConnect, run, busy }) {
   let problem = '';
   if (!amount) problem = 'Enter an amount.';
   else if (amount < minDeposit) problem = `The minimum is ${formatAmount(minDeposit)} tNEAR.`;
+  else if (accountId && !me) problem = 'Loading your wallet balance…';
   else if (accountId && amount > wallet) problem = 'That is more tNEAR than your wallet holds. Use "Get 100 tNEAR" at the top.';
   else if (minRate == null) problem = 'Enter a minimum rate between 0% and 500%.';
 
@@ -391,6 +392,7 @@ function RiskPanel({ market, me, accountId, onConnect, run, busy }) {
   let problem = '';
   if (!amount) problem = 'Enter your margin.';
   else if (amount < minDeposit) problem = `The minimum is ${formatAmount(minDeposit)} tNEAR.`;
+  else if (accountId && !me) problem = 'Loading your wallet balance…';
   else if (accountId && amount > wallet) problem = 'That is more tNEAR than your wallet holds. Use "Get 100 tNEAR" at the top.';
   else if (rate == null || rate === 0) problem = 'Enter a rate above 0%.';
   else if (lengths.length === 0) problem = 'Pick at least one deal length.';
