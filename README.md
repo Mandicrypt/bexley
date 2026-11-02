@@ -15,7 +15,7 @@ Work in progress. This README only describes what works today.
 
 | Part | Status |
 |---|---|
-| Test USDC token (`contracts/test-usdc`) | Written and unit-tested. Not deployed yet. |
+| Test USDC token (`contracts/test-usdc`) | Live on testnet at [`usdc.bexley.testnet`](https://testnet.nearblocks.io/address/usdc.bexley.testnet). |
 | Bexley core contract | Not started |
 | AI matching agent | Not started |
 | Web app | Not started |
