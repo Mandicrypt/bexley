@@ -1,29 +1,33 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  APP_ID, EXPLORER, TOKEN_ID, connect, disconnect, currentAccount, getConnector, loadMarket, loadAccount,
-  claimTokens, createSave, createOffer, cancelSave, takeOffer, closeOffer, settleDeal, withdraw, errorText,
+  EXPLORER, GUARDIAN_ID, POOL_ID, XNEAR_ID, TNEAR_ID, connect, disconnect, currentAccount, getConnector, loadPool, loadAccount,
+  quote, claimTnear, mintBx, mintX, redeemBx, redeemX, spDeposit, spWithdraw, vaultDeposit, vaultWithdraw, placeOrder,
+  cancelOrder, claimStuck, errorText,
 } from './lib/near.js';
 import {
-  parseAmount, formatAmount, formatUsd, usdValue, formatRate, parseRate, lengthLabel, grownAmount, timeLeft, shortAccount,
+  parseAmount, formatAmount, formatUsd, usdValue, formatTimes, formatBacking, timeAgo, timeLeft, shortAccount, parseUsdPrice,
 } from './lib/format.mjs';
-import { rankOffers } from '../../agent/logic.mjs';
 
 const REFRESH_MS = 15_000;
+const SLIPPAGE_BPS = 100n; // accept up to 1% less than quoted
+
+const money = (units, places = 2) => `$${formatAmount(units ?? 0, places)}`;
+const withSlippage = (v) => (v ? (BigInt(v) * (10_000n - SLIPPAGE_BPS)) / 10_000n : null);
 
 export default function App() {
-  const [market, setMarket] = useState(null);
+  const [pool, setPool] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [accountId, setAccountId] = useState(null);
   const [me, setMe] = useState(null);
-  const [tab, setTab] = useState('save');
+  const [tab, setTab] = useState('mint');
   const [busy, setBusy] = useState('');
   const [toast, setToast] = useState(null);
 
   const refresh = useCallback(async () => {
     try {
-      setMarket(await loadMarket());
+      setPool(await loadPool());
       setLoadError('');
-    } catch (e) {
+    } catch {
       setLoadError('Could not reach NEAR testnet. Retrying…');
     }
     if (accountId) {
@@ -32,9 +36,7 @@ export default function App() {
       } catch {
         /* keep the last good data */
       }
-    } else {
-      setMe(null);
-    }
+    } else setMe(null);
   }, [accountId]);
 
   useEffect(() => {
@@ -62,7 +64,6 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  /** Run a wallet action with a busy state, a result message and a refresh. */
   const run = useCallback(
     async (key, fn, success) => {
       setBusy(key);
@@ -81,43 +82,56 @@ export default function App() {
 
   const onConnect = () => connect().catch((e) => setToast({ text: errorText(e), bad: true }));
   const onDisconnect = () => disconnect().then(() => setAccountId(null));
-
-  const counts = me
-    ? {
-        mine:
-          me.saves.filter((s) => s.status === 'Open').length +
-          me.deals.filter((d) => d.status === 'Active').length,
-      }
-    : { mine: 0 };
+  const ctx = { pool, me, accountId, onConnect, run, busy };
+  const stuck = me && (BigInt(me.claim_tnear) > 0n || BigInt(me.claim_xnear) > 0n);
+  const latest = pool?.notes?.[0];
 
   return (
     <>
-      <Header accountId={accountId} me={me} onConnect={onConnect} onDisconnect={onDisconnect} run={run} busy={busy} />
+      <Header {...ctx} onDisconnect={onDisconnect} />
       <main className="wrap">
         {!accountId && <Hero onConnect={onConnect} />}
-        <Stats market={market} error={loadError} />
+        <Stats pool={pool} error={loadError} />
+        {latest && (
+          <button className="latest" onClick={() => setTab('guardian')}>
+            <span className="tag ink">Guardian</span>
+            <span className="latest-text">{latest.text}</span>
+            <span className="hint">{timeAgo(latest.at)}</span>
+          </button>
+        )}
+        {stuck && (
+          <div className="note warn banner">
+            A transfer to your wallet didn't go through, so Bexley is holding it for you.
+            <button className="btn small" disabled={busy === 'stuck'} onClick={() => run('stuck', claimStuck, 'Sent again.')}>
+              Send it again
+            </button>
+          </div>
+        )}
         <nav className="tabs" role="tablist" aria-label="Bexley sections">
           {[
-            ['save', 'Save'],
-            ['risk', 'Take risk'],
-            ['mine', 'My deals', counts.mine],
-            ['market', 'Market'],
-          ].map(([id, label, n]) => (
+            ['mint', 'Mint'],
+            ['redeem', 'Redeem'],
+            ['earn', 'Earn'],
+            ['vaults', 'Vaults'],
+            ['orders', 'Orders'],
+            ['guardian', 'Guardian'],
+          ].map(([id, label]) => (
             <button key={id} role="tab" className="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
               {label}
-              {n ? <span className="count">{n}</span> : null}
             </button>
           ))}
         </nav>
-        {tab === 'save' && <SavePanel market={market} me={me} accountId={accountId} onConnect={onConnect} run={run} busy={busy} />}
-        {tab === 'risk' && <RiskPanel market={market} me={me} accountId={accountId} onConnect={onConnect} run={run} busy={busy} />}
-        {tab === 'mine' && <MyDeals market={market} me={me} accountId={accountId} onConnect={onConnect} run={run} busy={busy} />}
-        {tab === 'market' && <Market market={market} />}
+        {tab === 'mint' && <Mint {...ctx} />}
+        {tab === 'redeem' && <Redeem {...ctx} />}
+        {tab === 'earn' && <Earn {...ctx} />}
+        {tab === 'vaults' && <Vaults {...ctx} />}
+        {tab === 'orders' && <Orders {...ctx} />}
+        {tab === 'guardian' && <Guardian pool={pool} />}
       </main>
       <footer>
         <div className="wrap">
-          Bexley runs on NEAR testnet with tNEAR, a free test token with no real value. Contract:{' '}
-          <a href={`${EXPLORER}/address/${APP_ID}`} target="_blank" rel="noreferrer">{APP_ID}</a>. Built for the NEAR Hackathon.
+          Bexley runs on NEAR testnet with tNEAR, a free test token with no real value. Pool:{' '}
+          <a href={`${EXPLORER}/address/${POOL_ID}`} target="_blank" rel="noreferrer">{POOL_ID}</a>. Built for the NEAR Hackathon.
         </div>
       </footer>
       {toast && (
@@ -129,7 +143,7 @@ export default function App() {
   );
 }
 
-// ---------- Pieces ----------
+// ---------- Shared pieces ----------
 
 function Logo({ size = 28 }) {
   return (
@@ -154,15 +168,15 @@ function Header({ accountId, me, onConnect, onDisconnect, run, busy }) {
         {accountId ? (
           <div className="who">
             <span className="bal">
-              Wallet: <b className="num">{me ? formatAmount(me.tokenBalance) : '…'}</b> tNEAR
+              <b className="num">{me ? formatAmount(me.tnear) : '…'}</b> tNEAR · <b className="num">{me ? formatAmount(me.bx) : '…'}</b> bxUSD ·{' '}
+              <b className="num">{me ? formatAmount(me.xnear) : '…'}</b> xNEAR
             </span>
             <button
               className="btn green small"
-              disabled={!canClaim || busy === 'claim'}
-              title={canClaim ? 'Get 100 free test tNEAR' : `You can claim again in ${me ? timeLeft(me.nextClaimAt) : '…'}`}
-              onClick={() => run('claim', claimTokens, '100 tNEAR added to your wallet.')}
+              disabled={(me && !canClaim) || busy === 'claim'}
+              onClick={() => run('claim', claimTnear, '100 tNEAR added to your wallet.')}
             >
-              {busy === 'claim' ? 'Claiming…' : !me ? 'Get 100 tNEAR' : canClaim ? 'Get 100 tNEAR' : `Next claim in ${timeLeft(me.nextClaimAt)}`}
+              {busy === 'claim' ? 'Claiming…' : !me || canClaim ? 'Get 100 tNEAR' : `Next claim in ${timeLeft(me.nextClaimAt)}`}
             </button>
             <button className="btn ghost small" onClick={onDisconnect} title="Disconnect wallet">
               {shortAccount(accountId)}
@@ -183,11 +197,11 @@ function Hero({ onConnect }) {
     <section className="hero">
       <div>
         <h1>
-          Keep your dollars safe, or <em>take the upside</em>.
+          One pool of NEAR. <em>Two ways to hold it.</em>
         </h1>
         <p>
-          Bexley pairs savers and risk-takers in one pool on NEAR. Savers lock in the dollar value of their deposit plus a fixed rate.
-          Risk-takers pay that rate and take the price move, with leverage. An AI agent finds each saver the best offer.
+          Bexley splits NEAR into bxUSD, a stablecoin worth $1, and xNEAR, leveraged NEAR that takes the swings. An AI Guardian runs the
+          pool's safety work around the clock and explains every move.
         </p>
         <button className="btn green" onClick={onConnect}>
           Connect a testnet wallet
@@ -195,49 +209,55 @@ function Hero({ onConnect }) {
       </div>
       <div className="sides">
         <div className="side">
-          <b>Savers</b>
-          <span className="hint">Your deposit keeps its dollar value and earns a fixed rate. Risk-takers' margin pays you first if the price falls.</span>
+          <b>bxUSD</b>
+          <span className="hint">Stays at $1. Put it in the Stability Pool to earn 80% of the pool's fees.</span>
         </div>
         <div className="side">
-          <b>Risk-takers</b>
-          <span className="hint">Put up margin, pay savers a rate, and keep the gains when NEAR rises, up to 11x exposure.</span>
+          <b>xNEAR</b>
+          <span className="hint">Leveraged NEAR with no liquidations. Or pick a Steady 2x or 3x vault and let it hold its leverage.</span>
         </div>
         <div className="side">
-          <b>The agent</b>
-          <span className="hint">Matches each saving with its best offer and settles deals on time. Its key can't move funds.</span>
+          <b>AI Pool Guardian</b>
+          <span className="hint">Posts prices, tunes fees to the market, protects bxUSD and runs your stop-losses. Its key can't move funds.</span>
         </div>
       </div>
     </section>
   );
 }
 
-function Stats({ market, error }) {
-  const p = market?.price;
-  const fresh = p?.fresh;
+const MODE_TEXT = {
+  Healthy: 'Healthy',
+  Caution: 'Caution',
+  Stabilize: 'Protecting bxUSD',
+};
+
+function Stats({ pool, error }) {
+  const s = pool?.state;
+  const noX = s && BigInt(s.x_supply) === 0n;
   return (
-    <section className="stats" aria-label="Bexley numbers">
+    <section className="stats" aria-label="Pool numbers">
       <div className="stat">
         <div className="k">NEAR price</div>
-        <div className="v num">{p && BigInt(p.price) > 0n ? formatUsd(p.price, 3) : '—'}</div>
+        <div className="v num">{s && BigInt(s.price) > 0n ? formatUsd(s.price, 3) : '—'}</div>
         <div className="s">
-          <span className={`dot${fresh && !error ? '' : ' off'}`} />
-          {error ? error : fresh ? 'Live, posted by the agent' : 'Waiting for a fresh price'}
+          <span className={`dot${s?.price_fresh && !error ? '' : ' off'}`} />
+          {error || (s?.price_fresh ? 'Live, from the Guardian' : 'Waiting for a fresh price')}
         </div>
       </div>
       <div className="stat">
-        <div className="k">Matched volume</div>
-        <div className="v num">{market ? formatAmount(market.stats.matched_volume, 0) : '—'}</div>
-        <div className="s">tNEAR in deals</div>
+        <div className="k">xNEAR</div>
+        <div className="v num">{s ? formatUsd(s.x_price, 4) : '—'}</div>
+        <div className="s">{s ? (noX ? 'Be the first to mint' : `${formatTimes(s.leverage_bps)} leverage`) : ' '}</div>
       </div>
       <div className="stat">
-        <div className="k">Deals</div>
-        <div className="v num">{market ? market.stats.deals : '—'}</div>
-        <div className="s">{market ? `${market.stats.deals_settled} settled` : ' '}</div>
+        <div className="k">Backing</div>
+        <div className="v num">{s ? formatBacking(s.cr_bps) : '—'}</div>
+        <div className="s">{s ? <span className={`mode ${s.mode}`}>{MODE_TEXT[s.mode]}</span> : ' '}</div>
       </div>
       <div className="stat">
-        <div className="k">Users</div>
-        <div className="v num">{market ? market.stats.users : '—'}</div>
-        <div className="s">{market ? `${market.saves.length} waiting · ${market.offers.length} offers` : ' '}</div>
+        <div className="k">Pool value</div>
+        <div className="v num">{s ? money(s.tvl, 0) : '—'}</div>
+        <div className="s">{s ? `${money(s.bx_supply, 0)} in bxUSD` : ' '}</div>
       </div>
     </section>
   );
@@ -251,28 +271,19 @@ function ConnectFirst({ onConnect, what }) {
   );
 }
 
-function LengthChips({ durations, value, onChange, multi }) {
+function Seg({ value, onChange, options }) {
   return (
-    <div className="chips">
-      {durations.map((d) => {
-        const on = multi ? value.includes(d) : value === d;
-        return (
-          <button
-            key={d}
-            type="button"
-            className="chip"
-            aria-pressed={on}
-            onClick={() => (multi ? onChange(on ? value.filter((x) => x !== d) : [...value, d].sort((a, b) => a - b)) : onChange(d))}
-          >
-            {lengthLabel(d)}
-          </button>
-        );
-      })}
+    <div className="seg" role="radiogroup">
+      {options.map(([v, label]) => (
+        <button key={v} type="button" role="radio" aria-checked={value === v} className="segbtn" onClick={() => onChange(v)}>
+          {label}
+        </button>
+      ))}
     </div>
   );
 }
 
-function AmountInput({ id, value, onChange, max }) {
+function AmountInput({ id, value, onChange, max, unit }) {
   return (
     <div className="inputrow">
       <input id={id} inputMode="decimal" placeholder="0.0" value={value} onChange={(e) => onChange(e.target.value)} />
@@ -281,290 +292,389 @@ function AmountInput({ id, value, onChange, max }) {
           MAX
         </button>
       )}
-      <span className="unit">tNEAR</span>
+      <span className="unit">{unit}</span>
     </div>
   );
 }
 
-// ---------- Save ----------
+/** Live quote from the pool, refreshed as the amount changes. */
+function useQuote(action, amount, pool) {
+  const [q, setQ] = useState(null);
+  const key = `${action}:${amount ?? ''}:${pool?.state?.price}:${pool?.state?.fee_level}`;
+  useEffect(() => {
+    if (!amount) return setQ(null);
+    let live = true;
+    const t = setTimeout(() => {
+      quote(action, amount)
+        .then((v) => live && setQ(BigInt(v)))
+        .catch(() => live && setQ(null));
+    }, 250);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  return q;
+}
 
-function SavePanel({ market, me, accountId, onConnect, run, busy }) {
-  const durations = market?.config?.durations || [600, 3600, 86400];
-  const [amountText, setAmountText] = useState('10');
-  const [length, setLength] = useState(600);
-  const [minRateText, setMinRateText] = useState('0');
+function feeLabel(bps) {
+  return bps === 0 ? 'Free right now' : `${(bps / 100).toFixed(2)}%`;
+}
 
-  const amount = parseAmount(amountText);
-  const minRate = parseRate(minRateText);
-  const price = market ? BigInt(market.price.price) : 0n;
-  const minDeposit = market ? BigInt(market.config.min_deposit) : 0n;
-  const wallet = me ? BigInt(me.tokenBalance) : 0n;
+function Rows({ children }) {
+  return <div className="rows">{children}</div>;
+}
+function Row({ k, v, big }) {
+  return (
+    <div className={`row${big ? ' big' : ''}`}>
+      <span>{k}</span>
+      <span>{v}</span>
+    </div>
+  );
+}
 
-  // What the market would give this saving right now.
-  const best = useMemo(() => {
-    if (!market || !amount) return null;
-    const fake = { id: -1, owner: accountId || '_', amount: amount.toString(), duration_secs: length, min_rate_bps: minRate ?? 0, created_at: '0' };
-    const free = new Map(market.offers.map((o) => [o.id, BigInt(o.margin_available)]));
-    return rankOffers(fake, market.offers, free)[0] || null;
-  }, [market, amount, length, minRate, accountId]);
+// ---------- Mint ----------
+
+function Mint({ pool, me, accountId, onConnect, run, busy }) {
+  const [which, setWhich] = useState('x');
+  const [text, setText] = useState('10');
+  const s = pool?.state;
+  const amount = parseAmount(text);
+  const action = which === 'x' ? 'mint_x' : 'mint_bx';
+  const q = useQuote(action, amount, pool);
+  const fee = s ? (which === 'x' ? s.fees_bps.mint_x : s.fees_bps.mint_bx) : 0;
+  const paused = which === 'bx' && s && !s.fees_bps.mint_bx_open;
+  const noX = s && BigInt(s.x_supply) === 0n;
 
   let problem = '';
   if (!amount) problem = 'Enter an amount.';
-  else if (amount < minDeposit) problem = `The minimum is ${formatAmount(minDeposit)} tNEAR.`;
-  else if (accountId && !me) problem = 'Loading your wallet balance…';
-  else if (accountId && amount > wallet) problem = 'That is more tNEAR than your wallet holds. Use "Get 100 tNEAR" at the top.';
-  else if (minRate == null) problem = 'Enter a minimum rate between 0% and 500%.';
+  else if (accountId && !me) problem = 'Loading your wallet…';
+  else if (accountId && amount > BigInt(me.tnear)) problem = 'That is more tNEAR than your wallet holds. Use "Get 100 tNEAR" at the top.';
+  else if (paused) problem = 'New bxUSD is paused while the pool rebuilds its backing.';
+  else if (which === 'bx' && noX) problem = 'bxUSD needs xNEAR behind it first. Mint some xNEAR to start the pool.';
+  else if (s && !s.price_fresh) problem = 'Waiting for a fresh price from the Guardian.';
 
-  const dollars = amount && price ? usdValue(amount, price) : 0n;
-  const rateForPreview = best ? best.rate_bps : minRate ?? 0;
-  const grownDollars = amount && price ? usdValue(grownAmount(amount, rateForPreview, length), price) : 0n;
+  const unit = which === 'x' ? 'xNEAR' : 'bxUSD';
+  const outUsd = q != null ? (which === 'x' ? (q * BigInt(s.x_price)) / 1_000_000n : q) : null;
 
   return (
     <div className="grid2">
       <section className="card">
-        <h2>Save</h2>
-        <p className="lead">Deposit tNEAR and lock in its dollar value plus a fixed rate. If NEAR falls, a risk-taker's margin covers you.</p>
+        <h2>Mint</h2>
+        <p className="lead">Turn tNEAR into the side you want.</p>
         <div className="field">
-          <label htmlFor="save-amount">Amount</label>
-          <AmountInput id="save-amount" value={amountText} onChange={setAmountText} max={me?.tokenBalance} />
+          <Seg value={which} onChange={setWhich} options={[['x', 'xNEAR · leverage'], ['bx', 'bxUSD · stable']]} />
         </div>
         <div className="field">
-          <span className="label">Deal length</span>
-          <LengthChips durations={durations} value={length} onChange={setLength} />
-          <span className="hint">10 minutes and 1 hour are for trying Bexley quickly.</span>
+          <label htmlFor="mint-amount">You pay</label>
+          <AmountInput id="mint-amount" value={text} onChange={setText} max={me?.tnear} unit="tNEAR" />
         </div>
-        <div className="field">
-          <label htmlFor="save-rate">Lowest rate you accept (per year)</label>
-          <div className="inputrow">
-            <input id="save-rate" inputMode="decimal" value={minRateText} onChange={(e) => setMinRateText(e.target.value)} />
-            <span className="unit">%</span>
-          </div>
-          <span className="hint">The agent only matches you with offers at or above this.</span>
-        </div>
-        {problem && amountText !== '' ? <p className="err">{problem}</p> : null}
+        {problem && text !== '' ? <p className="err">{problem}</p> : null}
         {accountId ? (
           <button
             className="btn green wide"
-            disabled={!!problem || busy === 'save'}
-            onClick={() => run('save', () => createSave(amount, length, minRate), 'Saving created. The agent will match it soon, or pick an offer yourself in My deals.')}
+            disabled={!!problem || q == null || busy === 'mint'}
+            onClick={() =>
+              run('mint', () => (which === 'x' ? mintX(amount, withSlippage(q)) : mintBx(amount, withSlippage(q))), `Minted ${formatAmount(q, 4)} ${unit}.`)
+            }
           >
-            {busy === 'save' ? 'Confirm in your wallet…' : 'Save'}
+            {busy === 'mint' ? 'Confirm in your wallet…' : `Mint ${unit}`}
           </button>
         ) : (
-          <ConnectFirst onConnect={onConnect} what="save" />
+          <ConnectFirst onConnect={onConnect} what="mint" />
         )}
       </section>
       <aside className="card soft">
-        <h3>What you lock in</h3>
-        <div className="rows">
-          <div className="row"><span>NEAR price now</span><span>{price ? formatUsd(price, 3) : '—'}</span></div>
-          <div className="row"><span>Your deposit's value</span><span>{dollars ? formatUsd(dollars) : '—'}</span></div>
-          <div className="row"><span>Best offer now</span><span>{best ? `${formatRate(best.rate_bps)} a year` : 'None yet'}</span></div>
-          <div className="sep" />
-          <div className="row big"><span>Value at the end</span><span>{grownDollars ? formatUsd(grownDollars, 4) : '—'}</span></div>
-          <div className="row"><span>Paid in tNEAR at the end price</span><span>{lengthLabel(length)}</span></div>
-        </div>
+        <h3>You get</h3>
+        <Rows>
+          <Row big k={unit} v={q != null ? formatAmount(q, 4) : '—'} />
+          <Row k="Worth" v={outUsd != null ? money(outUsd) : '—'} />
+          <Row k="Fee" v={s ? feeLabel(fee) : '—'} />
+          {which === 'x' && <Row k="Leverage now" v={s ? formatTimes(s.leverage_bps) : '—'} />}
+        </Rows>
         <p className="note" style={{ marginTop: 16 }}>
-          {best
-            ? `A risk-taker is ready: ${formatRate(best.rate_bps)} a year with ${best.max_cover + 1}x exposure on their side. You'll be matched within about 15 minutes, or right away from My deals.`
-            : 'No offer fits this yet. Your saving waits safely until one does, and you can cancel any time before a match.'}
+          {which === 'x'
+            ? 'xNEAR owns everything the pool holds above the bxUSD it owes. When NEAR rises, xNEAR rises faster; when NEAR falls, it falls faster. There are no liquidations.'
+            : 'bxUSD is always redeemable for $1 of tNEAR. xNEAR holders absorb the price swings, and the Stability Pool steps in if backing falls under 130%.'}
         </p>
       </aside>
     </div>
   );
 }
 
-// ---------- Take risk ----------
+// ---------- Redeem ----------
 
-function RiskPanel({ market, me, accountId, onConnect, run, busy }) {
-  const durations = market?.config?.durations || [600, 3600, 86400];
-  const [amountText, setAmountText] = useState('20');
-  const [rateText, setRateText] = useState('10');
-  const [lengths, setLengths] = useState([600, 3600, 86400]);
-  const [cover, setCover] = useState(3);
-
-  const amount = parseAmount(amountText);
-  const rate = parseRate(rateText);
-  const price = market ? BigInt(market.price.price) : 0n;
-  const minDeposit = market ? BigInt(market.config.min_deposit) : 0n;
-  const wallet = me ? BigInt(me.tokenBalance) : 0n;
+function Redeem({ pool, me, accountId, onConnect, run, busy }) {
+  const [which, setWhich] = useState('x');
+  const [text, setText] = useState('');
+  const s = pool?.state;
+  const amount = parseAmount(text);
+  const action = which === 'x' ? 'redeem_x' : 'redeem_bx';
+  const q = useQuote(action, amount, pool);
+  const fee = s ? (which === 'x' ? s.fees_bps.redeem_x : s.fees_bps.redeem_bx) : 0;
+  const paused = which === 'x' && s && !s.fees_bps.redeem_x_open;
+  const unit = which === 'x' ? 'xNEAR' : 'bxUSD';
+  const have = me ? BigInt(which === 'x' ? me.xnear : me.bx) : 0n;
 
   let problem = '';
-  if (!amount) problem = 'Enter your margin.';
-  else if (amount < minDeposit) problem = `The minimum is ${formatAmount(minDeposit)} tNEAR.`;
-  else if (accountId && !me) problem = 'Loading your wallet balance…';
-  else if (accountId && amount > wallet) problem = 'That is more tNEAR than your wallet holds. Use "Get 100 tNEAR" at the top.';
-  else if (rate == null || rate === 0) problem = 'Enter a rate above 0%.';
-  else if (lengths.length === 0) problem = 'Pick at least one deal length.';
-
-  const capacity = amount ? amount * BigInt(cover) : 0n;
-  const exposure = cover + 1;
-  const waiting = market?.saves.filter((s) => lengths.includes(s.duration_secs) && s.min_rate_bps <= (rate ?? 0)) || [];
+  if (!amount) problem = 'Enter an amount.';
+  else if (accountId && !me) problem = 'Loading your wallet…';
+  else if (accountId && amount > have) problem = `That is more ${unit} than you hold.`;
+  else if (paused) problem = 'xNEAR exits are paused while the pool rebuilds its backing. Your xNEAR keeps its share; try again once backing is over 130%.';
+  else if (s && !s.price_fresh) problem = 'Waiting for a fresh price from the Guardian.';
 
   return (
     <div className="grid2">
       <section className="card">
-        <h2>Take risk</h2>
-        <p className="lead">Put up margin and pay savers a rate. You take the price move on the whole deal, so you gain more when NEAR rises and lose your margin first when it falls.</p>
+        <h2>Redeem</h2>
+        <p className="lead">Turn bxUSD or xNEAR back into tNEAR at fair value.</p>
         <div className="field">
-          <label htmlFor="risk-amount">Margin</label>
-          <AmountInput id="risk-amount" value={amountText} onChange={setAmountText} max={me?.tokenBalance} />
+          <Seg value={which} onChange={setWhich} options={[['x', 'xNEAR'], ['bx', 'bxUSD']]} />
         </div>
         <div className="field">
-          <label htmlFor="risk-rate">Rate you pay savers (per year)</label>
-          <div className="inputrow">
-            <input id="risk-rate" inputMode="decimal" value={rateText} onChange={(e) => setRateText(e.target.value)} />
-            <span className="unit">%</span>
-          </div>
-          <span className="hint">Higher rates win savers first.</span>
+          <label htmlFor="redeem-amount">You redeem</label>
+          <AmountInput id="redeem-amount" value={text} onChange={setText} max={have} unit={unit} />
         </div>
-        <div className="field">
-          <span className="label">Deal lengths you accept</span>
-          <LengthChips durations={durations} value={lengths} onChange={setLengths} multi />
-        </div>
-        <div className="field">
-          <span className="label">Exposure</span>
-          <div className="chips">
-            {[1, 2, 3, 5, 10].map((c) => (
-              <button key={c} type="button" className="chip" aria-pressed={cover === c} onClick={() => setCover(c)}>
-                {c + 1}x
-              </button>
-            ))}
-          </div>
-          <span className="hint">At {exposure}x, each tNEAR of margin backs {cover} tNEAR of savings.</span>
-        </div>
-        {problem && amountText !== '' ? <p className="err">{problem}</p> : null}
+        {problem && text !== '' ? <p className="err">{problem}</p> : null}
         {accountId ? (
           <button
             className="btn wide"
-            disabled={!!problem || busy === 'offer'}
-            onClick={() => run('offer', () => createOffer(amount, rate, lengths, cover), 'Offer posted. The agent will match savers to it.')}
+            disabled={!!problem || q == null || q === 0n || busy === 'redeem'}
+            onClick={() =>
+              run('redeem', () => (which === 'x' ? redeemX(amount, withSlippage(q)) : redeemBx(amount, withSlippage(q))), `Redeemed for ${formatAmount(q, 4)} tNEAR.`)
+            }
           >
-            {busy === 'offer' ? 'Confirm in your wallet…' : 'Post offer'}
+            {busy === 'redeem' ? 'Confirm in your wallet…' : `Redeem ${unit}`}
           </button>
         ) : (
-          <ConnectFirst onConnect={onConnect} what="take risk" />
+          <ConnectFirst onConnect={onConnect} what="redeem" />
         )}
       </section>
       <aside className="card soft">
-        <h3>Your offer</h3>
-        <div className="rows">
-          <div className="row"><span>Margin value</span><span>{amount && price ? formatUsd(usdValue(amount, price)) : '—'}</span></div>
-          <div className="row"><span>Savings you can back</span><span>{capacity ? `${formatAmount(capacity)} tNEAR` : '—'}</span></div>
-          <div className="row"><span>Your exposure</span><span>{exposure}x NEAR</span></div>
-          <div className="sep" />
-          <div className="row"><span>If NEAR rises 10%</span><span>≈ +{(exposure * 10).toFixed(0)}% on margin</span></div>
-          <div className="row"><span>If NEAR falls 10%</span><span>≈ −{Math.min(100, exposure * 10).toFixed(0)}% on margin</span></div>
-          <div className="row"><span>Bexley fee</span><span>10% of profit only</span></div>
-        </div>
-        <p className={`note${waiting.length ? '' : ' warn'}`} style={{ marginTop: 16 }}>
-          {waiting.length
-            ? `${waiting.length} saving${waiting.length > 1 ? 's are' : ' is'} waiting that this offer could take.`
-            : 'No savings are waiting for these terms right now. Your offer stays open until savers arrive, and you can close it any time.'}{' '}
-          Before costs, rough figures; the rate you pay savers comes out of your share.
-        </p>
+        <h3>You get</h3>
+        <Rows>
+          <Row big k="tNEAR" v={q != null ? formatAmount(q, 4) : '—'} />
+          <Row k="Worth" v={q != null && s ? money(usdValue(q, s.price)) : '—'} />
+          <Row k="Fee" v={s ? (paused ? 'Paused' : feeLabel(fee)) : '—'} />
+          <Row k={`Your ${unit}`} v={me ? formatAmount(have, 4) : '—'} />
+        </Rows>
       </aside>
     </div>
   );
 }
 
-// ---------- My deals ----------
+// ---------- Earn ----------
 
-function MyDeals({ market, me, accountId, onConnect, run, busy }) {
-  if (!accountId) return <div className="card"><h2>My deals</h2><p className="lead">Connect your wallet to see your savings, offers and deals.</p><ConnectFirst onConnect={onConnect} what="see your deals" /></div>;
-  if (!me || !market) return <p className="empty">Loading your deals…</p>;
+function Earn({ pool, me, accountId, onConnect, run, busy }) {
+  const [text, setText] = useState('');
+  const s = pool?.state;
+  const sp = s?.stability_pool;
+  const pos = me?.stability_pool;
+  const amount = parseAmount(text);
 
-  const balance = BigInt(me.balance);
-  const freeMargins = new Map(market.offers.map((o) => [o.id, BigInt(o.margin_available)]));
-  const saves = [...me.saves].sort((a, b) => b.id - a.id);
-  const offers = [...me.offers].sort((a, b) => b.id - a.id);
-  const deals = [...me.deals].sort((a, b) => b.id - a.id);
+  let problem = '';
+  if (!amount) problem = 'Enter an amount.';
+  else if (accountId && !me) problem = 'Loading your wallet…';
+  else if (accountId && amount > BigInt(me.bx)) problem = 'That is more bxUSD than you hold. Mint some first.';
 
+  const hasPos = pos && BigInt(pos.shares) > 0n;
+  return (
+    <div className="grid2">
+      <section className="card">
+        <h2>Stability Pool</h2>
+        <p className="lead">
+          Deposit bxUSD to earn 80% of every fee the pool charges. If backing ever falls under 130%, part of your bxUSD is converted
+          into xNEAR at fair value to protect the pool, and you keep that xNEAR.
+        </p>
+        <div className="field">
+          <label htmlFor="sp-amount">Deposit</label>
+          <AmountInput id="sp-amount" value={text} onChange={setText} max={me?.bx} unit="bxUSD" />
+        </div>
+        {problem && text !== '' ? <p className="err">{problem}</p> : null}
+        {accountId ? (
+          <button className="btn green wide" disabled={!!problem || busy === 'sp'} onClick={() => run('sp', () => spDeposit(amount), 'Deposited. You are now earning fees.')}>
+            {busy === 'sp' ? 'Confirm in your wallet…' : 'Deposit bxUSD'}
+          </button>
+        ) : (
+          <ConnectFirst onConnect={onConnect} what="earn" />
+        )}
+      </section>
+      <aside className="card soft">
+        <h3>Pool</h3>
+        <Rows>
+          <Row k="Total in the pool" v={sp ? money(sp.value) : '—'} />
+          <Row k="Held as bxUSD" v={sp ? formatAmount(sp.bx) : '—'} />
+          <Row k="Held as xNEAR" v={sp ? formatAmount(sp.x) : '—'} />
+          <Row k="Fees paid so far" v={s ? money(s.stats.fees_usd) : '—'} />
+        </Rows>
+        <h3 style={{ marginTop: 20 }}>Your share</h3>
+        <Rows>
+          <Row big k="Value" v={hasPos ? money(pos.value) : '—'} />
+          <Row k="bxUSD" v={hasPos ? formatAmount(pos.bx, 4) : '—'} />
+          <Row k="xNEAR" v={hasPos ? formatAmount(pos.x, 4) : '—'} />
+        </Rows>
+        {hasPos && (
+          <button className="btn ghost wide" style={{ marginTop: 16 }} disabled={busy === 'spw'} onClick={() => run('spw', spWithdraw, 'Withdrawn to your wallet.')}>
+            {busy === 'spw' ? 'Confirm in your wallet…' : 'Withdraw all'}
+          </button>
+        )}
+      </aside>
+    </div>
+  );
+}
+
+// ---------- Vaults ----------
+
+function Vaults({ pool, me, accountId, onConnect, run, busy }) {
+  if (!pool) return <p className="empty">Loading vaults…</p>;
   return (
     <div>
-      <section className="section card soft" style={{ display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <div>
-          <div className="label">Ready to withdraw</div>
-          <div className="num" style={{ fontSize: 24, fontWeight: 600 }}>{formatAmount(balance, 4)} tNEAR</div>
-          <div className="hint">Settled deals, cancelled savings and closed offers land here.</div>
+      <p className="lead">
+        xNEAR's leverage floats as the pool changes. A Steady vault holds a mix of tNEAR and xNEAR and rebalances to keep one fixed
+        leverage. The Guardian rebalances when a vault drifts more than 3%.
+      </p>
+      <div className="grid2 even">
+        {pool.vaults.map((v) => (
+          <VaultCard key={v.id} v={v} pool={pool} me={me} accountId={accountId} onConnect={onConnect} run={run} busy={busy} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
+  const [text, setText] = useState('');
+  const amount = parseAmount(text);
+  const s = pool.state;
+  const pos = me?.vaults?.find((p) => p.vault === v.id);
+  const hasPos = pos && BigInt(pos.shares) > 0n;
+  const capped = BigInt(v.value) > 0n && BigInt(v.t) === 0n;
+
+  let problem = '';
+  if (!amount) problem = 'Enter an amount.';
+  else if (accountId && !me) problem = 'Loading your wallet…';
+  else if (accountId && amount > BigInt(me.tnear)) problem = 'That is more tNEAR than your wallet holds.';
+  else if (BigInt(s.x_supply) === 0n) problem = 'The pool needs some xNEAR first.';
+
+  return (
+    <section className="card">
+      <div className="sectionhead">
+        <h2>{v.name}</h2>
+        <span className={`tag ${v.needs_rebalance ? 'red' : 'green'}`}>{v.needs_rebalance ? 'Rebalance due' : 'On target'}</span>
+      </div>
+      <Rows>
+        <Row k="Leverage now" v={BigInt(v.value) > 0n ? formatTimes(v.leverage_bps) : formatTimes(v.target_bps)} />
+        <Row k="Vault size" v={`${formatAmount(v.value)} tNEAR`} />
+        <Row k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} tNEAR · ${money(usdValue(pos.value, s.price))}` : '—'} />
+      </Rows>
+      {capped && <p className="hint">xNEAR alone is under {formatTimes(v.target_bps)} right now, so this vault holds only xNEAR.</p>}
+      <div className="field" style={{ marginTop: 16 }}>
+        <label htmlFor={`v${v.id}`}>Deposit</label>
+        <AmountInput id={`v${v.id}`} value={text} onChange={setText} max={me?.tnear} unit="tNEAR" />
+      </div>
+      {problem && text !== '' ? <p className="err">{problem}</p> : null}
+      <div className="btnrow">
+        {accountId ? (
+          <button className="btn green" disabled={!!problem || busy === `vd${v.id}`} onClick={() => run(`vd${v.id}`, () => vaultDeposit(v.id, amount), `Deposited into ${v.name}.`)}>
+            {busy === `vd${v.id}` ? 'Confirm…' : 'Deposit'}
+          </button>
+        ) : (
+          <ConnectFirst onConnect={onConnect} what="deposit" />
+        )}
+        {hasPos && (
+          <button className="btn ghost" disabled={busy === `vw${v.id}`} onClick={() => run(`vw${v.id}`, () => vaultWithdraw(v.id), 'Withdrawn to your wallet.')}>
+            {busy === `vw${v.id}` ? 'Confirm…' : 'Withdraw all'}
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ---------- Orders ----------
+
+function Orders({ pool, me, accountId, onConnect, run, busy }) {
+  const [text, setText] = useState('');
+  const [stopText, setStopText] = useState('');
+  const [takeText, setTakeText] = useState('');
+  const s = pool?.state;
+  const amount = parseAmount(text);
+  const stop = stopText ? parseUsdPrice(stopText) : null;
+  const take = takeText ? parseUsdPrice(takeText) : null;
+  const price = s ? BigInt(s.price) : 0n;
+
+  let problem = '';
+  if (!amount) problem = 'Enter how much xNEAR to protect.';
+  else if (accountId && !me) problem = 'Loading your wallet…';
+  else if (accountId && amount > BigInt(me.xnear)) problem = 'That is more xNEAR than you hold.';
+  else if (!stop && !take) problem = 'Set a stop price, a take price, or both.';
+  else if ((stopText && !stop) || (takeText && !take)) problem = 'Prices must be numbers in dollars, like 3.50.';
+  else if (stop && take && stop >= take) problem = 'The stop price must be below the take price.';
+  else if (stop && price && stop >= price) problem = 'The stop price must be below the current NEAR price.';
+  else if (take && price && take <= price) problem = 'The take price must be above the current NEAR price.';
+
+  const orders = [...(me?.orders || [])].sort((a, b) => b.id - a.id);
+  return (
+    <div className="grid2">
+      <section className="card">
+        <h2>Stop-loss and take-profit</h2>
+        <p className="lead">Park xNEAR with a NEAR price to sell at. When NEAR reaches it, the Guardian sells and sends tNEAR to your wallet. The contract checks the price, so nobody can sell early.</p>
+        <div className="field">
+          <label htmlFor="o-amount">xNEAR to protect</label>
+          <AmountInput id="o-amount" value={text} onChange={setText} max={me?.xnear} unit="xNEAR" />
         </div>
-        <button className="btn green" disabled={balance === 0n || busy === 'withdraw'} onClick={() => run('withdraw', withdraw, 'Sent to your wallet.')}>
-          {busy === 'withdraw' ? 'Confirm in your wallet…' : 'Withdraw to wallet'}
-        </button>
-      </section>
-
-      <section className="section">
-        <div className="sectionhead"><h3>Deals</h3></div>
-        {deals.length === 0 ? (
-          <p className="empty">No deals yet. Save or post an offer, and matched deals appear here.</p>
-        ) : (
-          <div className="list">
-            {deals.map((d) => (
-              <DealItem key={d.id} d={d} me={accountId} quote={me.quoteById[d.id]} run={run} busy={busy} />
-            ))}
+        <div className="two">
+          <div className="field">
+            <label htmlFor="o-stop">Sell if NEAR falls to</label>
+            <div className="inputrow">
+              <span className="unit">$</span>
+              <input id="o-stop" inputMode="decimal" placeholder="optional" value={stopText} onChange={(e) => setStopText(e.target.value)} />
+            </div>
           </div>
+          <div className="field">
+            <label htmlFor="o-take">Sell if NEAR rises to</label>
+            <div className="inputrow">
+              <span className="unit">$</span>
+              <input id="o-take" inputMode="decimal" placeholder="optional" value={takeText} onChange={(e) => setTakeText(e.target.value)} />
+            </div>
+          </div>
+        </div>
+        <p className="hint">NEAR is {s ? formatUsd(s.price, 3) : '—'} now.</p>
+        {problem && text !== '' ? <p className="err">{problem}</p> : null}
+        {accountId ? (
+          <button className="btn wide" disabled={!!problem || busy === 'order'} onClick={() => run('order', () => placeOrder(amount, stop, take), 'Order placed. The Guardian is watching it.')}>
+            {busy === 'order' ? 'Confirm in your wallet…' : 'Place order'}
+          </button>
+        ) : (
+          <ConnectFirst onConnect={onConnect} what="place orders" />
         )}
       </section>
-
-      <section className="section">
-        <div className="sectionhead"><h3>Savings</h3></div>
-        {saves.length === 0 ? (
-          <p className="empty">No savings yet.</p>
+      <aside>
+        <h3>Your orders</h3>
+        {!accountId ? (
+          <p className="empty">Connect your wallet to see your orders.</p>
+        ) : orders.length === 0 ? (
+          <p className="empty">No orders yet.</p>
         ) : (
           <div className="list">
-            {saves.map((s) => {
-              const best = s.status === 'Open' ? rankOffers(s, market.offers, freeMargins)[0] : null;
-              return (
-                <div className="item" key={s.id}>
-                  <div>
-                    <div className="title">
-                      <StatusTag status={s.status} /> {formatAmount(s.amount)} tNEAR for {lengthLabel(s.duration_secs)}
-                    </div>
-                    <div className="meta">
-                      Saving #{s.id} · lowest rate {formatRate(s.min_rate_bps)}
-                      {s.status === 'Open' && (best ? ` · best offer ${formatRate(best.rate_bps)}` : ' · waiting for an offer')}
-                      {s.deal_id != null && ` · deal #${s.deal_id}`}
-                    </div>
-                  </div>
-                  {s.status === 'Open' && (
-                    <div className="actions">
-                      {best && (
-                        <button className="btn green small" disabled={busy === `take${s.id}`} onClick={() => run(`take${s.id}`, () => takeOffer(s.id, best.id), `Matched at ${formatRate(best.rate_bps)} a year.`)}>
-                          Take {formatRate(best.rate_bps)} now
-                        </button>
-                      )}
-                      <button className="btn ghost small" disabled={busy === `cancel${s.id}`} onClick={() => run(`cancel${s.id}`, () => cancelSave(s.id), 'Cancelled. Your deposit is ready to withdraw.')}>
-                        Cancel
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      <section className="section">
-        <div className="sectionhead"><h3>Offers</h3></div>
-        {offers.length === 0 ? (
-          <p className="empty">No offers yet.</p>
-        ) : (
-          <div className="list">
-            {offers.map((o) => (
+            {orders.map((o) => (
               <div className="item" key={o.id}>
                 <div>
                   <div className="title">
-                    <StatusTag status={o.status} /> {formatRate(o.rate_bps)} a year · {o.max_cover + 1}x
+                    <span className={`tag ${o.status === 'Open' ? 'green' : o.status === 'Executed' ? 'ink' : ''}`}>{o.status}</span>
+                    {formatAmount(o.x_amount, 4)} xNEAR
                   </div>
                   <div className="meta">
-                    Offer #{o.id} · {formatAmount(o.margin_available)} of {formatAmount(o.margin_total)} tNEAR free · {o.durations.map((x) => lengthLabel(x, true)).join(', ')}
+                    {o.stop_price ? `Stop ${formatUsd(o.stop_price, 3)}` : ''}
+                    {o.stop_price && o.take_price ? ' · ' : ''}
+                    {o.take_price ? `Take ${formatUsd(o.take_price, 3)}` : ''}
+                    {o.status === 'Executed' && ` · sold at ${formatUsd(o.executed_price, 3)} for ${formatAmount(o.tnear_out, 4)} tNEAR`}
                   </div>
                 </div>
-                {o.status === 'Active' && (
+                {o.status === 'Open' && (
                   <div className="actions">
-                    <button className="btn ghost small" disabled={busy === `close${o.id}`} onClick={() => run(`close${o.id}`, () => closeOffer(o.id), 'Offer closed. Free margin is ready to withdraw.')}>
-                      Close offer
+                    <button className="btn ghost small" disabled={busy === `oc${o.id}`} onClick={() => run(`oc${o.id}`, () => cancelOrder(o.id), 'Cancelled. Your xNEAR is back.')}>
+                      Cancel
                     </button>
                   </div>
                 )}
@@ -572,136 +682,68 @@ function MyDeals({ market, me, accountId, onConnect, run, busy }) {
             ))}
           </div>
         )}
-      </section>
+      </aside>
     </div>
   );
 }
 
-function StatusTag({ status }) {
-  const cls = { Open: 'green', Active: 'green', Matched: 'ink', Settled: '', Cancelled: '', Closed: '' }[status] ?? '';
-  return <span className={`tag ${cls}`}>{status}</span>;
-}
+// ---------- Guardian ----------
 
-function DealItem({ d, me, quote, run, busy }) {
-  const saver = d.saver === me;
-  const role = saver ? 'Saver' : 'Risk-taker';
-  const active = d.status === 'Active';
-  const mineNow = quote ? (saver ? quote.saver_payout : quote.risk_taker_payout) : null;
-  const mineFinal = saver ? d.saver_payout : d.risk_taker_payout;
-  const put = saver ? d.saver_amount : d.margin;
+const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
+
+function Guardian({ pool }) {
+  if (!pool) return <p className="empty">Loading the Guardian's notes…</p>;
+  const s = pool.state;
   return (
-    <div className="item">
-      <div>
-        <div className="title">
-          <StatusTag status={d.status} />
-          {quote?.at_risk && active ? <span className="tag red">Protection</span> : null}
-          Deal #{d.id} · {role} · {formatAmount(d.saver_amount)} + {formatAmount(d.margin)} tNEAR
+    <div className="grid2">
+      <section>
+        <div className="sectionhead">
+          <h2>What the Guardian did</h2>
+          <span className="hint">Written on-chain, newest first</span>
         </div>
-        <div className="meta">
-          {formatRate(d.rate_bps)} a year · {lengthLabel(d.duration_secs)} · entry {formatUsd(d.entry_price, 3)}
-          {active ? ` · ${timeLeft(d.end_at)} left` : d.exit_price ? ` · exit ${formatUsd(d.exit_price, 3)}${d.settled_early ? ' (settled early)' : ''}` : ''}
-        </div>
-        <div className="meta">
-          You put in <span className="num">{formatAmount(put, 4)}</span> ·{' '}
-          {active
-            ? mineNow != null
-              ? <>if settled now you get <span className="num">{formatAmount(mineNow, 4)}</span> tNEAR</>
-              : 'waiting for a price'
-            : <>you got <span className="num">{formatAmount(mineFinal, 4)}</span> tNEAR</>}
-        </div>
-      </div>
-      {active && quote?.can_settle && (
-        <div className="actions">
-          <button className="btn green small" disabled={busy === `settle${d.id}`} onClick={() => run(`settle${d.id}`, () => settleDeal(d.id), 'Deal settled. Your share is ready to withdraw.')}>
-            Settle now
-          </button>
-        </div>
-      )}
+        {pool.notes.length === 0 ? (
+          <p className="empty">No notes yet. The Guardian runs every 15 minutes.</p>
+        ) : (
+          <ol className="notes">
+            {pool.notes.map((n) => (
+              <li key={n.id}>
+                <div className="notehead">
+                  <span className={`tag ${n.kind === 'protect' ? 'red' : n.kind === 'watch' ? '' : 'green'}`}>{KIND_LABEL[n.kind] || n.kind}</span>
+                  <span className="hint">{timeAgo(n.at)}</span>
+                </div>
+                <p>{n.text}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+      <aside className="card soft">
+        <h3>How it works</h3>
+        <p className="hint">Every 15 minutes the Guardian reads NEAR's price from three sources, then:</p>
+        <ul className="plain">
+          <li>posts the price on-chain</li>
+          <li>sets fees from the 24-hour move: normal under 5%, 2x at 5–10%, 3x above 10%</li>
+          <li>protects bxUSD if backing falls under 130%</li>
+          <li>rebalances Steady vaults that drifted</li>
+          <li>runs stop-loss and take-profit orders</li>
+        </ul>
+        <Rows>
+          <Row k="Fee level now" v={['Calm (1x)', 'Volatile (2x)', 'Stormy (3x)'][s.fee_level]} />
+          <Row k="Protections run" v={s.stats.stabilizations} />
+          <Row k="Rebalances" v={s.stats.rebalances} />
+          <Row k="Orders run" v={s.stats.orders_executed} />
+        </Rows>
+        <p className="note" style={{ marginTop: 16 }}>
+          It can't move anyone's money. Its account,{' '}
+          <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>, only has a key for those six jobs, and the pool
+          contract checks every rule itself.
+        </p>
+        <p className="hint" style={{ marginTop: 12 }}>
+          Tokens: <a href={`${EXPLORER}/address/${XNEAR_ID}`} target="_blank" rel="noreferrer">xNEAR</a> ·{' '}
+          <a href={`${EXPLORER}/address/${POOL_ID}`} target="_blank" rel="noreferrer">bxUSD</a> ·{' '}
+          <a href={`${EXPLORER}/address/${TNEAR_ID}`} target="_blank" rel="noreferrer">tNEAR</a>
+        </p>
+      </aside>
     </div>
   );
 }
-
-// ---------- Market ----------
-
-function Market({ market }) {
-  if (!market) return <p className="empty">Loading the market…</p>;
-  const offers = [...market.offers].sort((a, b) => b.rate_bps - a.rate_bps || a.max_cover - b.max_cover);
-  return (
-    <div>
-      <section className="section">
-        <div className="sectionhead"><h3>Offers from risk-takers</h3><span className="hint">Best rate first</span></div>
-        {offers.length === 0 ? (
-          <p className="empty">No open offers right now.</p>
-        ) : (
-          <div className="scroll">
-            <table>
-              <thead><tr><th>Rate</th><th>Exposure</th><th>Free margin</th><th>Lengths</th><th>By</th></tr></thead>
-              <tbody>
-                {offers.map((o) => (
-                  <tr key={o.id}>
-                    <td className="num">{formatRate(o.rate_bps)}</td>
-                    <td className="num">{o.max_cover + 1}x</td>
-                    <td className="num">{formatAmount(o.margin_available)}</td>
-                    <td>{o.durations.map((x) => lengthLabel(x, true)).join(', ')}</td>
-                    <td>{shortAccount(o.owner)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-      <section className="section">
-        <div className="sectionhead"><h3>Savings waiting</h3></div>
-        {market.saves.length === 0 ? (
-          <p className="empty">Nobody is waiting. Every saving has been matched.</p>
-        ) : (
-          <div className="scroll">
-            <table>
-              <thead><tr><th>Amount</th><th>Length</th><th>Lowest rate</th><th>By</th></tr></thead>
-              <tbody>
-                {market.saves.map((s) => (
-                  <tr key={s.id}>
-                    <td className="num">{formatAmount(s.amount)}</td>
-                    <td>{lengthLabel(s.duration_secs)}</td>
-                    <td className="num">{formatRate(s.min_rate_bps)}</td>
-                    <td>{shortAccount(s.owner)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-      <section className="section">
-        <div className="sectionhead"><h3>Recent deals</h3></div>
-        {market.recent.length === 0 ? (
-          <p className="empty">No deals yet.</p>
-        ) : (
-          <div className="scroll">
-            <table>
-              <thead><tr><th>Deal</th><th>Size</th><th>Rate</th><th>Length</th><th>Status</th><th>Matched by</th></tr></thead>
-              <tbody>
-                {market.recent.map((d) => (
-                  <tr key={d.id}>
-                    <td className="num">#{d.id}</td>
-                    <td className="num">{formatAmount(BigInt(d.saver_amount) + BigInt(d.margin))}</td>
-                    <td className="num">{formatRate(d.rate_bps)}</td>
-                    <td>{lengthLabel(d.duration_secs, true)}</td>
-                    <td><StatusTag status={d.status} /></td>
-                    <td>{d.matched_by === market.config.agent ? 'Agent' : 'Saver'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-      <p className="hint">
-        Token: <a href={`${EXPLORER}/address/${TOKEN_ID}`} target="_blank" rel="noreferrer">{TOKEN_ID}</a> · Agent:{' '}
-        <a href={`${EXPLORER}/address/${market.config.agent}`} target="_blank" rel="noreferrer">{market.config.agent}</a>
-      </p>
-    </div>
-  );
-}
-

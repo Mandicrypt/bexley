@@ -85,3 +85,33 @@ export function shortAccount(id) {
   if (!id) return '';
   return id.length > 22 ? `${id.slice(0, 8)}…${id.slice(-8)}` : id;
 }
+
+/** Basis points as leverage, "2.47x". */
+export function formatTimes(bps) {
+  const v = Number(BigInt(bps ?? 0)) / 10_000;
+  return v > 100 ? '—' : `${v.toFixed(2)}x`;
+}
+
+/** Basis points as a whole percent, "167%". */
+export function formatBacking(bps) {
+  const v = BigInt(bps ?? 0);
+  return v === 0n ? '—' : `${(Number(v) / 100).toFixed(0)}%`;
+}
+
+/** "3 min ago" from a nanosecond timestamp. */
+export function timeAgo(ns, nowMs = Date.now()) {
+  const s = Math.max(0, Math.floor((nowMs - Number(BigInt(ns) / 1_000_000n)) / 1000));
+  if (s < 60) return 'just now';
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} h ago`;
+  return `${Math.floor(h / 24)} d ago`;
+}
+
+/** "3.80" (dollars) -> micro-dollars bigint, or null. */
+export function parseUsdPrice(text) {
+  const n = Number(String(text ?? '').trim());
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return BigInt(Math.round(n * 1_000_000));
+}

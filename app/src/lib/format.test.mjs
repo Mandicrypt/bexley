@@ -50,3 +50,15 @@ test('time left', () => {
   assert.equal(timeLeft(ns(2 * 3600_000 + 5 * 60_000 + 1), now), '2h 05m');
   assert.equal(timeLeft(ns(3 * 86400_000 + 4 * 3600_000 + 1), now), '3d 4h');
 });
+
+import { formatTimes, formatBacking, timeAgo, parseUsdPrice } from './format.mjs';
+
+test('pool numbers', () => {
+  assert.equal(formatTimes(24_700), '2.47x');
+  assert.equal(formatBacking(16_700), '167%');
+  assert.equal(formatBacking(0), '—');
+  assert.equal(parseUsdPrice('3.80'), 3_800_000n);
+  assert.equal(parseUsdPrice('x'), null);
+  const now = 10_000_000;
+  assert.equal(timeAgo(BigInt(now - 5 * 60_000) * 1_000_000n, now), '5 min ago');
+});

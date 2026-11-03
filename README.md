@@ -19,7 +19,7 @@ This README only describes what works today.
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs on GitHub Actions every 15 minutes. 9 logic tests pass. |
-| Web app (`app/`) | Being rebuilt for the pool design. The published version still shows the earlier deals design. |
+| Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Published on GitHub Pages. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
 
