@@ -86,3 +86,11 @@ test('status note when mode changes or every 6 hours', () => {
   assert.equal(shouldPostStatus(old, 'Healthy', NOW), true);
   assert.equal(shouldPostStatus([], 'Healthy', NOW), true);
 });
+
+test('status note when the pool changed a lot', () => {
+  const last = [{ kind: 'watch', at: nsAgo(60_000), text: 'Pool check: NEAR $3.826, no bxUSD yet, no xNEAR yet. All healthy.' }];
+  assert.equal(shouldPostStatus(last, 'Healthy', NOW, undefined, pool({ x_supply: '5', cr_bps: '0' })), true);
+  const b = [{ kind: 'watch', at: nsAgo(60_000), text: 'Pool check: backing 341%, xNEAR at 1.41x. All healthy.' }];
+  assert.equal(shouldPostStatus(b, 'Healthy', NOW, undefined, pool({ cr_bps: '33500' })), false);
+  assert.equal(shouldPostStatus(b, 'Healthy', NOW, undefined, pool({ cr_bps: '30000' })), true);
+});

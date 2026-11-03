@@ -136,7 +136,7 @@ if (first.length + rest.length === 0) note('- Nothing needed.');
 // Report
 pool = await view('get_pool');
 const notes = await view('get_notes', { limit: 20 });
-if (BigInt(pool.price) > 0n && shouldPostStatus(notes, pool.mode, Date.now())) {
+if (BigInt(pool.price) > 0n && shouldPostStatus(notes, pool.mode, Date.now(), undefined, pool)) {
   const text = statusNote(pool, m.change24h);
   if (await call('post_note', { kind: 'watch', text }, 10n)) note(`- Posted: "${text}"`);
 }

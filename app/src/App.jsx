@@ -702,7 +702,7 @@ function Guardian({ pool }) {
           <span className="hint">Written on-chain, newest first</span>
         </div>
         {pool.notes.length === 0 ? (
-          <p className="empty">No notes yet. The Guardian runs every 15 minutes.</p>
+          <p className="empty">No notes yet. The Guardian runs every 5 minutes.</p>
         ) : (
           <ol className="notes">
             {pool.notes.map((n) => (
@@ -719,7 +719,7 @@ function Guardian({ pool }) {
       </section>
       <aside className="card soft">
         <h3>How it works</h3>
-        <p className="hint">Every 15 minutes the Guardian reads NEAR's price from three sources, then:</p>
+        <p className="hint">Every 5 minutes the Guardian reads NEAR's price from three sources, then:</p>
         <ul className="plain">
           <li>posts the price on-chain</li>
           <li>sets fees from the 24-hour move: normal under 5%, 2x at 5–10%, 3x above 10%</li>

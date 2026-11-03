@@ -88,13 +88,24 @@ export function statusNote(pool, change24h) {
   return `Pool check: ${price}, ${backing}, ${lev}. ${state}`;
 }
 
-/** Post a status note if the mode changed since the last one, or it is old. */
-export function shouldPostStatus(notes, mode, nowMs, everyMs = 6 * 3600_000) {
+/**
+ * Post a pool check when the mode changed, the pool changed a lot since the
+ * last check (first bxUSD or xNEAR, or backing moved 20+ points), or the
+ * last check is older than `everyMs`.
+ */
+export function shouldPostStatus(notes, mode, nowMs, everyMs = 6 * 3600_000, pool = null) {
   const last = notes.find((n) => n.kind === 'watch');
   if (!last) return true;
   const ageMs = nowMs - Number(BigInt(last.at) / 1_000_000n);
   if (ageMs >= everyMs) return true;
-  return !last.text.includes(modeWord(mode));
+  if (!last.text.includes(modeWord(mode))) return true;
+  if (pool) {
+    if (last.text.includes('no xNEAR yet') && BigInt(pool.x_supply) > 0n) return true;
+    if (last.text.includes('no bxUSD yet') && BigInt(pool.cr_bps) > 0n) return true;
+    const m = last.text.match(/backing (\d+)%/);
+    if (m && BigInt(pool.cr_bps) > 0n && Math.abs(Number(m[1]) - Number(BigInt(pool.cr_bps)) / 100) >= 20) return true;
+  }
+  return false;
 }
 
 function modeWord(mode) {

@@ -18,7 +18,7 @@ This README only describes what works today.
 | Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 29 unit tests pass. |
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
-| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs on GitHub Actions every 15 minutes. 9 logic tests pass. |
+| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. 9 logic tests pass. |
 | Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Published on GitHub Pages. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
@@ -64,14 +64,14 @@ Park xNEAR with a **stop price**, a **take price**, or both. When NEAR reaches o
 
 ## The AI Pool Guardian
 
-Every 15 minutes the Guardian:
+Every 5 minutes the Guardian:
 
 1. **Prices**: posts the median NEAR/USD price when it moved 0.1% or is 20 minutes old. The pool refuses prices older than an hour.
 2. **Sets fees**: reads NEAR's 24-hour move. Under 5% is calm (normal fees), 5–10% volatile (2x fees), over 10% stormy (3x fees). Higher fees in rough markets slow churn and pay the Stability Pool more for its extra risk.
 3. **Protects**: calls `stabilize` when backing is under 130%.
 4. **Rebalances** Steady vaults that drifted.
 5. **Executes** stop-loss and take-profit orders whose price is reached.
-6. **Explains**: writes a plain-English note on the pool contract for every fee change, protection, rebalance and order, plus a pool check when the mode changes or every 6 hours. Read them with `get_notes`.
+6. **Explains**: writes a plain-English note on the pool contract for every fee change, protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
 
 **It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level`, `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 

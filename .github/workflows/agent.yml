@@ -1,38 +1,102 @@
 name: Bexley Pool Guardian
 
-# The agent runs on its own every 15 minutes (GitHub may start it a few
-# minutes late), and can be run by hand from the Actions tab.
+# GitHub's own timer is unreliable for new repos (it can skip hours), so the
+# Guardian keeps its own heartbeat:
+#   - "loop" runs a tick every 5 minutes for about 5h45m, then starts the
+#     next loop itself (allowed for workflow_dispatch with GITHUB_TOKEN).
+#   - The hourly schedule is only a backup: it starts a loop if none is
+#     running or queued.
+# "tick", "dry-run" and "setup" can still be run by hand.
+run-name: ${{ github.event_name == 'schedule' && 'Guardian keep-alive' || format('Guardian {0}', inputs.mode) }}
+
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '7 * * * *'
   workflow_dispatch:
     inputs:
       mode:
         description: What to run
         required: true
-        default: tick
+        default: loop
         type: choice
         options:
+          - loop
           - tick
           - dry-run
           - setup
 
-concurrency:
-  group: bexley-agent
-  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: write
+
+env:
+  NEAR_ACCOUNT_ID: bexley.testnet
+  APP_ID: pool.bexley.testnet
+  AGENT_ID: guardian.bexley.testnet
+  POOL_ID: pool.bexley.testnet
+  GUARDIAN_ID: guardian.bexley.testnet
 
 jobs:
-  agent:
+  keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Start a loop if none is running
+        run: |
+          active=$(gh run list -R "$GITHUB_REPOSITORY" --workflow agent.yml --limit 20 \
+            --json displayTitle,status \
+            -q '[.[] | select(.displayTitle == "Guardian loop" and (.status == "in_progress" or .status == "queued" or .status == "pending" or .status == "waiting"))] | length')
+          echo "Active loops: $active"
+          if [ "$active" = "0" ]; then
+            gh workflow run agent.yml -R "$GITHUB_REPOSITORY" -f mode=loop
+            echo "Started a new Guardian loop."
+          fi
+
+  loop:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'loop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    concurrency:
+      group: guardian-loop
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        working-directory: agent
+        run: npm ci
+      - name: Test the decision logic
+        working-directory: agent
+        run: npm test
+      - name: Tick every 5 minutes
+        working-directory: agent
+        run: |
+          # Only the derived, limited Guardian key is used by the ticks.
+          export AGENT_PRIVATE_KEY=$(node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
+          echo "::add-mask::$AGENT_PRIVATE_KEY"
+          unset NEAR_PRIVATE_KEY
+          end=$((SECONDS + 20700))
+          while [ $SECONDS -lt $end ]; do
+            timeout 240 node run.mjs || echo "Tick failed; trying again next round."
+            sleep 300
+          done
+      - name: Start the next loop
+        if: always()
+        run: gh workflow run agent.yml -R "$GITHUB_REPOSITORY" -f mode=loop
+
+  once:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode != 'loop'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      NEAR_ACCOUNT_ID: bexley.testnet
-      APP_ID: pool.bexley.testnet
-      AGENT_ID: guardian.bexley.testnet
-      POOL_ID: pool.bexley.testnet
-      GUARDIAN_ID: guardian.bexley.testnet
-      # The agent's limited key is derived from this; the agent itself
-      # never uses the owner's full access.
       NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@v4
@@ -49,13 +113,12 @@ jobs:
         if: inputs.mode == 'setup'
         working-directory: agent
         run: node setup.mjs
-      - name: Run one agent tick
+      - name: Run one tick
         if: inputs.mode != 'setup'
         working-directory: agent
         env:
           DRY_RUN: ${{ inputs.mode == 'dry-run' && '1' || '' }}
         run: |
-          # Pass only the derived agent key to the tick, not the owner key.
           export AGENT_PRIVATE_KEY=$(node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
           echo "::add-mask::$AGENT_PRIVATE_KEY"
           env -u NEAR_PRIVATE_KEY node run.mjs
