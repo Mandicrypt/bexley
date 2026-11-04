@@ -323,7 +323,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
 /* ---------- Ask Bexley ---------- */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.ask { padding: 32px 0 0; }
+.ask { padding: 32px 0 40px; }
 .askbar {
   display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 18px;
   background: var(--raised); border: 1.5px solid var(--line-strong); box-shadow: var(--shadow); color: var(--green-ink);
@@ -394,3 +394,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   .plan-facts .fact strong { max-width: none; text-align: left; }
 }
 .feed:has(> li:only-child)::before { display: none; }
+
+/* Demo */
+.demo-btn { background: transparent; color: var(--ink); border: 1.5px dashed var(--line-strong); }
+.demo-btn:hover { border-color: var(--amber); }
+.demo-btn.on { border-style: solid; border-color: var(--amber); color: var(--amber); }
+.demobar { background: var(--amber-soft); color: var(--ink); font-size: 14px; border-bottom: 1px solid var(--line); }
+.demobar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 8px; }
+.demobar b { color: var(--amber); }

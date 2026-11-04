@@ -26,7 +26,16 @@ export async function loadPool() {
 }
 
 /** One account: wallet balances plus positions in the pool. */
+// Demo mode (see demo.mjs): while on, actions and the account come from the
+// in-browser demo wallet instead of the chain.
+let demo = null;
+export const setDemo = (d) => {
+  demo = d;
+};
+const d = (name, real) => (...a) => (demo ? demo[name](...a) : real(...a));
+
 export async function loadAccount(accountId) {
+  if (demo) return demo.account();
   const [tnear, xnear, nextClaimAt, account] = await Promise.all([
     view(TNEAR_ID, 'ft_balance_of', { account_id: accountId }),
     view(XNEAR_ID, 'ft_balance_of', { account_id: accountId }),
@@ -87,29 +96,29 @@ const minOut = (v) => (v ? { min_out: v.toString() } : {});
 
 // ---- Actions ----
 
-export const claimTnear = () => send(TNEAR_ID, 'claim', {}, { gasTgas: 30n });
+export const claimTnear = d('claimTnear', () => send(TNEAR_ID, 'claim', {}, { gasTgas: 30n }));
 
-export const mintBx = (t, min) => sendToPool(TNEAR_ID, t, { type: 'mint_bx', ...minOut(min) });
-export const mintX = (t, min) => sendToPool(TNEAR_ID, t, { type: 'mint_x', ...minOut(min) });
-export const redeemX = (x, min) => sendToPool(XNEAR_ID, x, { type: 'redeem_x', ...minOut(min) });
-export const redeemBx = (b, min) =>
-  send(POOL_ID, 'redeem_bx', { amount: b.toString(), ...(min ? { min_out: min.toString() } : {}) }, { deposit: '1', gasTgas: 100n });
+export const mintBx = d('mintBx', (t, min) => sendToPool(TNEAR_ID, t, { type: 'mint_bx', ...minOut(min) }));
+export const mintX = d('mintX', (t, min) => sendToPool(TNEAR_ID, t, { type: 'mint_x', ...minOut(min) }));
+export const redeemX = d('redeemX', (x, min) => sendToPool(XNEAR_ID, x, { type: 'redeem_x', ...minOut(min) }));
+export const redeemBx = d('redeemBx', (b, min) =>
+  send(POOL_ID, 'redeem_bx', { amount: b.toString(), ...(min ? { min_out: min.toString() } : {}) }, { deposit: '1', gasTgas: 100n }));
 
-export const spDeposit = (b) => send(POOL_ID, 'sp_deposit', { amount: b.toString() }, { deposit: '1' });
-export const spWithdraw = () => send(POOL_ID, 'sp_withdraw', {}, { deposit: '1', gasTgas: 100n });
+export const spDeposit = d('spDeposit', (b) => send(POOL_ID, 'sp_deposit', { amount: b.toString() }, { deposit: '1' }));
+export const spWithdraw = d('spWithdraw', () => send(POOL_ID, 'sp_withdraw', {}, { deposit: '1', gasTgas: 100n }));
 
-export const vaultDeposit = (vault, t) => sendToPool(TNEAR_ID, t, { type: 'vault_deposit', vault });
-export const vaultWithdraw = (vault) => send(POOL_ID, 'vault_withdraw', { vault }, { deposit: '1', gasTgas: 250n });
+export const vaultDeposit = d('vaultDeposit', (vault, t) => sendToPool(TNEAR_ID, t, { type: 'vault_deposit', vault }));
+export const vaultWithdraw = d('vaultWithdraw', (vault) => send(POOL_ID, 'vault_withdraw', { vault }, { deposit: '1', gasTgas: 250n }));
 
-export const placeOrder = (x, stop, take) =>
+export const placeOrder = d('placeOrder', (x, stop, take) =>
   sendToPool(XNEAR_ID, x, {
     type: 'order',
     ...(stop ? { stop_price: stop.toString() } : {}),
     ...(take ? { take_price: take.toString() } : {}),
-  });
-export const cancelOrder = (id) => send(POOL_ID, 'cancel_order', { order_id: id }, { deposit: '1', gasTgas: 100n });
+  }));
+export const cancelOrder = d('cancelOrder', (id) => send(POOL_ID, 'cancel_order', { order_id: id }, { deposit: '1', gasTgas: 100n }));
 
-export const claimStuck = () => send(POOL_ID, 'claim', {}, { gasTgas: 100n });
+export const claimStuck = d('claimStuck', () => send(POOL_ID, 'claim', {}, { gasTgas: 100n }));
 
 /** Turn a wallet or contract error into one plain sentence. */
 export function errorText(e) {

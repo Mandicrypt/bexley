@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   EXPLORER, GUARDIAN_ID, POOL_ID, XNEAR_ID, TNEAR_ID, connect, disconnect, currentAccount, getConnector, loadPool, loadAccount,
   quote, claimTnear, mintBx, mintX, redeemBx, redeemX, spDeposit, spWithdraw, vaultDeposit, vaultWithdraw, placeOrder,
-  cancelOrder, claimStuck, errorText,
+  cancelOrder, claimStuck, errorText, setDemo,
 } from './lib/near.js';
+import { DEMO_ID, createDemo } from './lib/demo.mjs';
 import {
   parseAmount, formatAmount, formatUsd, usdValue, formatTimes, formatBacking, timeAgo, timeLeft, shortAccount, parseUsdPrice,
 } from './lib/format.mjs';
@@ -27,29 +28,27 @@ const pctRate = (bps) => `${(Number(bps) / 100).toFixed(0)}%`;
 
 // ---------- Theme ----------
 
+// Light by default for everyone; dark only when the visitor picks it.
 function readTheme() {
   try {
-    return localStorage.getItem('bexley-theme') || 'system';
+    return localStorage.getItem('bexley-theme') === 'dark' ? 'dark' : 'light';
   } catch {
-    return 'system';
+    return 'light';
   }
 }
 
 function useTheme() {
   const [theme, setTheme] = useState(readTheme);
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'system') root.removeAttribute('data-theme');
-    else root.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
     try {
       localStorage.setItem('bexley-theme', theme);
     } catch {
       /* private mode */
     }
   }, [theme]);
-  const isDark = () =>
-    theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
-  return [isDark, () => setTheme(isDark() ? 'light' : 'dark')];
+  const isDark = () => theme === 'dark';
+  return [isDark, () => setTheme(theme === 'dark' ? 'light' : 'dark')];
 }
 
 // ---------- App ----------
@@ -69,6 +68,11 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [isDark, toggleTheme] = useTheme();
   const [explain, setExplain] = useState(false);
+  const [demoOn, setDemoOn] = useState(false);
+  const poolRef = useRef(null);
+  const demoRef = useRef(null);
+  poolRef.current = pool;
+  const acct = demoOn ? DEMO_ID : accountId;
 
   const refresh = useCallback(async () => {
     try {
@@ -77,14 +81,14 @@ export default function App() {
     } catch {
       setLoadError('Could not reach NEAR testnet. Retrying…');
     }
-    if (accountId) {
+    if (acct) {
       try {
-        setMe(await loadAccount(accountId));
+        setMe(await loadAccount(acct));
       } catch {
         /* keep the last good data */
       }
     } else setMe(null);
-  }, [accountId]);
+  }, [acct]);
 
   useEffect(() => {
     refresh();
@@ -147,9 +151,23 @@ export default function App() {
     setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
   };
 
-  const onConnect = () => connect().catch((e) => setToast({ text: errorText(e), bad: true }));
+  const startDemo = () => {
+    if (!demoRef.current) demoRef.current = createDemo(() => poolRef.current, quote);
+    demoRef.current.reset();
+    setDemo(demoRef.current);
+    setMe(null);
+    setDemoOn(true);
+    setToast({ text: 'Demo on: a pretend wallet with example positions. Nothing is sent.' });
+  };
+  const stopDemo = () => {
+    setDemo(null);
+    setMe(null);
+    setDemoOn(false);
+  };
+
+  const onConnect = () => (demoOn ? stopDemo() : null, connect()).catch((e) => setToast({ text: errorText(e), bad: true }));
   const onDisconnect = () => disconnect().then(() => setAccountId(null));
-  const ctx = { pool, me, accountId, onConnect, run, busy };
+  const ctx = { pool, me, accountId: acct, onConnect, run, busy };
   const stuck = me && (BigInt(me.claim_tnear) > 0n || BigInt(me.claim_xnear) > 0n);
 
   return (
@@ -157,15 +175,29 @@ export default function App() {
       <Header
         page={page}
         go={go}
-        accountId={accountId}
+        accountId={acct}
         me={me}
         onConnect={onConnect}
-        onDisconnect={onDisconnect}
+        onDisconnect={demoOn ? stopDemo : onDisconnect}
+        demoOn={demoOn}
+        onDemo={demoOn ? stopDemo : startDemo}
         run={run}
         busy={busy}
         isDark={isDark()}
         toggleTheme={toggleTheme}
       />
+      {demoOn && (
+        <div className="demobar" role="status">
+          <div className="wrap">
+            <span>
+              <b>Demo.</b> A pretend wallet with live prices. Nothing here is real and nothing is sent.
+            </span>
+            <button className="btn sm line" onClick={stopDemo}>
+              Exit demo
+            </button>
+          </div>
+        </div>
+      )}
       <main className="wrap">
         {stuck && (
           <div className="note warn banner">
@@ -177,7 +209,7 @@ export default function App() {
         )}
         {page === 'trade' && (
           <>
-            {!accountId && <Hero pool={pool} onPick={pick} />}
+            {!acct && <Hero pool={pool} onPick={pick} />}
             <Split pool={pool} error={loadError} open={explain} setOpen={setExplain} />
             <section className="page cols" id="trade">
               <TradePanel {...ctx} />
@@ -237,7 +269,7 @@ function ThemeIcon({ dark }) {
   );
 }
 
-function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, isDark, toggleTheme }) {
+function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, isDark, toggleTheme, demoOn, onDemo }) {
   const canClaim = !me || BigInt(me.nextClaimAt || 0) === 0n;
   const nav = (cls) =>
     PAGES.map(([id, label]) => (
@@ -256,6 +288,11 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
         <nav className="nav" aria-label="Sections">{nav()}</nav>
         <div className="spacer" />
         <div className="right">
+          {!demoOn && !accountId && (
+            <button className="btn sm demo-btn" onClick={onDemo} title="Try Bexley with a pretend wallet">
+              Demo
+            </button>
+          )}
           <button className="iconbtn" onClick={toggleTheme} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
             <ThemeIcon dark={isDark} />
           </button>
@@ -538,7 +575,7 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
   else if (dir === 'redeem' && side === 'x' && s && !s.fees_bps.redeem_x_open) problem = 'xNEAR exits are paused until backing is back over 130%. Your xNEAR keeps its share.';
   else if (s && !s.price_fresh) problem = 'Waiting for a fresh price from the Guardian.';
 
-  const getUsd = q == null || !s ? null : getK === 'x' ? (q * BigInt(s.x_price)) / 1_000_000n : getK === 'bx' ? q : usdValue(q, s.price);
+  const getUsd = q == null || !s ? null : getK === 'x' ? (q * BigInt(s.x_price)) / 1_000_000n : getK === 'bx' ? q : (q * BigInt(s.price)) / 1_000_000n;
   const verb = dir === 'mint' ? `Mint ${TOKENS[side][0]}` : `Redeem ${TOKENS[side][0]}`;
 
   const submit = () => {
@@ -851,8 +888,8 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
         </div>
         <div className="facts">
           <Fact k="Leverage now" v={formatTimes(lev)} />
-          <Fact k="Vault size" v={`${formatAmount(v.value)} tNEAR`} />
-          <Fact k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} tNEAR, ${money(usdValue(pos.value, s.price))}` : '—'} />
+          <Fact k="Vault size" v={`${formatAmount(me?.demo && hasPos ? BigInt(v.value) + BigInt(pos.value) : v.value)} tNEAR`} />
+          <Fact k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} tNEAR, ${money((BigInt(pos.value) * BigInt(s.price)) / 1_000_000n)}` : '—'} />
         </div>
         {!hasPos && s && (
           <Example>

@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0d1211" media="(prefers-color-scheme: dark)" />
     <script>
-      try { var t = localStorage.getItem('bexley-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+      var t = 'light'; try { if (localStorage.getItem('bexley-theme') === 'dark') t = 'dark'; } catch (e) {} document.documentElement.setAttribute('data-theme', t);
     </script>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
