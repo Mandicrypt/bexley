@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793817749671,
+  "id": "cbcfebcc4cc3441eb7d2734ad0675805",
+  "file": "2026-11-04/cbcfebcc4cc3441eb7d2734ad0675805.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 193.7% and xNEAR leverage is only 2.07, so savers are still wanted, but the rate is already at the 20% maximum. NEAR swung 15.95% in a day, so 3x fees stay to pay the Stability Pool for that risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793815712701,
   "id": "2e66ab41c4a14ac3b719053625ac5717",
   "file": "2026-11-04/2e66ab41c4a14ac3b719053625ac5717.json",
