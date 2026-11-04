@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { checkDecision, parseReply, ruleDecision, askAI, buildFacts, volatilityFromCandles } from './ai.mjs';
+import { sha256Hex, verifyProof } from './proof.mjs';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { keccak_256 } from '@noble/hashes/sha3.js';
+import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils.js';
 
 const T = (n) => (BigInt(Math.round(n * 1e6)) * 10n ** 18n).toString();
 const pool = (over = {}) => ({
@@ -38,32 +42,63 @@ test('rules fallback gives a full decision', () => {
   assert.match(d.reason, /12%/);
 });
 
-test('askAI uses the model reply and checks it', async () => {
-  const fake = async (url, opts) => {
-    const body = JSON.parse(opts.body);
-    assert.match(url, /chat\/completions$/);
-    assert.match(opts.headers.Authorization, /^Bearer k$/);
-    assert.equal(body.messages.length, 2);
-    return {
-      ok: true,
-      json: async () => ({ choices: [{ message: { content: '{"fee_level":1,"savings_rate_bps":1100,"reason":"NEAR swung 6% today, so fees go to 2x. Backing is 348%, so the rate rises to 11%.","status":"Healthy at 348% backing."}' } }] }),
-    };
+// A fake NEAR AI Cloud: attestation report, completion and a real signature.
+function fakeNearAI({ failFirstModel = false, tamper = false } = {}) {
+  const priv = secp256k1.utils.randomSecretKey();
+  const addr = '0x' + bytesToHex(keccak_256(secp256k1.getPublicKey(priv, false).subarray(1)).subarray(12));
+  const sign = (text) => {
+    const msg = utf8ToBytes(text);
+    const d = keccak_256(new Uint8Array([...utf8ToBytes(`\x19Ethereum Signed Message:\n${msg.length}`), ...msg]));
+    const rec = secp256k1.sign(d, priv, { prehash: false, format: 'recovered' });
+    return '0x' + bytesToHex(rec.subarray(1)) + (27 + rec[0]).toString(16);
   };
-  const r = await askAI(pool(), { change24h: -6, vol24h: 3.1, range24h: 7 }, { apiKey: 'k', fetchImpl: fake });
+  const seen = { completions: 0, lastRequest: null, lastResponse: null };
+  const fetchImpl = async (url, opts = {}) => {
+    if (url.includes('/attestation/report')) {
+      assert.match(url, /nonce=[0-9a-f]{64}/);
+      const raw = JSON.stringify({ gateway_attestation: { signing_address: addr, signing_algo: 'ecdsa' }, model_attestations: [] });
+      return { ok: true, text: async () => raw };
+    }
+    if (url.includes('/chat/completions')) {
+      seen.completions++;
+      assert.equal(opts.headers.Authorization, 'Bearer k');
+      if (failFirstModel && seen.completions === 1) return { ok: false, status: 404, text: async () => 'no model' };
+      seen.lastRequest = opts.body;
+      const content = '{"fee_level":1,"savings_rate_bps":1100,"reason":"NEAR swung 6% today, so fees go to 2x. Backing is 348%, so the rate rises to 11%.","status":"Healthy."}';
+      seen.lastResponse = JSON.stringify({ id: 'chatcmpl-9', choices: [{ message: { content } }] });
+      return { ok: true, text: async () => seen.lastResponse };
+    }
+    if (url.includes('/signature/chatcmpl-9')) {
+      const resp = tamper ? seen.lastResponse + ' ' : seen.lastResponse;
+      const text = `${sha256Hex(seen.lastRequest)}:${sha256Hex(resp)}`;
+      return { ok: true, json: async () => ({ text, signature: sign(text), signing_address: addr, signing_algo: 'ecdsa', signature_kind: 'gateway' }) };
+    }
+    throw new Error('unexpected ' + url);
+  };
+  return { fetchImpl, seen };
+}
+
+test('askAI decides and returns a proof that checks out', async () => {
+  const { fetchImpl } = fakeNearAI();
+  const r = await askAI(pool(), { change24h: -6, vol24h: 3.1, range24h: 7 }, { apiKey: 'k', fetchImpl });
   assert.equal(r.decision.level, 1);
   assert.equal(r.decision.rate, 1100);
+  assert.equal(r.proof.id, 'chatcmpl-9');
+  assert.equal(r.proof.check.ok, true);
+  assert.equal(verifyProof(JSON.parse(JSON.stringify(r.proof))).ok, true);
+});
+
+test('a proof for different bytes fails the check', async () => {
+  const { fetchImpl } = fakeNearAI({ tamper: true });
+  const r = await askAI(pool(), { change24h: -6 }, { apiKey: 'k', fetchImpl });
+  assert.equal(r.proof.check.ok, false);
 });
 
 test('askAI tries the next model when one fails', async () => {
-  let calls = 0;
-  const fake = async () => {
-    calls++;
-    if (calls === 1) return { ok: false, status: 404, text: async () => 'no model' };
-    return { ok: true, json: async () => ({ choices: [{ message: { content: '{"fee_level":0,"savings_rate_bps":800,"reason":"Markets are calm, nothing to change."}' } }] }) };
-  };
-  const r = await askAI(pool(), { change24h: 1 }, { apiKey: 'k', fetchImpl: fake });
-  assert.equal(calls, 2);
-  assert.equal(r.decision.rate, 800);
+  const { fetchImpl, seen } = fakeNearAI({ failFirstModel: true });
+  const r = await askAI(pool(), { change24h: 1 }, { apiKey: 'k', fetchImpl });
+  assert.equal(seen.completions, 2);
+  assert.equal(r.decision.rate, 1100);
 });
 
 test('facts are plain numbers', () => {
@@ -80,4 +115,20 @@ test('volatility from candles', () => {
   const moving = volatilityFromCandles([4, 4.2, 3.9, 4.1], [4.1, 4.3, 4.2, 4.2], [3.9, 4, 3.8, 3.9]);
   assert.ok(moving.vol24h > 0);
   assert.ok(Math.abs(moving.range24h - ((4.3 - 3.8) / 3.8) * 100) < 1e-9);
+});
+
+test('saveProof writes the proof, the report and the index', async () => {
+  const { mkdtempSync, readFileSync, existsSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { saveProof } = await import('./proofs.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'proofs-'));
+  const { fetchImpl } = fakeNearAI();
+  const r = await askAI(pool(), { change24h: -6 }, { apiKey: 'k', fetchImpl });
+  const file = saveProof(dir, r.proof, r.attestation);
+  const index = JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8'));
+  assert.equal(index[0].file, file);
+  assert.equal(index[0].verified, true);
+  assert.ok(existsSync(join(dir, 'attest', `${r.attestation.report_sha256}.json`)));
+  assert.equal(verifyProof(JSON.parse(readFileSync(join(dir, file), 'utf8'))).ok, true);
 });

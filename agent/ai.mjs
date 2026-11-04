@@ -7,6 +7,7 @@
 // badly, the Guardian falls back to its fixed rules (logic.mjs).
 
 import { feeLevelFor, savingsRateFor, feeReason, rateReason, statusNote } from './logic.mjs';
+import { attestedSigners, sha256Hex, verifyProof } from './proof.mjs';
 
 export const NEARAI_URL = process.env.NEARAI_URL || 'https://cloud-api.near.ai/v1';
 export const MODELS = (process.env.NEARAI_MODEL || 'deepseek-ai/DeepSeek-V4-Flash,z-ai/glm-5.2').split(',');
@@ -108,35 +109,107 @@ export function ruleDecision(pool, market) {
   return { level, rate, reason: parts.join(' ') || 'No change needed.', status: statusNote(pool, market.change24h) };
 }
 
-/** Ask the model. Tries each model in turn. Returns {decision, model} or throws. */
-export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY, fetchImpl = fetch } = {}) {
+const headersFor = (apiKey) => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * NEAR AI's hardware attestation for a model: the report, and the signing
+ * keys it names. Fetched with a fresh random nonce, BEFORE the question is
+ * asked. Cached for a few hours (cache is a plain object kept by the caller).
+ */
+export async function getAttestation(model, { apiKey, fetchImpl = fetch, cache = {}, maxAgeMs = 3 * 3600_000 } = {}) {
+  const hit = cache[model];
+  if (hit && Date.now() - hit.fetched_at < maxAgeMs) return hit;
+  const nonce = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const url = `${NEARAI_URL}/attestation/report?model=${encodeURIComponent(model)}&signing_algo=ecdsa&nonce=${nonce}`;
+  const r = await fetchImpl(url, { headers: headersFor(apiKey), signal: AbortSignal.timeout(30_000) });
+  if (!r.ok) throw new Error(`attestation HTTP ${r.status}`);
+  const raw = await r.text();
+  const report = JSON.parse(raw);
+  const out = { model, nonce, fetched_at: Date.now(), signers: attestedSigners(report), report_sha256: sha256Hex(raw), raw };
+  cache[model] = out;
+  return out;
+}
+
+/** NEAR AI's signature for one answer. Retries briefly: it can take a moment. */
+async function getSignature(id, model, { apiKey, fetchImpl }) {
+  for (let i = 0; i < 6; i++) {
+    const r = await fetchImpl(`${NEARAI_URL}/signature/${encodeURIComponent(id)}?model=${encodeURIComponent(model)}&signing_algo=ecdsa`, {
+      headers: headersFor(apiKey),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (r.ok) {
+      const j = await r.json();
+      if (j.signature) return j;
+    }
+    await sleep(1500 * (i + 1));
+  }
+  return null;
+}
+
+/**
+ * Ask the model. Tries each model in turn. Returns {decision, model, facts, proof}
+ * or throws. The proof keeps the exact request and response bytes, NEAR AI's
+ * signature and the attested keys, so anyone can check it (proof.mjs).
+ */
+export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY, fetchImpl = fetch, attestCache = {} } = {}) {
   if (!apiKey) throw new Error('No NEARAI_API_KEY');
   const facts = buildFacts(pool, market);
   const errs = [];
   for (const model of MODELS) {
     try {
+      let attestation = null;
+      try {
+        attestation = await getAttestation(model, { apiKey, fetchImpl, cache: attestCache });
+      } catch (e) {
+        errs.push(`${model}: no attestation (${e.message})`);
+      }
+      // Build the body once and keep these exact bytes: they are what NEAR AI signs.
+      const request = JSON.stringify({
+        model,
+        temperature: 0.2,
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: `Pool and market data:\n${JSON.stringify(facts, null, 2)}` },
+        ],
+      });
       const r = await fetchImpl(`${NEARAI_URL}/chat/completions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model,
-          temperature: 0.2,
-          max_tokens: 2000,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Pool and market data:\n${JSON.stringify(facts, null, 2)}` },
-          ],
-        }),
+        headers: { ...headersFor(apiKey), 'x-no-aliasing': 'true' },
+        body: request,
         signal: AbortSignal.timeout(45_000),
       });
-      if (!r.ok) throw new Error(`${model}: HTTP ${r.status} ${(await r.text()).slice(0, 160)}`);
-      const j = await r.json();
+      const response = await r.text();
+      if (!r.ok) throw new Error(`${model}: HTTP ${r.status} ${response.slice(0, 160)}`);
+      const j = JSON.parse(response);
       const c = j?.choices?.[0];
       // Some models put their answer in reasoning fields when content is empty.
       const text = c?.message?.content || c?.message?.reasoning_content || c?.message?.reasoning || '';
       if (!text) throw new Error(`${model}: empty reply (finish: ${c?.finish_reason || 'none'})`);
-      return { decision: checkDecision(parseReply(text), pool), model, facts };
+      const decision = checkDecision(parseReply(text), pool);
+
+      let proof = null;
+      try {
+        const signature = j.id ? await getSignature(j.id, model, { apiKey, fetchImpl }) : null;
+        proof = {
+          v: 1,
+          at: Date.now(),
+          model,
+          id: j.id || null,
+          request,
+          response,
+          signature,
+          attestation: attestation && { nonce: attestation.nonce, fetched_at: attestation.fetched_at, signers: attestation.signers, report_sha256: attestation.report_sha256 },
+          decision: { level: decision.level, rate: decision.rate, reason: decision.reason },
+        };
+        proof.check = verifyProof(proof);
+      } catch (e) {
+        proof = proof || null;
+        errs.push(`proof: ${e.message}`);
+      }
+      return { decision, model, facts, proof, attestation };
     } catch (e) {
       errs.push(String(e?.message || e).includes(model) ? String(e.message) : `${model}: ${e?.message || e}`);
     }

@@ -26,7 +26,7 @@ on:
           - setup
 
 permissions:
-  contents: read
+  contents: write # to publish AI proofs to the "proofs" branch
   actions: write
 
 env:
@@ -69,6 +69,10 @@ jobs:
       NEARAI_API_KEY: ${{ secrets.NEARAI_API_KEY || secrets.NEAR_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: proofs
+          path: proofs-repo
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -85,9 +89,11 @@ jobs:
           export AGENT_PRIVATE_KEY=$(node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
           echo "::add-mask::$AGENT_PRIVATE_KEY"
           unset NEAR_PRIVATE_KEY
+          export PROOF_DIR="$GITHUB_WORKSPACE/proofs-repo"
           end=$((SECONDS + 20700))
           while [ $SECONDS -lt $end ]; do
             timeout 240 node run.mjs || echo "Tick failed; trying again next round."
+            ../scripts/publish-proofs.sh || echo "Could not publish proofs this round."
             sleep 300
           done
       - name: Start the next loop
@@ -104,6 +110,10 @@ jobs:
       NEARAI_API_KEY: ${{ secrets.NEARAI_API_KEY || secrets.NEAR_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: proofs
+          path: proofs-repo
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -125,4 +135,7 @@ jobs:
         run: |
           export AGENT_PRIVATE_KEY=$(node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
           echo "::add-mask::$AGENT_PRIVATE_KEY"
+          # Dry runs save nothing; real ticks publish their AI proof.
+          if [ -z "$DRY_RUN" ]; then export PROOF_DIR="$GITHUB_WORKSPACE/proofs-repo"; fi
           env -u NEAR_PRIVATE_KEY node run.mjs
+          if [ -z "$DRY_RUN" ]; then ../scripts/publish-proofs.sh; fi

@@ -24,6 +24,7 @@ import { deriveAgentKey } from './key.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { plan, shouldPostStatus, statusNote, toMicroUsd } from './logic.mjs';
 import { NEARAI_URL, askAI, ruleDecision, volatilityFromCandles } from './ai.mjs';
+import { saveProof } from './proofs.mjs';
 
 const POOL_ID = process.env.POOL_ID || 'pool.bexley.testnet';
 const GUARDIAN_ID = process.env.GUARDIAN_ID || 'guardian.bexley.testnet';
@@ -158,10 +159,24 @@ let decision = null;
 let source = null;
 if (aiDue) {
   try {
-    const r = await askAI(pool, m);
+    state.attest = state.attest || {};
+    const r = await askAI(pool, m, { attestCache: state.attest });
+    for (const a of Object.values(state.attest)) delete a.raw; // keep the state file small
     decision = r.decision;
     source = `AI (${r.model})`;
     state.lastAiAt = Date.now();
+    if (r.proof) {
+      const c = r.proof.check;
+      note(`- Proof: ${c?.ok ? 'verified' : 'NOT verified'}. ${(c?.checks || []).map((x) => `${x.ok ? 'ok' : 'FAIL'}: ${x.name}`).join('; ')}`);
+      if (process.env.PROOF_DIR) {
+        try {
+          const f = saveProof(process.env.PROOF_DIR, r.proof, r.attestation);
+          note(`- Proof saved: ${f}`);
+        } catch (e) {
+          note(`- Could not save the proof (${shortError(e)}).`);
+        }
+      }
+    } else note('- No proof for this answer.');
     note(`- AI read: ${JSON.stringify(r.facts)}`);
     note(`- AI decided: fee level ${decision.level}, rate ${decision.rate / 100}%. "${decision.reason}"`);
   } catch (e) {
