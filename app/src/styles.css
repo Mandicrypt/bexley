@@ -306,6 +306,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 }
 .toast.bad { background: var(--red); color: #fff; }
 
+/* ---------- Ask Bexley ---------- */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ask { padding: 32px 0 0; }
+.askbar {
+  display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 18px;
+  background: var(--raised); border: 1.5px solid var(--line-strong); box-shadow: var(--shadow); color: var(--green-ink);
+}
+.askbar:focus-within { border-color: var(--green); }
+.askbar input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 17px; font-weight: 600; padding: 10px 0; color: var(--ink); }
+.askbar input::placeholder { color: var(--muted); font-weight: 500; }
+.examples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.example { border: 1px solid var(--line); background: transparent; border-radius: 99px; padding: 6px 13px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.example:hover { border-color: var(--green); color: var(--ink); }
+.plan { margin-top: 14px; padding: 18px 20px; border-radius: 16px; background: var(--surface); display: grid; gap: 12px; }
+.plan > p:first-child { font-size: 16px; color: var(--ink); }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-weight: 650; }
+.steps li.done { color: var(--muted); text-decoration: line-through; }
+.steps li.now::marker { color: var(--green-ink); }
+.plan > .btn, .plan > .btnrow { justify-self: start; }
+
 /* ---------- Risk check ---------- */
 .risk { padding: 8px 0 0; display: grid; gap: 16px; }
 .risk-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }

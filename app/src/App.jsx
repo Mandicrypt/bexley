@@ -8,6 +8,7 @@ import {
   parseAmount, formatAmount, formatUsd, usdValue, formatTimes, formatBacking, timeAgo, timeLeft, shortAccount, parseUsdPrice,
 } from './lib/format.mjs';
 import { poolNumbers, scenario, leverage, xPriceAt, dailyVolatility, suggestStop, riskWord } from './lib/risk.mjs';
+import { ACTIONS } from './lib/intent.mjs';
 
 const REFRESH_MS = 15_000;
 const SLIPPAGE_BPS = 100n; // accept up to 1% less than quoted
@@ -169,6 +170,7 @@ export default function App() {
           <>
             {!accountId && <Hero onConnect={onConnect} />}
             <Split pool={pool} error={loadError} />
+            <AskBexley {...ctx} />
             <section className="page cols">
               <TradePanel {...ctx} />
               <GuardianFeed pool={pool} limit={5} onMore={() => go('guardian')} />
@@ -1009,6 +1011,175 @@ export function RiskCheck({ pool, me, accountId, run, busy, onOrders }) {
               Set my own
             </button>
           </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ---------- Ask Bexley ----------
+
+const EXAMPLES = [
+  'Make me 2x long with 50 tNEAR',
+  'Put 30 tNEAR into bxUSD and earn on it',
+  'Protect all my xNEAR if NEAR drops 10%',
+];
+
+function askContext(pool, me) {
+  const s = pool?.state;
+  const n = (units) => (units == null ? null : Number(BigInt(units) / 10n ** 18n) / 1e6);
+  return {
+    near_price_usd: s ? Number(s.price) / 1e6 : null,
+    xnear_price_usd: s ? Number(s.x_price) / 1e6 : null,
+    xnear_leverage: s ? Number(s.leverage_bps) / 10000 : null,
+    pool_mode: s?.mode,
+    savings_rate_pct: s ? s.savings_rate_bps / 100 : null,
+    mint_bx_open: s?.fees_bps.mint_bx_open,
+    redeem_x_open: s?.fees_bps.redeem_x_open,
+    wallet: me ? { tNEAR: n(me.tnear), xNEAR: n(me.xnear), bxUSD: n(me.bx) } : null,
+    stability_pool_bxusd: me ? n(me.stability_pool.value) : null,
+  };
+}
+
+/** Turn one checked step into a wallet transaction, using fresh balances. */
+async function runStep(step, accountId) {
+  const fresh = await loadAccount(accountId);
+  const bal = { tNEAR: fresh.tnear, xNEAR: fresh.xnear, bxUSD: fresh.bx };
+  const pays = ACTIONS[step.action].pays;
+  let units = null;
+  if (pays) {
+    units = step.amount === 'all' ? BigInt(bal[pays]) : parseAmount(String(step.amount));
+    if (!units || units <= 0n) throw new Error(`You have no ${pays} for this step.`);
+    if (units > BigInt(bal[pays])) throw new Error(`This step needs more ${pays} than you hold.`);
+  }
+  const usd = (v) => (v == null ? null : BigInt(Math.round(v * 1e6)));
+  switch (step.action) {
+    case 'mint_x':
+    case 'mint_bx':
+    case 'redeem_x':
+    case 'redeem_bx': {
+      const q = BigInt(await quote(step.action, units));
+      if (q === 0n) throw new Error('The pool cannot do this right now.');
+      const fn = { mint_x: mintX, mint_bx: mintBx, redeem_x: redeemX, redeem_bx: redeemBx }[step.action];
+      return fn(units, withSlippage(q));
+    }
+    case 'sp_deposit':
+      return spDeposit(units);
+    case 'sp_withdraw':
+      return spWithdraw();
+    case 'vault_deposit':
+      return vaultDeposit(step.vault - 2, units);
+    case 'vault_withdraw':
+      return vaultWithdraw(step.vault - 2);
+    case 'place_order':
+      return placeOrder(units, usd(step.stop_price), usd(step.take_price));
+    default:
+      throw new Error('Unknown step');
+  }
+}
+
+function AskBexley({ pool, me, accountId, onConnect, run, busy }) {
+  const [text, setText] = useState('');
+  const [plan, setPlan] = useState(null);
+  const [asking, setAsking] = useState(false);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState(0);
+
+  const ask = async (msg) => {
+    const message = (msg ?? text).trim();
+    if (message.length < 2) return setError('Type what you want to do.');
+    setText(message);
+    setAsking(true);
+    setError('');
+    setPlan(null);
+    setDone(0);
+    try {
+      const r = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, context: askContext(pool, me) }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'Ask Bexley could not answer right now.');
+      setPlan(j);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setAsking(false);
+    }
+  };
+
+  const next = plan?.steps?.[done];
+  return (
+    <section className="ask" aria-label="Ask Bexley">
+      <form
+        className="askbar"
+        onSubmit={(e) => {
+          e.preventDefault();
+          ask();
+        }}
+      >
+        <label htmlFor="ask" className="sr">Ask Bexley</label>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
+        </svg>
+        <input id="ask" placeholder="Ask Bexley: tell it what you want to do" value={text} onChange={(e) => setText(e.target.value)} maxLength={400} />
+        <button className="btn sm" type="submit" disabled={asking}>
+          {asking ? 'Thinking…' : 'Ask'}
+        </button>
+      </form>
+      {!plan && !error && !asking && (
+        <div className="examples">
+          {EXAMPLES.map((e) => (
+            <button key={e} className="example" onClick={() => ask(e)}>
+              {e}
+            </button>
+          ))}
+        </div>
+      )}
+      {error && <p className="err" style={{ marginTop: 10 }}>{error}</p>}
+      {plan && (
+        <div className="plan">
+          <p>{plan.reply}</p>
+          {plan.steps.length > 0 && (
+            <>
+              <ol className="steps">
+                {plan.steps.map((st, i) => (
+                  <li key={i} className={i < done ? 'done' : i === done ? 'now' : ''}>
+                    {st.label}
+                  </li>
+                ))}
+              </ol>
+              {done >= plan.steps.length ? (
+                <p className="hint">All done. Your balances update in a few seconds.</p>
+              ) : accountId ? (
+                <div className="btnrow">
+                  <button
+                    className="btn go sm"
+                    disabled={busy === 'ask'}
+                    onClick={() =>
+                      run('ask', async () => {
+                        await runStep(next, accountId);
+                        setDone((d) => d + 1);
+                      }, `Step ${done + 1} done.`)
+                    }
+                  >
+                    {busy === 'ask' ? 'Confirm in your wallet…' : plan.steps.length > 1 ? `Approve step ${done + 1} of ${plan.steps.length}` : 'Approve in wallet'}
+                  </button>
+                  <button className="btn line sm" onClick={() => setPlan(null)}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button className="btn sm" onClick={onConnect}>
+                  Connect wallet to run this plan
+                </button>
+              )}
+            </>
+          )}
+          <p className="hint" style={{ marginTop: 10 }}>
+            Planned by an AI model on NEAR AI Cloud. Check each step: nothing happens until you approve it in your wallet.
+          </p>
         </div>
       )}
     </section>

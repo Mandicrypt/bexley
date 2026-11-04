@@ -21,7 +21,7 @@ This README only describes what works today.
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, with fixed rules as backup. 21 tests pass. |
-| Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
+| Web app (`app/`) | Trade (mint and redeem), Ask Bexley, Your risk, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
 
@@ -88,6 +88,19 @@ Every 5 minutes the Guardian:
 
 Each run's decision log is on its GitHub Actions page.
 
+## Ask Bexley
+
+A chat box on the Trade page. Type what you want, like *"Make me 2x long with 50 tNEAR and sell if NEAR drops to $3.50"*, and an AI model on NEAR AI Cloud turns it into a short plan of steps (mint, redeem, Stability Pool, Steady vaults, stop-loss and take-profit orders).
+
+- The AI only sees public numbers the page already shows (prices, leverage, your balances) and your message.
+- Every plan is checked twice, on the server and in the browser (`app/src/lib/intent.mjs`): only known actions, positive amounts, at most 4 steps, sensible stop and take prices. Anything else is dropped.
+- Nothing happens until you approve each step in your own wallet. Amounts are re-checked against fresh balances right before each step, and mints and redeems keep the 1% price guard.
+- The AI key stays on the server, in a Vercel function (`app/api/ask.js`).
+
+## Your risk
+
+Connected users with xNEAR or bxUSD see what their holdings would gain or lose if NEAR moves 10% or 20%, how much they move with NEAR overall, and a suggested stop-loss: two days of NEAR's usual moves below today (between 5% and 25%), from the last day of CoinGecko prices. One click protects all their xNEAR with that stop. The Orders page has the same suggestion.
+
 ## Accounts on testnet
 
 | Account | What it is |
@@ -128,7 +141,7 @@ Other calls: `redeem_bx`, `sp_deposit`, `sp_withdraw`, `vault_withdraw`, `cancel
 ```bash
 cargo test --workspace          # contracts
 cd agent && npm test             # Guardian decisions
-cd app && npm test               # app number formatting
+cd app && npm test               # app: formatting, risk math, Ask Bexley plan checks
 ```
 
 ## Deploy
