@@ -248,7 +248,8 @@ p { margin: 0; }
 .field label { font-size: 14px; font-weight: 700; }
 .inputrow { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; background: var(--bg); }
 .inputrow:focus-within { border-color: var(--ink); }
-.inputrow input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 12px 0; font-size: 18px; font-weight: 700; }
+.inputrow input { flex: 1; width: 100%; min-width: 0; border: 0; outline: none; background: transparent; padding: 12px 0; font-size: 18px; font-weight: 700; }
+.field, .inputrow, .two > * { min-width: 0; }
 .inputrow .unit { color: var(--muted); font-weight: 700; font-size: 14px; }
 .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .hint { font-size: 13px; color: var(--muted); }
