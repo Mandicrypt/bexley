@@ -7,6 +7,8 @@ Bexley splits one pool of NEAR into two tokens:
 
 On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereum), Bexley adds a **Stability Pool** with a **savings rate paid by xNEAR**, **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, and an **AI Pool Guardian** that runs the pool's safety work, sets the savings rate from demand, and explains every move in public notes.
 
+**Try it:** [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app) (NEAR testnet; get free tNEAR in the app).
+
 Built for the NEAR Hackathon (Nov 2026).
 
 ## Status
@@ -19,7 +21,7 @@ This README only describes what works today.
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. 12 logic tests pass. |
-| Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Published on GitHub Pages. |
+| Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
 
