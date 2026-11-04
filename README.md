@@ -7,7 +7,7 @@ Bexley splits one pool of NEAR into two tokens:
 
 On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereum), Bexley adds a **Stability Pool** with a **savings rate paid by xNEAR**, **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, and an **AI Pool Guardian** that runs the pool's safety work, sets the savings rate from demand, and explains every move in public notes.
 
-**Try it:** [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app) (NEAR testnet; get free tNEAR in the app).
+**Try it:** [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app) (NEAR testnet; get free tNEAR in the app). No wallet? Click **Demo** for a pretend wallet with example positions and live prices; nothing is sent.
 
 Built for the NEAR Hackathon (Nov 2026).
 
