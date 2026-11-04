@@ -21,7 +21,9 @@
 import { appendFileSync } from 'node:fs';
 import { Account, FailoverRpcProvider, JsonRpcProvider } from 'near-api-js';
 import { deriveAgentKey } from './key.mjs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { plan, shouldPostStatus, statusNote, toMicroUsd } from './logic.mjs';
+import { askAI, ruleDecision, volatilityFromCandles } from './ai.mjs';
 
 const POOL_ID = process.env.POOL_ID || 'pool.bexley.testnet';
 const GUARDIAN_ID = process.env.GUARDIAN_ID || 'guardian.bexley.testnet';
@@ -96,45 +98,108 @@ async function market() {
     const open = Number(t?.o);
     if (change24h == null && v > 0 && open > 0) change24h = ((v - open) / open) * 100;
   } catch {}
-  if (got.length === 0) return { price: null, change24h, sources: 'none answered' };
+  // Hourly candles for the last day, for volatility.
+  let vol = { vol24h: null, range24h: null };
+  try {
+    const j = await getJson('https://api.kraken.com/0/public/OHLC?pair=NEARUSD&interval=60');
+    const rows = (Object.entries(j?.result || {}).find(([k]) => k !== 'last')?.[1] || []).slice(-25);
+    vol = volatilityFromCandles(rows.map((r) => Number(r[4])), rows.map((r) => Number(r[2])), rows.map((r) => Number(r[3])));
+  } catch {}
+  if (got.length === 0) return { price: null, change24h, ...vol, sources: 'none answered' };
   const sorted = got.map(([, v]) => v).sort((a, b) => a - b);
   const mid = sorted[Math.floor(sorted.length / 2)];
-  return { price: toMicroUsd(mid), usd: mid, change24h, sources: got.map(([n, v]) => `${n} $${v}`).join(', ') };
+  return { price: toMicroUsd(mid), usd: mid, change24h, ...vol, sources: got.map(([n, v]) => `${n} $${v}`).join(', ') };
 }
 
 // ---- Tick ----
 
+// The AI is asked at most every 30 minutes (or right away if the pool's mode
+// changed), so settings move deliberately instead of flickering. The loop
+// runs ticks as separate processes, so this is kept in a small file.
+const STATE_FILE = process.env.GUARDIAN_STATE || '/tmp/bexley-guardian-state.json';
+const AI_EVERY_MS = 30 * 60_000;
+const readState = () => {
+  try {
+    return JSON.parse(readFileSync(STATE_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+const state = readState();
+
 note(`## Pool Guardian tick ${new Date().toISOString()}${DRY_RUN ? ' (dry run)' : ''}`);
 const m = await market();
-note(`**Market:** ${m.price ? `NEAR $${m.usd}` : 'no price'} (${m.sources})${m.change24h != null ? `, ${m.change24h.toFixed(2)}% in 24h` : ''}`);
+note(
+  `**Market:** ${m.price ? `NEAR $${m.usd}` : 'no price'} (${m.sources})` +
+    `${m.change24h != null ? `, ${m.change24h.toFixed(2)}% in 24h` : ''}` +
+    `${m.vol24h != null ? `, volatility ${m.vol24h.toFixed(2)}%, range ${m.range24h.toFixed(2)}%` : ''}`,
+);
 
 let pool = await view('get_pool');
 const vaultsBefore = await view('get_vaults');
 const triggeredBefore = await view('get_triggered_orders', { limit: 20 });
-note(`**Pool:** mode ${pool.mode}, backing ${pool.cr_bps === '0' ? 'n/a' : (Number(pool.cr_bps) / 100).toFixed(1) + '%'}, fee level ${pool.fee_level}`);
-
-// Price goes first; protection, vaults and orders depend on it and on the
-// state it creates, so they are re-read after.
-const first = plan({ pool, vaults: [], triggered: [], newPrice: m.price, change24h: m.change24h, nowMs: Date.now() });
+note(`**Pool:** mode ${pool.mode}, backing ${pool.cr_bps === '0' ? 'n/a' : (Number(pool.cr_bps) / 100).toFixed(1) + '%'}, fee level ${pool.fee_level}, savings rate ${pool.savings_rate_set_bps / 100}%`);
 note('**Actions:**');
-for (const a of first) {
-  if (a.type === 'set_price' && (await call('set_price', { price: a.price.toString() }, 10n))) note(`- Posted NEAR price $${m.usd}.`);
-  if (a.type === 'set_fee_level' && (await call('set_fee_level', { level: a.level, reason: a.reason, savings_rate_bps: a.rate }, 10n)))
-    note(`- Fee level ${a.level}, savings rate ${(a.rate / 100).toFixed(0)}%: ${a.reason}`);
-}
+let acted = 0;
 
+// 1. Price first: everything else needs a fresh one.
+for (const a of plan({ pool: { ...pool, savings_rate_set_bps: null }, vaults: [], triggered: [], newPrice: m.price, change24h: null, nowMs: Date.now() })) {
+  if (a.type === 'set_price' && (await call('set_price', { price: a.price.toString() }, 10n))) {
+    note(`- Posted NEAR price $${m.usd}.`);
+    acted++;
+  }
+}
+pool = await view('get_pool');
+
+// 2. Fees and savings rate: the AI decides, within hard limits.
+const hasKey = !!process.env.NEARAI_API_KEY;
+const aiDue = hasKey && (Date.now() - (state.lastAiAt || 0) >= AI_EVERY_MS || state.lastMode !== pool.mode);
+let decision = null;
+let source = null;
+if (aiDue) {
+  try {
+    const r = await askAI(pool, m);
+    decision = r.decision;
+    source = `AI (${r.model})`;
+    state.lastAiAt = Date.now();
+    note(`- AI read: ${JSON.stringify(r.facts)}`);
+    note(`- AI decided: fee level ${decision.level}, rate ${decision.rate / 100}%. "${decision.reason}"`);
+  } catch (e) {
+    note(`- AI unavailable (${shortError(e)}). Using the fixed rules this time.`);
+    decision = ruleDecision(pool, m);
+    source = 'rules (fallback)';
+  }
+} else if (!hasKey) {
+  decision = ruleDecision(pool, m);
+  source = 'rules (no AI key)';
+}
+state.lastMode = pool.mode;
+if (decision && (decision.level !== pool.fee_level || decision.rate !== pool.savings_rate_set_bps)) {
+  if (await call('set_fee_level', { level: decision.level, reason: decision.reason, savings_rate_bps: decision.rate }, 10n)) {
+    note(`- Set fee level ${decision.level} and savings rate ${decision.rate / 100}% (${source}).`);
+    acted++;
+  }
+} else if (decision) {
+  note(`- Settings unchanged (${source}).`);
+}
+try {
+  writeFileSync(STATE_FILE, JSON.stringify(state));
+} catch {}
+
+// 3. Protection, vaults and orders, on the latest state.
 pool = await view('get_pool');
 const vaults = await view('get_vaults');
 const triggered = await view('get_triggered_orders', { limit: 20 });
-const rest = plan({ pool, vaults, triggered, newPrice: null, change24h: null, nowMs: Date.now() });
+const rest = plan({ pool: { ...pool, savings_rate_set_bps: null }, vaults, triggered, newPrice: null, change24h: null, nowMs: Date.now() });
 for (const a of rest) {
   if (a.type === 'stabilize' && (await call('stabilize', {}))) note('- Stabilized: Stability Pool bxUSD converted to xNEAR to lift backing.');
   if (a.type === 'rebalance' && (await call('rebalance', { vault: a.vault }, 150n))) note(`- Rebalanced vault ${a.vault}.`);
   if (a.type === 'execute_order' && (await call('execute_order', { order_id: a.order_id }, 80n))) note(`- Executed order ${a.order_id}.`);
+  acted++;
 }
-if (first.length + rest.length === 0) note('- Nothing needed.');
+if (acted === 0) note('- Nothing needed.');
 
-// Report
+// 4. Report.
 pool = await view('get_pool');
 const notes = await view('get_notes', { limit: 20 });
 if (BigInt(pool.price) > 0n && shouldPostStatus(notes, pool.mode, Date.now(), undefined, pool)) {

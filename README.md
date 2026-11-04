@@ -20,7 +20,7 @@ This README only describes what works today.
 | Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 37 unit tests pass. |
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
-| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. 12 logic tests pass. |
+| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, with fixed rules as backup. 21 tests pass. |
 | Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
@@ -77,12 +77,12 @@ Park xNEAR with a **stop price**, a **take price**, or both. When NEAR reaches o
 Every 5 minutes the Guardian:
 
 1. **Prices**: posts the median NEAR/USD price when it moved 0.1% or is 20 minutes old. The pool refuses prices older than an hour.
-2. **Sets fees**: reads NEAR's 24-hour move. Under 5% is calm (normal fees), 5–10% volatile (2x fees), over 10% stormy (3x fees). Higher fees in rough markets slow churn and pay the Stability Pool more for its extra risk.
-3. **Sets the savings rate** from demand for leverage: backing over 300% means bxUSD is scarce and xNEAR barely levered, so 12% to attract savers; 200–300% is balanced, 8%; under 200% means xNEAR is already well levered, so 5% to ease its cost; 0% whenever the pool is not Healthy.
+2. **Decides fees and the savings rate with an AI model.** Every 30 minutes (or at once if the pool's mode changes), an AI model on [NEAR AI Cloud](https://cloud.near.ai) reads the facts: NEAR's price, 24-hour move, hourly volatility and range (from Kraken candles), backing, xNEAR leverage, Stability Pool size, and the current settings. It picks a fee level (normal, 2x or 3x) and a savings rate, and writes the reason users see. Its answer must pass hard limits before anything is sent: fee level 0–2, rate 0–20%, at most 4 points of rate change per decision, and 0% outside Healthy mode. The contract enforces the fee and rate limits again on its own.
+3. **Falls back to fixed rules** if the AI is unreachable, answers badly, or no API key is set: normal / 2x / 3x fees at under 5% / 5–10% / over 10% daily moves, and a 12% / 8% / 5% / 0% rate by backing (over 300%, 200–300%, under 200%, not Healthy).
 4. **Protects**: calls `stabilize` when backing is under 130%.
 5. **Rebalances** Steady vaults that drifted.
 6. **Executes** stop-loss and take-profit orders whose price is reached.
-7. **Explains**: writes a plain-English note on the pool contract for every fee or rate change, protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
+7. **Explains**: writes a plain-English note on the pool contract for every fee or rate change (the AI's own words when the AI decided), protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
 
 **It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level` (which also sets the savings rate), `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 

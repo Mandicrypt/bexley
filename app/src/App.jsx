@@ -632,7 +632,8 @@ function GuardianPage({ pool }) {
       <div className="pagehead">
         <h2>The Pool Guardian</h2>
         <p>
-          An AI agent that runs the pool's safety work every 5 minutes and writes down what it did and why, on-chain. It can't move
+          An agent that runs the pool's safety work every 5 minutes. An AI model on NEAR AI Cloud reads the market and the pool and
+          sets the fees and the savers' rate, then explains why in the notes below. It works inside hard limits, and it can't move
           anyone's money: its account only holds a key for these jobs, and the pool checks every rule itself.
         </p>
       </div>
@@ -641,15 +642,15 @@ function GuardianPage({ pool }) {
           <h3>What it does</h3>
           <div className="facts" style={{ marginTop: 0 }}>
             <Fact k="Posts the NEAR price" v="Median of 3 exchanges" />
-            <Fact k="Sets fees from the 24h move" v={s ? ['Calm, 1x', 'Volatile, 2x', 'Stormy, 3x'][s.fee_level] : '—'} />
-            <Fact k="Sets the savers' rate" v={s ? `${pctRate(s.savings_rate_bps)} a year` : '—'} />
+            <Fact k="Fees, set by AI" v={s ? ['Normal, 1x', 'Volatile, 2x', 'Stormy, 3x'][s.fee_level] : '—'} />
+            <Fact k="Savers' rate, set by AI" v={s ? `${pctRate(s.savings_rate_bps)} a year` : '—'} />
             <Fact k="Protections run" v={s ? s.stats.stabilizations : '—'} />
             <Fact k="Vault rebalances" v={s ? s.stats.rebalances : '—'} />
             <Fact k="Orders run" v={s ? s.stats.orders_executed : '—'} />
           </div>
           <p className="hint">
-            Rate rule: 12% when bxUSD is scarce (backing over 300%), 8% when balanced, 5% when xNEAR is already well levered, 0% in a
-            crisis.
+            Hard limits on every AI decision: fees 1x to 3x, rate 0% to 20%, at most 4 points of rate change at a time, and 0% whenever the
+            pool isn't healthy. If the AI is unreachable, fixed rules take over.
           </p>
           <p className="hint" style={{ marginTop: 10 }}>
             Account: <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>
