@@ -35,7 +35,7 @@ Rules you must follow:
 - Never invent numbers. Use only the data given.
 
 Answer with JSON only, no other text:
-{"fee_level": 0|1|2, "savings_rate_bps": integer, "reason": "one or two plain sentences for users explaining any change, citing the numbers that drove it", "status": "one short plain sentence summarizing the pool right now"}
+{"fee_level": 0|1|2, "savings_rate_bps": integer, "reason": "at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps", "status": "one short plain sentence summarizing the pool right now"}
 Write for ordinary users: short sentences, no jargon, no exclamation marks.`;
 
 /** The facts the AI sees. Small, numeric, and all from real sources. */
@@ -56,6 +56,16 @@ export function buildFacts(pool, market) {
     current_fee_level: pool.fee_level,
     current_savings_rate_bps: pool.savings_rate_set_bps,
   };
+}
+
+/** Squash spaces and cut at the last full sentence (or word) that fits. */
+export function fitText(t, max) {
+  t = t.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const dot = cut.lastIndexOf('. ');
+  if (dot > max * 0.4) return cut.slice(0, dot + 1);
+  return cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:]$/, '') + '…';
 }
 
 /** Pull the first JSON object out of a model reply. */
@@ -82,7 +92,7 @@ export function checkDecision(d, pool) {
   rate = Math.max(LIMITS.rateMin, Math.min(LIMITS.rateMax, rate));
   rate = Math.max(cur - LIMITS.rateStepMax, Math.min(cur + LIMITS.rateStepMax, rate));
   if (pool.mode !== 'Healthy') rate = 0;
-  const reason = String(d.reason || '').replace(/\s+/g, ' ').trim().slice(0, 270);
+  const reason = fitText(String(d.reason || ''), 270);
   const status = String(d.status || '').replace(/\s+/g, ' ').trim().slice(0, 200);
   if (reason.length < 10) throw new Error('Reason missing');
   return { level, rate, reason, status };
