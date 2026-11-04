@@ -306,12 +306,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 }
 .toast.bad { background: var(--red); color: #fff; }
 
+/* ---------- Risk check ---------- */
+.risk { padding: 8px 0 0; display: grid; gap: 16px; }
+.risk-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.risk-head h2 { font-size: 22px; font-weight: 800; }
+.scen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.scen-cell { background: var(--bg); padding: 14px 16px; }
+.scen-cell .n { font-size: 22px; font-weight: 750; letter-spacing: -0.02em; }
+.scen-cell .l { font-size: 13px; color: var(--muted); }
+.stopnote { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.stopnote > div:first-child { flex: 1 1 360px; min-width: 0; }
+
 /* ---------- Small screens ---------- */
 @media (max-width: 900px) {
   .nav { display: none; }
   .mobnav { display: flex; gap: 2px; overflow-x: auto; padding: 8px 0; border-top: 1px solid var(--line); }
   .cols, .cols.even { grid-template-columns: minmax(0, 1fr); }
   .whatif { grid-template-columns: minmax(0, 1fr); }
+  .scen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
   .top .row { gap: 10px; }

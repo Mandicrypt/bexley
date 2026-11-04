@@ -7,6 +7,7 @@ import {
 import {
   parseAmount, formatAmount, formatUsd, usdValue, formatTimes, formatBacking, timeAgo, timeLeft, shortAccount, parseUsdPrice,
 } from './lib/format.mjs';
+import { poolNumbers, scenario, leverage, xPriceAt, dailyVolatility, suggestStop, riskWord } from './lib/risk.mjs';
 
 const REFRESH_MS = 15_000;
 const SLIPPAGE_BPS = 100n; // accept up to 1% less than quoted
@@ -172,6 +173,7 @@ export default function App() {
               <TradePanel {...ctx} />
               <GuardianFeed pool={pool} limit={5} onMore={() => go('guardian')} />
             </section>
+            <RiskCheck {...ctx} onOrders={() => go('orders')} />
           </>
         )}
         {page === 'earn' && <Earn {...ctx} />}
@@ -813,6 +815,7 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
 // ---------- Orders ----------
 
 function Orders({ pool, me, accountId, onConnect, run, busy }) {
+  const vol = useVolatility();
   const [text, setText] = useState('');
   const [stopText, setStopText] = useState('');
   const [takeText, setTakeText] = useState('');
@@ -861,7 +864,18 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
               </div>
             </div>
           </div>
-          <p className="hint" style={{ marginBottom: 14 }}>NEAR is {s ? formatUsd(s.price, 3) : '—'} now.</p>
+          <p className="hint" style={{ marginBottom: 14 }}>
+            NEAR is {s ? formatUsd(s.price, 3) : '—'} now.{' '}
+            {s && (
+              <button
+                className="linkbtn"
+                onClick={() => setStopText(String(suggestStop(Number(s.price) / 1e6, vol).price))}
+                title="Two days of NEAR's usual moves below today's price"
+              >
+                Suggest a stop
+              </button>
+            )}
+          </p>
           {problem && <p className="err">{problem}</p>}
           {accountId ? (
             <button className="btn go wide" disabled={!amount || !!problem || busy === 'order'} onClick={() => run('order', () => placeOrder(amount, stop, take), 'Order placed. The Guardian is watching it.')}>
@@ -909,6 +923,94 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
           </p>
         </div>
       </div>
+    </section>
+  );
+}
+
+// ---------- Risk check ----------
+
+/** NEAR's daily volatility from the last day of CoinGecko prices (null if unavailable). */
+function useVolatility() {
+  const [vol, setVol] = useState(null);
+  useEffect(() => {
+    let live = true;
+    fetch('https://api.coingecko.com/api/v3/coins/near/market_chart?vs_currency=usd&days=1')
+      .then((r) => r.json())
+      .then((j) => live && setVol(dailyVolatility(j?.prices)))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return vol;
+}
+
+const MOVES = [-20, -10, 10, 20];
+
+export function RiskCheck({ pool, me, accountId, run, busy, onOrders }) {
+  const vol = useVolatility();
+  if (!accountId || !me || !pool) return null;
+  const p = poolNumbers(pool.state);
+  const x = Number(BigInt(me.xnear) / 10n ** 18n) / 1e6;
+  const bx = Number(BigInt(me.bx) / 10n ** 18n) / 1e6 + Number(BigInt(me.stability_pool.value) / 10n ** 18n) / 1e6;
+  if (x <= 0 && bx <= 0) return null;
+
+  const lev = leverage(p);
+  const xValue = x * xPriceAt(p, p.price);
+  const total = xValue + bx;
+  const posLev = total > 0 ? (xValue * (Number.isFinite(lev) ? lev : 1)) / total : 0;
+  const stop = suggestStop(p.price, vol);
+  const atStop = scenario(p, x, bx, -stop.gapPct);
+  const openStops = (me.orders || []).filter((o) => o.status === 'Open' && o.stop_price);
+  const $ = (v) => `${v < 0 ? '-' : ''}$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  return (
+    <section className="risk" aria-label="Your risk">
+      <div className="risk-head">
+        <div>
+          <h2>Your risk</h2>
+          <p className="hint">
+            Worth {$(total)} now: {$(xValue)} in xNEAR and {$(bx)} in bxUSD. Overall you move about {posLev.toFixed(2)}x with NEAR.
+          </p>
+        </div>
+        <span className={`chip ${posLev < 1.5 ? 'green' : posLev < 2.5 ? 'amber' : 'red'}`}>{riskWord(posLev)} risk</span>
+      </div>
+      <div className="scen" role="table" aria-label="If NEAR moves">
+        {MOVES.map((mv) => {
+          const r = scenario(p, x, bx, mv);
+          return (
+            <div key={mv} className="scen-cell" role="row">
+              <div className="l" role="rowheader">If NEAR {mv > 0 ? 'rises' : 'falls'} {Math.abs(mv)}%</div>
+              <div className={`n ${r.change >= 0 ? 'up' : 'down'}`} role="cell">{r.change >= 0 ? '+' : ''}{$(r.change)}</div>
+              <div className="l" role="cell">{r.changePct >= 0 ? '+' : ''}{r.changePct.toFixed(1)}%</div>
+            </div>
+          );
+        })}
+      </div>
+      {x > 0 && (
+        <div className="note good stopnote">
+          <div>
+            <b>Suggested stop-loss: NEAR at ${stop.price.toFixed(3)}</b>, {stop.gapPct.toFixed(0)}% below today.{' '}
+            {vol != null ? `NEAR usually moves about ${vol.toFixed(1)}% a day, so this leaves room for normal swings. ` : ''}
+            If it's hit, your xNEAR is sold and you keep about {$(atStop.then)}.
+            {openStops.length > 0 && ` You already have ${openStops.length} open stop order${openStops.length > 1 ? 's' : ''}.`}
+          </div>
+          <div className="btnrow">
+            <button
+              className="btn go sm"
+              disabled={busy === 'protect'}
+              onClick={() =>
+                run('protect', () => placeOrder(BigInt(me.xnear), BigInt(Math.round(stop.price * 1e6)), null), `Stop-loss set at $${stop.price.toFixed(3)}. The Guardian is watching it.`)
+              }
+            >
+              {busy === 'protect' ? 'Confirm in your wallet…' : 'Protect all my xNEAR'}
+            </button>
+            <button className="btn line sm" onClick={onOrders}>
+              Set my own
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
