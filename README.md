@@ -84,6 +84,17 @@ Every 5 minutes the Guardian:
 6. **Executes** stop-loss and take-profit orders whose price is reached.
 7. **Explains**: writes a plain-English note on the pool contract for every fee or rate change (the AI's own words when the AI decided), protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
 
+### Provable AI
+
+Every AI decision comes with a public proof that it was made by the AI model inside NEAR AI's secure hardware (a TEE), and that nobody changed it afterwards, including us.
+
+1. Before asking, the Guardian fetches NEAR AI's hardware attestation report for the model, with a fresh random nonce. The report names the signing keys that exist only inside the enclave.
+2. It sends the question and keeps the exact request and response bytes.
+3. It fetches NEAR AI's signature for that answer (`/v1/signature/{id}`). The model's enclave signs `model:sha256(request):sha256(response)`.
+4. It checks the proof itself (`agent/proof.mjs`) and publishes it to the [`proofs` branch](https://github.com/Mandicrypt/bexley/tree/proofs): the exact request and response, the signature, and the attestation report.
+
+On the Guardian page, click **AI, verified** on a note and your browser downloads the proof and redoes every check (`app/src/lib/proof.mjs`): the hashes match the signed text, the signature recovers to the signing key, and that key is in the hardware report. You can also inspect the model's hardware report in [NEAR AI's verification center](https://cloud.near.ai/verify).
+
 **It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level` (which also sets the savings rate), `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 
 Each run's decision log is on its GitHub Actions page.

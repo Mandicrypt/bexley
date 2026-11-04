@@ -5,6 +5,7 @@ import {
   cancelOrder, claimStuck, errorText, setDemo,
 } from './lib/near.js';
 import { DEMO_ID, createDemo } from './lib/demo.mjs';
+import { verifyProof } from './lib/proof.mjs';
 import {
   parseAmount, formatAmount, formatUsd, usdValue, formatTimes, formatBacking, timeAgo, timeLeft, shortAccount, parseUsdPrice,
 } from './lib/format.mjs';
@@ -654,7 +655,90 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
 
 const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', rate: 'Savings rate', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
 
+// ---------- Provable AI ----------
+
+const PROOFS_RAW = 'https://raw.githubusercontent.com/Mandicrypt/bexley/proofs';
+const PROOFS_WEB = 'https://github.com/Mandicrypt/bexley/blob/proofs';
+
+/** The public index of AI proofs, refreshed when new notes arrive. */
+function useProofIndex(key) {
+  const [index, setIndex] = useState([]);
+  useEffect(() => {
+    let live = true;
+    fetch(`${PROOFS_RAW}/index.json?t=${Math.floor(Date.now() / 60000)}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((j) => live && Array.isArray(j) && setIndex(j))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [key]);
+  return index;
+}
+
+/** Downloads one proof and checks it in this browser. */
+function ProofPanel({ entry }) {
+  const [res, setRes] = useState(null);
+  useEffect(() => {
+    let live = true;
+    fetch(`${PROOFS_RAW}/${entry.file}`)
+      .then((r) => {
+        if (!r.ok) throw new Error('Could not download the proof.');
+        return r.json();
+      })
+      .then((p) => {
+        let answer = '';
+        try {
+          const m = JSON.parse(p.response)?.choices?.[0]?.message;
+          answer = m?.content || m?.reasoning_content || '';
+        } catch {}
+        live && setRes({ ...verifyProof(p), answer, model: p.model, kind: p.signature?.signature_kind });
+      })
+      .catch((e) => live && setRes({ error: e.message }));
+    return () => {
+      live = false;
+    };
+  }, [entry.file]);
+
+  if (!res) return <div className="proof">Checking the proof in your browser…</div>;
+  if (res.error) return <div className="proof bad">{res.error}</div>;
+  return (
+    <div className={`proof${res.ok ? '' : ' bad'}`}>
+      <b>{res.ok ? 'Checked in your browser: this decision came from NEAR AI secure hardware.' : 'This proof did not check out.'}</b>
+      <ul>
+        {res.checks.map((c) => (
+          <li key={c.name} className={c.ok ? 'ok' : 'no'}>
+            <span aria-hidden="true">{c.ok ? '✓' : '✕'}</span>
+            <div>
+              {c.name}
+              <small>{c.detail}</small>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="hint">
+        Model {res.model}
+        {res.kind === 'provider_tee' ? ', signed by the model\'s own enclave' : res.kind === 'gateway' ? ', signed by the NEAR AI gateway enclave' : ''}.
+      </p>
+      {res.answer && (
+        <details>
+          <summary>The AI's exact answer</summary>
+          <pre>{res.answer}</pre>
+        </details>
+      )}
+      <p className="hint links">
+        <a href={`${PROOFS_WEB}/${entry.file}`} target="_blank" rel="noreferrer">Proof file</a>
+        <a href="https://cloud.near.ai/verify" target="_blank" rel="noreferrer">NEAR AI verification center</a>
+        <a href="https://github.com/Mandicrypt/bexley/blob/main/app/src/lib/proof.mjs" target="_blank" rel="noreferrer">Checking code</a>
+      </p>
+    </div>
+  );
+}
+
 function GuardianFeed({ pool, limit, onMore, more, title = 'Pool Guardian' }) {
+  const proofs = useProofIndex(pool?.notes?.[0]?.id);
+  const [open, setOpen] = useState(null);
+  const proofFor = (n) => (n.kind === 'fees' || n.kind === 'rate' ? proofs.find((p) => p.reason === n.text) : null);
   const s = pool?.state;
   const [shown, setShown] = useState(limit);
   const all = pool?.notes ?? [];
@@ -678,8 +762,14 @@ function GuardianFeed({ pool, limit, onMore, more, title = 'Pool Guardian' }) {
               <div className="meta">
                 <span className="k">{KIND_LABEL[n.kind] || n.kind}</span>
                 <span>{timeAgo(n.at)}</span>
+                {proofFor(n) && (
+                  <button className="verified" onClick={() => setOpen(open === n.id ? null : n.id)} aria-expanded={open === n.id}>
+                    {open === n.id ? 'Hide proof' : 'AI, verified'}
+                  </button>
+                )}
               </div>
               <p>{n.text}</p>
+              {open === n.id && proofFor(n) && <ProofPanel entry={proofFor(n)} />}
             </li>
           ))}
         </ol>
@@ -727,6 +817,32 @@ function Example({ children }) {
   );
 }
 
+function LatestDecision({ pool }) {
+  const proofs = useProofIndex(pool?.notes?.[0]?.id);
+  const [open, setOpen] = useState(false);
+  const p = proofs[0];
+  if (!p) return null;
+  return (
+    <div className="latest">
+      <div className="meta">
+        <span className="k">Latest AI decision</span>
+        <span>{timeAgo(String(BigInt(p.at) * 1_000_000n))}</span>
+        {p.verified && (
+          <button className="verified" onClick={() => setOpen(!open)} aria-expanded={open}>
+            {open ? 'Hide proof' : 'AI, verified'}
+          </button>
+        )}
+      </div>
+      <p>{p.reason}</p>
+      {open && <ProofPanel entry={p} />}
+      <p className="hint">{(() => {
+          const n = proofs.filter((x) => x.verified).length;
+          return `${n} AI decision${n === 1 ? '' : 's'} with a public proof so far.`;
+        })()}</p>
+    </div>
+  );
+}
+
 function GuardianPage({ pool }) {
   const s = pool?.state;
   return (
@@ -754,6 +870,11 @@ function GuardianPage({ pool }) {
             Hard limits on every AI decision: fees 1x to 3x, rate 0% to 20%, at most 4 points of rate change at a time, and 0% whenever the
             pool isn't healthy. If the AI is unreachable, fixed rules take over.
           </p>
+          <LatestDecision pool={pool} />
+          <div className="note provable">
+            <b>Provable AI.</b> Every AI decision is signed inside NEAR AI's secure hardware. Click <em>AI, verified</em> on a note and
+            your browser checks the signature itself, so you don't have to trust Bexley.
+          </div>
           <p className="hint" style={{ marginTop: 10 }}>
             Account: <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>
           </p>
