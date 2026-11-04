@@ -438,3 +438,23 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .capbar { display: inline-block; width: 90px; height: 6px; border-radius: 99px; background: var(--bg); overflow: hidden; }
 .capbar i { display: block; height: 100%; background: var(--red); }
 @media (max-width: 560px) { .netswitch button { padding: 5px 8px; } }
+
+/* Deposit from another chain */
+.crosschain { margin-top: 8px; padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); display: grid; gap: 16px; }
+.cc-head h3 { font-size: 19px; }
+.cc-head .hint { margin-top: 4px; max-width: 70ch; }
+.cc-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px 24px; align-items: end; }
+.cc-grid select { border: 0; background: transparent; font: inherit; font-weight: 600; color: var(--ink); max-width: 55%; cursor: pointer; }
+.cc-out { display: grid; gap: 2px; padding-bottom: 14px; }
+.cc-out b { font-family: var(--display); font-size: 22px; font-weight: 600; }
+.cc-go { display: grid; gap: 10px; }
+.cc-go .field { margin: 0; }
+.cc-grid > .btn { justify-self: start; margin-bottom: 14px; }
+.cc-deposit { display: grid; gap: 12px; }
+.cc-addr { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.cc-addr code, .cc-deposit code { font-size: 14px; background: var(--surface); padding: 8px 10px; border-radius: 8px; word-break: break-all; }
+.cc-status { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.cc-status.s-SUCCESS { color: var(--green-ink); }
+.cc-status.s-REFUNDED, .cc-status.s-FAILED, .cc-status.s-INCOMPLETE_DEPOSIT { color: var(--red); }
+.cc-foot { margin-top: -4px; }
+@media (max-width: 900px) { .cc-grid { grid-template-columns: minmax(0, 1fr); } }

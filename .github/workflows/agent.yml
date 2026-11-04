@@ -65,6 +65,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+      NEAR_MAINNET_PRIVATE_KEY: ${{ secrets.NEAR_MAINNET_PRIVATE_KEY }}
       # The AI brain (NEAR AI Cloud). Without it the Guardian uses fixed rules.
       NEARAI_API_KEY: ${{ secrets.NEARAI_API_KEY || secrets.NEAR_API_KEY }}
     steps:
@@ -89,10 +90,25 @@ jobs:
           export AGENT_PRIVATE_KEY=$(node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
           echo "::add-mask::$AGENT_PRIVATE_KEY"
           unset NEAR_PRIVATE_KEY
+          # Mainnet beta, if configured: its own derived limited key and state.
+          MAIN_OWNER=$(jq -r '.owner // empty' ../app/src/config/mainnet.json)
+          if [ -n "$MAIN_OWNER" ] && [ -n "$NEAR_MAINNET_PRIVATE_KEY" ]; then
+            MAIN_AGENT_KEY=$(NEAR_PRIVATE_KEY="$NEAR_MAINNET_PRIVATE_KEY" node -e "import('./key.mjs').then(m=>console.log(m.deriveAgentKey(process.env.NEAR_PRIVATE_KEY).privateKey))")
+            echo "::add-mask::$MAIN_AGENT_KEY"
+            echo "Mainnet beta: pool.$MAIN_OWNER"
+          fi
+          unset NEAR_MAINNET_PRIVATE_KEY
           export PROOF_DIR="$GITHUB_WORKSPACE/proofs-repo"
           end=$((SECONDS + 20700))
           while [ $SECONDS -lt $end ]; do
             timeout 240 node run.mjs || echo "Tick failed; trying again next round."
+            if [ -n "$MAIN_AGENT_KEY" ]; then
+              echo "--- mainnet beta ---"
+              AGENT_PRIVATE_KEY="$MAIN_AGENT_KEY" POOL_ID="pool.$MAIN_OWNER" GUARDIAN_ID="guardian.$MAIN_OWNER" \
+                NEAR_RPC_URL="https://free.rpc.fastnear.com,https://near.lava.build" \
+                GUARDIAN_STATE=/tmp/bexley-guardian-state-mainnet.json PROOF_DIR="$GITHUB_WORKSPACE/proofs-repo/mainnet" \
+                timeout 240 node run.mjs || echo "Mainnet tick failed; trying again next round."
+            fi
             ../scripts/publish-proofs.sh || echo "Could not publish proofs this round."
             sleep 300
           done

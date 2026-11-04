@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   EXPLORER, GUARDIAN_ID, POOL_ID, XNEAR_ID, TNEAR_ID, connect, disconnect, currentAccount, getConnector, loadPool, loadAccount,
-  quote, claimTnear, mintBx, mintX, redeemBx, redeemX, spDeposit, spWithdraw, vaultDeposit, vaultWithdraw, placeOrder,
+  quote, quote as quote_, claimTnear, mintBx, mintX, redeemBx, redeemX, spDeposit, spWithdraw, vaultDeposit, vaultWithdraw, placeOrder,
   cancelOrder, claimStuck, errorText, setDemo, ASSET, IS_MAINNET, MAINNET_READY, MAINNET_CAP_NEAR, NETWORK, switchNetwork, unwrapNear,
 } from './lib/near.js';
 import { DEMO_ID, createDemo } from './lib/demo.mjs';
@@ -220,6 +220,7 @@ export default function App() {
                 <PoolPulse pool={pool} />
               </div>
             </section>
+            <CrossChain {...ctx} />
             {!IS_MAINNET && <AskBexley {...ctx} />}
             <RiskCheck {...ctx} onOrders={() => go('orders')} />
           </>
@@ -248,6 +249,266 @@ export default function App() {
         </div>
       )}
     </>
+  );
+}
+
+// ---------- Deposit from another chain (NEAR Intents) ----------
+
+const STATUS_WORDS = {
+  PENDING_DEPOSIT: 'Waiting for your deposit',
+  KNOWN_DEPOSIT_TX: 'Deposit seen, confirming',
+  INCOMPLETE_DEPOSIT: 'Deposit was less than the quote. Send the rest, or wait for a refund',
+  PROCESSING: 'Swapping to NEAR',
+  SUCCESS: 'Done',
+  REFUNDED: 'Refunded to your address',
+  FAILED: 'Failed. Any funds are refunded to your address',
+};
+
+function readPending() {
+  try {
+    return JSON.parse(localStorage.getItem('bexley-intent') || 'null');
+  } catch {
+    return null;
+  }
+}
+function writePending(v) {
+  try {
+    if (v) localStorage.setItem('bexley-intent', JSON.stringify(v));
+    else localStorage.removeItem('bexley-intent');
+  } catch {}
+}
+
+function CrossChain({ pool, me, accountId, onConnect, run, busy }) {
+  const [tokens, setTokens] = useState([]);
+  const [pick, setPick] = useState('');
+  const [amount, setAmount] = useState('25');
+  const [quote, setQuote] = useState(null);
+  const [qErr, setQErr] = useState('');
+  const [refundTo, setRefundTo] = useState('');
+  const [deposit, setDeposit] = useState(() => (IS_MAINNET ? readPending() : null));
+  const [status, setStatus] = useState(null);
+  const [getting, setGetting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/intents?action=tokens')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((t) => {
+        if (Array.isArray(t) && t.length) {
+          setTokens(t);
+          setPick((p) => p || t[0].assetId);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const token = tokens.find((t) => t.assetId === pick);
+
+  // Live preview quote (no deposit address).
+  useEffect(() => {
+    if (!token || !amount || deposit) return;
+    let live = true;
+    setQErr('');
+    const t = setTimeout(() => {
+      fetch('/api/intents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'quote', dry: true, originAsset: token.assetId, amount, recipient: (IS_MAINNET && accountId) || 'bexley.near' }),
+      })
+        .then(async (r) => {
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(j.error || 'No quote right now.');
+          live && setQuote(j);
+        })
+        .catch((e) => live && (setQuote(null), setQErr(e.message)));
+    }, 500);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [pick, amount, accountId, deposit]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Follow a real deposit.
+  useEffect(() => {
+    if (!deposit) return;
+    let live = true;
+    const poll = () =>
+      fetch(`/api/intents?action=status&depositAddress=${encodeURIComponent(deposit.depositAddress)}${deposit.depositMemo ? `&depositMemo=${encodeURIComponent(deposit.depositMemo)}` : ''}`)
+        .then((r) => r.json())
+        .then((j) => live && j.status && setStatus(j))
+        .catch(() => {});
+    poll();
+    const t = setInterval(poll, 8000);
+    return () => {
+      live = false;
+      clearInterval(t);
+    };
+  }, [deposit]);
+
+  const getAddress = async () => {
+    setGetting(true);
+    setQErr('');
+    try {
+      const r = await fetch('/api/intents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'quote', dry: false, originAsset: token.assetId, amount, recipient: accountId, refundTo }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.depositAddress) throw new Error(j.error || 'NEAR Intents did not give a deposit address. Try again.');
+      const d = { ...j, at: Date.now(), account: accountId };
+      writePending(d);
+      setDeposit(d);
+      setStatus(null);
+    } catch (e) {
+      setQErr(e.message);
+    } finally {
+      setGetting(false);
+    }
+  };
+
+  const reset = () => {
+    writePending(null);
+    setDeposit(null);
+    setStatus(null);
+  };
+
+  const copy = (text) => {
+    navigator.clipboard?.writeText(text).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      },
+      () => {},
+    );
+  };
+
+  const got = status?.status === 'SUCCESS' ? BigInt(status.amountOut || deposit?.amountOut || 0) : 0n;
+  const mintWith = (side) =>
+    run(`cc-${side}`, async () => {
+      const q = BigInt(await quote_(side === 'x' ? 'mint_x' : 'mint_bx', got));
+      const min = withSlippage(q);
+      await (side === 'x' ? mintX(got, min) : mintBx(got, min));
+      reset();
+    }, side === 'x' ? 'Minted xNEAR with your deposit.' : 'Minted bxUSD with your deposit.');
+
+  if (!tokens.length) return null;
+  return (
+    <section className="crosschain" aria-label="Deposit from another chain">
+      <div className="cc-head">
+        <h3>Deposit from another chain</h3>
+        <p className="hint">
+          Pay with USDC, USDT, ETH, SOL or BTC from their own chains. NEAR Intents swaps it and sends NEAR to your wallet, ready to mint.
+          {!IS_MAINNET && ' Live quotes; deposits run on the mainnet beta.'}
+        </p>
+      </div>
+
+      {!deposit ? (
+        <div className="cc-grid">
+          <div className="field">
+            <label htmlFor="cc-token">You send</label>
+            <div className="inputrow">
+              <input id="cc-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount to send" />
+              <select id="cc-token" value={pick} onChange={(e) => setPick(e.target.value)}>
+                {tokens.map((t) => (
+                  <option key={t.assetId} value={t.assetId}>
+                    {t.symbol} on {t.chainName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="cc-out">
+            <span className="hint">You get, in your NEAR wallet</span>
+            <b>{quote ? `${Number(quote.amountOutFormatted).toFixed(3)} NEAR` : '—'}</b>
+            <span className="hint">{quote ? `About $${Number(quote.amountOutUsd).toFixed(2)}, in about ${quote.timeEstimate} seconds. Swap fee included.` : qErr || 'Getting a live quote…'}</span>
+          </div>
+          {IS_MAINNET ? (
+            accountId ? (
+              <div className="cc-go">
+                <div className="field">
+                  <label htmlFor="cc-refund">Your {token?.chainName} address, for refunds</label>
+                  <div className="inputrow">
+                    <input id="cc-refund" placeholder={token?.chain === 'sol' ? 'Solana address' : token?.chain === 'btc' ? 'bc1…' : token?.chain === 'tron' ? 'T…' : '0x…'} value={refundTo} onChange={(e) => setRefundTo(e.target.value.trim())} />
+                  </div>
+                </div>
+                <button className="btn go" disabled={!quote || refundTo.length < 20 || getting} onClick={getAddress}>
+                  {getting ? 'Getting address…' : 'Get my deposit address'}
+                </button>
+              </div>
+            ) : (
+              <button className="btn" onClick={onConnect}>
+                Connect your NEAR wallet to deposit
+              </button>
+            )
+          ) : (
+            <button className="btn line" onClick={() => switchNetwork('mainnet')} disabled={!MAINNET_READY}>
+              {MAINNET_READY ? 'Deposit on the mainnet beta' : 'Mainnet beta opening soon'}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="cc-deposit">
+          {status?.status !== 'SUCCESS' && (
+            <>
+              <p>
+                Send exactly <b>{deposit.amountIn} {deposit.origin.symbol}</b> on <b>{deposit.origin.chainName}</b> to this address:
+              </p>
+              <div className="cc-addr">
+                <code>{deposit.depositAddress}</code>
+                <button className="btn sm line" onClick={() => copy(deposit.depositAddress)}>
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              {deposit.depositMemo && (
+                <p>
+                  Memo (required): <code>{deposit.depositMemo}</code>
+                </p>
+              )}
+              <p className="hint">
+                Only {deposit.origin.symbol} on {deposit.origin.chainName}. You'll get about {Number(deposit.amountOutFormatted).toFixed(3)} NEAR. If it can't finish
+                by {deposit.deadline ? new Date(deposit.deadline).toLocaleTimeString() : 'the deadline'}, it's refunded to your address.
+              </p>
+            </>
+          )}
+          <div className={`cc-status s-${status?.status || 'PENDING_DEPOSIT'}`}>
+            <i className="pulse" aria-hidden="true" />
+            {STATUS_WORDS[status?.status] || 'Waiting for your deposit'}
+          </div>
+          {status?.status === 'SUCCESS' && got > 0n && (
+            <>
+              <p>
+                <b>{formatAmount(got, 3)} wNEAR</b> arrived in your wallet. Mint with it now:
+              </p>
+              <div className="btnrow">
+                <button className="btn go" disabled={!!busy} onClick={() => mintWith('bx')}>
+                  Mint bxUSD
+                </button>
+                <button className="btn" disabled={!!busy} onClick={() => mintWith('x')}>
+                  Mint xNEAR
+                </button>
+                <button className="btn line" onClick={reset}>
+                  Keep it as NEAR
+                </button>
+              </div>
+            </>
+          )}
+          {status && ['REFUNDED', 'FAILED'].includes(status.status) && (
+            <button className="btn line" onClick={reset}>
+              Start again
+            </button>
+          )}
+          {(!status || status.status === 'PENDING_DEPOSIT') && (
+            <button className="linkbtn" onClick={reset}>
+              Cancel (only if you haven't sent anything)
+            </button>
+          )}
+        </div>
+      )}
+      <p className="hint cc-foot">
+        Powered by <a href="https://near-intents.org" target="_blank" rel="noreferrer">NEAR Intents</a>. Bexley never holds these funds.
+      </p>
+    </section>
   );
 }
 
@@ -712,8 +973,8 @@ const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', rate: 'Savings rate', pr
 
 // ---------- Provable AI ----------
 
-const PROOFS_RAW = 'https://raw.githubusercontent.com/Mandicrypt/bexley/proofs';
-const PROOFS_WEB = 'https://github.com/Mandicrypt/bexley/blob/proofs';
+const PROOFS_RAW = `https://raw.githubusercontent.com/Mandicrypt/bexley/proofs${IS_MAINNET ? '/mainnet' : ''}`;
+const PROOFS_WEB = `https://github.com/Mandicrypt/bexley/blob/proofs${IS_MAINNET ? '/mainnet' : ''}`;
 
 /** The public index of AI proofs, refreshed when new notes arrive. */
 function useProofIndex(key) {
@@ -917,7 +1178,7 @@ function GuardianPage({ pool }) {
             <Fact
               k="Posts the NEAR price"
               v={
-                <a href="https://github.com/Mandicrypt/bexley/tree/proofs/prices" target="_blank" rel="noreferrer">
+                <a href={`https://github.com/Mandicrypt/bexley/tree/proofs${IS_MAINNET ? '/mainnet' : ''}/prices`} target="_blank" rel="noreferrer">
                   Median of 3 exchanges
                 </a>
               }
