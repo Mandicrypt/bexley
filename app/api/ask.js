@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model,
           temperature: 0.1,
-          max_tokens: 500,
+          max_tokens: 2000,
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: systemPrompt(ctx) },
@@ -62,7 +62,13 @@ export default async function handler(req, res) {
         continue;
       }
       const j = await r.json();
-      const plan = checkPlan(parseJson(j?.choices?.[0]?.message?.content || ''), { price: ctx.near_price_usd });
+      const m = j?.choices?.[0]?.message || {};
+      const text = m.content || m.reasoning_content || m.reasoning || '';
+      if (!text) {
+        lastErr = 'empty reply';
+        continue;
+      }
+      const plan = checkPlan(parseJson(text), { price: ctx.near_price_usd });
       return res.status(200).json({ ...plan, model });
     } catch (e) {
       lastErr = String(e?.message || e);

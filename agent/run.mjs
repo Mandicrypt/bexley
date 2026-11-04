@@ -23,7 +23,7 @@ import { Account, FailoverRpcProvider, JsonRpcProvider } from 'near-api-js';
 import { deriveAgentKey } from './key.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { plan, shouldPostStatus, statusNote, toMicroUsd } from './logic.mjs';
-import { askAI, ruleDecision, volatilityFromCandles } from './ai.mjs';
+import { NEARAI_URL, askAI, ruleDecision, volatilityFromCandles } from './ai.mjs';
 
 const POOL_ID = process.env.POOL_ID || 'pool.bexley.testnet';
 const GUARDIAN_ID = process.env.GUARDIAN_ID || 'guardian.bexley.testnet';
@@ -166,6 +166,15 @@ if (aiDue) {
     note(`- AI decided: fee level ${decision.level}, rate ${decision.rate / 100}%. "${decision.reason}"`);
   } catch (e) {
     note(`- AI unavailable (${shortError(e)}). Using the fixed rules this time.`);
+    if (process.env.DRY_RUN) {
+      try {
+        const lr = await fetch(`${NEARAI_URL}/models`, { headers: { Authorization: `Bearer ${process.env.NEARAI_API_KEY}` } });
+        const lj = await lr.json();
+        note(`- Models on this key: ${(lj.data || []).map((x) => x.id).join(', ').slice(0, 900)}`);
+      } catch (e2) {
+        note(`- Could not list models (${shortError(e2)}).`);
+      }
+    }
     decision = ruleDecision(pool, m);
     source = 'rules (fallback)';
   }

@@ -102,7 +102,7 @@ export function ruleDecision(pool, market) {
 export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY, fetchImpl = fetch } = {}) {
   if (!apiKey) throw new Error('No NEARAI_API_KEY');
   const facts = buildFacts(pool, market);
-  let lastErr;
+  const errs = [];
   for (const model of MODELS) {
     try {
       const r = await fetchImpl(`${NEARAI_URL}/chat/completions`, {
@@ -111,7 +111,7 @@ export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY,
         body: JSON.stringify({
           model,
           temperature: 0.2,
-          max_tokens: 400,
+          max_tokens: 2000,
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
@@ -122,13 +122,16 @@ export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY,
       });
       if (!r.ok) throw new Error(`${model}: HTTP ${r.status} ${(await r.text()).slice(0, 160)}`);
       const j = await r.json();
-      const text = j?.choices?.[0]?.message?.content;
+      const c = j?.choices?.[0];
+      // Some models put their answer in reasoning fields when content is empty.
+      const text = c?.message?.content || c?.message?.reasoning_content || c?.message?.reasoning || '';
+      if (!text) throw new Error(`${model}: empty reply (finish: ${c?.finish_reason || 'none'})`);
       return { decision: checkDecision(parseReply(text), pool), model, facts };
     } catch (e) {
-      lastErr = e;
+      errs.push(String(e?.message || e).includes(model) ? String(e.message) : `${model}: ${e?.message || e}`);
     }
   }
-  throw lastErr;
+  throw new Error(errs.join(' | '));
 }
 
 /**
