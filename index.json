@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793828521109,
+  "id": "825dae65a9e74e449987d5f473b18d23",
+  "file": "2026-11-04/825dae65a9e74e449987d5f473b18d23.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR's wide 24h range of 15.95% keeps fees at 3x. Backing is high at 192.6%, so the 20% savings rate stays to attract savers and give xNEAR more leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793826485384,
   "id": "bbaceeca558f40dc902a32bc90b44ed0",
   "file": "2026-11-04/bbaceeca558f40dc902a32bc90b44ed0.json",
