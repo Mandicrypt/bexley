@@ -1,0 +1,111 @@
+name: Deploy to NEAR testnet
+
+# Run by hand from the Actions tab: "Deploy to NEAR testnet" -> "Run workflow".
+# Each contract lives on a sub-account of bexley.testnet. Running it again
+# later only updates the code; it never wipes existing data.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: What to deploy
+        required: true
+        default: pool-v2
+        type: choice
+        options:
+          - pool-v2
+          - pool-upgrade
+          - pool-code-only
+          - tnear
+          - balance
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NEAR_ACCOUNT_ID: bexley.testnet
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+      TNEAR_ID: tnear.bexley.testnet
+      XNEAR_ID: xnear.bexley.testnet
+      POOL_ID: pool.bexley.testnet
+      GUARDIAN_ID: guardian.bexley.testnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-near
+        run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install deploy scripts
+        run: |
+          (cd scripts && npm ci)
+          (cd agent && npm ci)
+      - name: Check the secret is set
+        run: |
+          if [ -z "$NEAR_PRIVATE_KEY" ]; then
+            echo "::error::The NEAR_PRIVATE_KEY secret is missing. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Owner balance
+        run: node scripts/balance.mjs
+
+      # v1 (one-to-one deals) is replaced by the pool. Its account is deleted
+      # and its NEAR returned to the owner to pay for the new contracts.
+      - name: Retire the v1 deals contract
+        if: inputs.target == 'pool-v2'
+        run: node scripts/retire.mjs app
+
+      - name: Build and deploy xNEAR
+        if: inputs.target == 'pool-v2'
+        run: |
+          (cd contracts/xtoken && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'xtoken.wasm' | head -1)
+          INIT=$(jq -nc --arg c "$POOL_ID" '{controller:$c, name:"Bexley Leveraged NEAR", symbol:"xNEAR", decimals:24}')
+          node scripts/deploy.mjs xnear "$WASM" new "$INIT"
+
+      - name: Build and deploy the Bexley pool (bxUSD)
+        if: inputs.target == 'pool-v2' || inputs.target == 'pool-code-only'
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'bexley.wasm' | head -1)
+          INIT=$(jq -nc --arg a "$TNEAR_ID" --arg x "$XNEAR_ID" --arg g "$GUARDIAN_ID" \
+            '{asset:$a, xtoken:$x, guardian:$g, price_feeder:$g}')
+          node scripts/deploy.mjs pool "$WASM" new "$INIT"
+
+      # Upgrade the live pool to new code and migrate its data in one
+      # transaction. Every balance and position is kept.
+      - name: Upgrade the pool (keeps all balances)
+        if: inputs.target == 'pool-upgrade'
+        env:
+          MIGRATE_METHOD: migrate
+          TOPUP_NEAR: '0.5'
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'bexley.wasm' | head -1)
+          node scripts/deploy.mjs pool "$WASM" -
+          node scripts/view.mjs "$POOL_ID" get_pool
+
+      - name: Let the pool hold tNEAR and xNEAR
+        if: inputs.target == 'pool-v2'
+        run: |
+          node scripts/call.mjs "$TNEAR_ID" register "{\"account_id\":\"$POOL_ID\"}"
+          node scripts/call.mjs "$XNEAR_ID" register "{\"account_id\":\"$POOL_ID\"}"
+
+      - name: Set up the Pool Guardian account
+        if: inputs.target == 'pool-v2'
+        working-directory: agent
+        env:
+          APP_ID: pool.bexley.testnet
+          AGENT_ID: guardian.bexley.testnet
+        run: node setup.mjs
+
+      - name: Build and deploy tNEAR (code only)
+        if: inputs.target == 'tnear'
+        run: |
+          (cd contracts/faucet-token && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'faucet_token.wasm' | head -1)
+          node scripts/deploy.mjs tnear "$WASM" -
