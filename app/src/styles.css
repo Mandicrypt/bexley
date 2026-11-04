@@ -510,3 +510,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   .l-bar span { font-size: 12px; padding: 4px 8px; }
 }
 @media (max-width: 560px) { .top .demo-btn { display: none; } }
+
+/* Crash test */
+.crash-top { display: grid; gap: 20px; padding: 22px; border-radius: 18px; background: var(--surface); margin-bottom: 28px; }
+.crash-now { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.crash-now div { display: grid; gap: 2px; align-content: start; }
+.crash-now b { font-family: var(--display); font-size: 24px; font-weight: 600; }
+.crash-now small { font-size: 13px; color: var(--muted); justify-self: start; }
+.crash-now small.down { color: var(--red); }
+.chip.red { background: var(--red-soft); color: var(--red); }
+.crash-chart { width: 100%; height: auto; max-height: 240px; }
+.crash-chart .bk { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.crash-chart line { stroke-width: 1.5; stroke-dasharray: 4 4; }
+.crash-chart .l150 { stroke: var(--amber); }
+.crash-chart .l130 { stroke: var(--red); }
+.crash-chart text { font-size: 12px; fill: var(--muted); font-family: var(--font); }
+.crash-chart .dot { fill: var(--green); stroke: var(--bg); stroke-width: 3; }
+.crash-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.crash-controls input { flex: 1; min-width: 160px; accent-color: var(--green); }
+.crash-feed .meta a { color: var(--green-ink); }
+.crash-link { margin-top: 14px; }
+@media (max-width: 900px) { .crash-now { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1,0 +1,69 @@
+name: Crash test
+
+# A real stress test on a SEPARATE testnet pool (crash.bexley.testnet), never
+# the live one. See agent/crashtest.mjs. The timeline and AI proofs are
+# published to the proofs branch (crashtest/) and replayed in the app.
+
+on:
+  workflow_dispatch:
+    inputs:
+      drop:
+        description: How far NEAR falls in the test (%)
+        default: '40'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  crash:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      NEAR_ACCOUNT_ID: bexley.testnet
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+      NEAR_RPC_URL: https://test.rpc.fastnear.com
+      NEARAI_API_KEY: ${{ secrets.NEARAI_API_KEY || secrets.NEAR_API_KEY }}
+      TNEAR_ID: tnear.bexley.testnet
+      CRASH_POOL: crash.bexley.testnet
+      CRASH_XNEAR: xcrash.bexley.testnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: proofs
+          path: proofs-repo
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-near
+        run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: |
+          (cd scripts && npm ci)
+          (cd agent && npm ci)
+      - name: Owner balance
+        run: node scripts/balance.mjs
+      - name: Deploy the test xNEAR and test pool (first time only)
+        run: |
+          (cd contracts/xtoken && cargo near build non-reproducible-wasm)
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          XW=$(find target/near -name 'xtoken.wasm' | head -1)
+          PW=$(find target/near -name 'bexley.wasm' | head -1)
+          node scripts/deploy.mjs xcrash "$XW" new "$(jq -nc --arg c "$CRASH_POOL" '{controller:$c, name:"Crash Test xNEAR", symbol:"xCRASH", decimals:24}')"
+          node scripts/deploy.mjs crash "$PW" new "$(jq -nc --arg a "$TNEAR_ID" --arg x "$CRASH_XNEAR" --arg o "$NEAR_ACCOUNT_ID" '{asset:$a, xtoken:$x, guardian:$o, price_feeder:$o}')"
+          node scripts/call.mjs "$TNEAR_ID" register "{\"account_id\":\"$CRASH_POOL\"}"
+          node scripts/call.mjs "$CRASH_XNEAR" register "{\"account_id\":\"$CRASH_POOL\"}" || true
+      - name: Run the crash
+        working-directory: agent
+        env:
+          PROOF_DIR: ${{ github.workspace }}/proofs-repo
+          DROP_PCT: ${{ inputs.drop }}
+        run: node crashtest.mjs
+      - name: Publish the timeline
+        if: always()
+        run: scripts/publish-proofs.sh

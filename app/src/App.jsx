@@ -57,6 +57,7 @@ function useTheme() {
 
 function pageFromHash() {
   const h = location.hash.replace('#', '');
+  if (h === 'crash-test') return h;
   return PAGES.some(([id]) => id === h) ? h : 'home';
 }
 
@@ -235,7 +236,8 @@ export default function App() {
         {page === 'earn' && <Earn {...ctx} />}
         {page === 'vaults' && <Vaults {...ctx} />}
         {page === 'orders' && <Orders {...ctx} />}
-        {page === 'guardian' && <GuardianPage pool={pool} />}
+        {page === 'guardian' && <GuardianPage pool={pool} go={go} />}
+        {page === 'crash-test' && <CrashTest />}
       </main>
       <footer>
         <div className="wrap">
@@ -1288,7 +1290,161 @@ function LatestDecision({ pool }) {
   );
 }
 
-function GuardianPage({ pool }) {
+// ---------- Crash test replay ----------
+
+const CRASH_RAW = 'https://raw.githubusercontent.com/Mandicrypt/bexley/proofs/crashtest';
+const TESTNET_EXPLORER = 'https://testnet.nearblocks.io';
+
+function CrashChart({ events, at }) {
+  const pts = events.filter((e) => e.backing_pct != null);
+  if (pts.length < 2) return null;
+  const W = 640;
+  const H = 200;
+  const lo = 100;
+  const hi = Math.max(220, ...pts.map((e) => e.backing_pct)) + 10;
+  const x = (i) => 8 + (i / (pts.length - 1)) * (W - 16);
+  const y = (v) => H - 8 - ((v - lo) / (hi - lo)) * (H - 16);
+  const line = pts.map((e, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(e.backing_pct).toFixed(1)}`).join(' ');
+  const cur = Math.min(pts.length - 1, pts.findIndex((e) => e.at >= (events[at]?.at ?? 0)) === -1 ? pts.length - 1 : pts.findIndex((e) => e.at >= events[at].at));
+  return (
+    <svg className="crash-chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Backing during the crash test">
+      {[150, 130].map((v) => (
+        <g key={v}>
+          <line x1="0" x2={W} y1={y(v)} y2={y(v)} className={v === 150 ? 'l150' : 'l130'} />
+          <text x={10} y={y(v) - 6}>
+            {v === 150 ? 'Caution 150%' : 'Protection 130%'}
+          </text>
+        </g>
+      ))}
+      <path d={line} className="bk" />
+      <circle cx={x(cur)} cy={y(pts[cur].backing_pct)} r="6" className="dot" />
+    </svg>
+  );
+}
+
+function CrashTest() {
+  const [t, setT] = useState(null);
+  const [err, setErr] = useState('');
+  const [at, setAt] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [open, setOpen] = useState(null);
+
+  useEffect(() => {
+    fetch(`${CRASH_RAW}/timeline.json?t=${Math.floor(Date.now() / 60000)}`)
+      .then((r) => {
+        if (!r.ok) throw new Error('The crash test has not run yet.');
+        return r.json();
+      })
+      .then((j) => {
+        setT(j);
+        setAt(0);
+      })
+      .catch((e) => setErr(e.message));
+  }, []);
+
+  const evs = t?.events || [];
+  useEffect(() => {
+    if (!playing) return;
+    if (at >= evs.length - 1) return setPlaying(false);
+    const id = setTimeout(() => setAt((a) => a + 1), 1400);
+    return () => clearTimeout(id);
+  }, [playing, at, evs.length]);
+
+  // Latest full state at or before this step.
+  const state = [...evs.slice(0, at + 1)].reverse().find((e) => e.backing_pct != null);
+  const first = evs.find((e) => e.backing_pct != null);
+  const mins = t ? Math.round(((t.finished_at || evs[evs.length - 1]?.at || t.started_at) - t.started_at) / 60000) : 0;
+
+  return (
+    <section className="page crash">
+      <div className="pagehead">
+        <h2>Crash test</h2>
+        <p>
+          A real stress test on NEAR testnet, on a separate test pool so the live pool is never touched. NEAR's price was pushed down{' '}
+          {t ? `${t.drop_target_pct}%` : ''} on purpose to show what Bexley does: the safety rails slow the fall, the AI Guardian raises
+          fees, and the Stability Pool steps in below 130% backing. bxUSD stays at $1 the whole time.
+        </p>
+      </div>
+      {err && <p className="empty">{err}</p>}
+      {t && state && (
+        <>
+          <div className="crash-top">
+            <div className="crash-now">
+              <div>
+                <span className="hint">NEAR</span>
+                <b>${state.price.toFixed(3)}</b>
+                <small className={state.price < first.price ? 'down' : ''}>{(((state.price / first.price) - 1) * 100).toFixed(1)}%</small>
+              </div>
+              <div>
+                <span className="hint">Backing</span>
+                <b>{state.backing_pct.toFixed(0)}%</b>
+                <small className={`chip ${state.mode === 'Healthy' ? 'green' : state.mode === 'Caution' ? 'amber' : 'red'}`}>{state.mode}</small>
+              </div>
+              <div>
+                <span className="hint">bxUSD</span>
+                <b className="t-bx">$1.00</b>
+                <small>Held at $1</small>
+              </div>
+              <div>
+                <span className="hint">xNEAR</span>
+                <b className="t-x">${state.x_price.toFixed(4)}</b>
+                <small>{state.leverage.toFixed(2)}x</small>
+              </div>
+              <div>
+                <span className="hint">Stability Pool</span>
+                <b>{state.sp_bx.toFixed(1)} bxUSD</b>
+                <small>{state.sp_x > 0 ? `+ ${state.sp_x.toFixed(2)} xNEAR from protection` : 'No protection used yet'}</small>
+              </div>
+            </div>
+            <CrashChart events={evs} at={at} />
+            <div className="crash-controls">
+              <button className="btn go sm" onClick={() => (at >= evs.length - 1 ? (setAt(0), setPlaying(true)) : setPlaying(!playing))}>
+                {playing ? 'Pause' : at >= evs.length - 1 ? 'Replay' : at === 0 ? 'Play the crash' : 'Resume'}
+              </button>
+              <input type="range" min="0" max={evs.length - 1} value={at} onChange={(e) => (setPlaying(false), setAt(Number(e.target.value)))} aria-label="Step" />
+              <span className="hint">
+                Step {at + 1} of {evs.length} · {mins} minutes in real time
+              </span>
+            </div>
+          </div>
+          <ol className="feed crash-feed">
+            {evs.slice(0, at + 1).map((e, i) => (
+              <li key={i} className={`k-${e.kind === 'ai' ? 'rate' : e.kind === 'protect' ? 'protect' : e.kind === 'mode' ? 'order' : 'watch'}`}>
+                <div className="meta">
+                  <span className="k">{{ start: 'Start', price: 'Price post', ai: 'AI Guardian', mode: 'Mode change', protect: 'Protection', note: 'Note' }[e.kind] || e.kind}</span>
+                  <span>{new Date(e.at).toLocaleTimeString()}</span>
+                  {e.tx && (
+                    <a href={`${TESTNET_EXPLORER}/txns/${e.tx}`} target="_blank" rel="noreferrer">
+                      Transaction
+                    </a>
+                  )}
+                  {e.proof_file && e.verified && (
+                    <button className="verified" onClick={() => setOpen(open === i ? null : i)}>
+                      {open === i ? 'Hide proof' : 'AI, verified'}
+                    </button>
+                  )}
+                </div>
+                <p>
+                  {e.text}
+                  {e.backing_pct != null && e.kind === 'price' && ` Backing ${e.backing_pct.toFixed(0)}%.`}
+                </p>
+                {open === i && e.proof_file && <ProofPanel entry={{ file: e.proof_file }} />}
+              </li>
+            ))}
+          </ol>
+          <p className="hint">
+            Test pool: <a href={`${TESTNET_EXPLORER}/address/${t.pool}`} target="_blank" rel="noreferrer">{t.pool}</a>. Full log:{' '}
+            <a href="https://github.com/Mandicrypt/bexley/blob/proofs/crashtest/timeline.json" target="_blank" rel="noreferrer">
+              timeline.json
+            </a>
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function GuardianPage({ pool, go }) {
   const s = pool?.state;
   return (
     <section className="page">
@@ -1324,6 +1480,9 @@ function GuardianPage({ pool }) {
             exchange quotes, and the pool lets one post move the price at most 5%.
           </p>
           <LatestDecision pool={pool} />
+          <button className="btn line sm crash-link" onClick={() => go('crash-test')}>
+            Watch the crash test
+          </button>
           <div className="note provable">
             <b>Provable AI.</b> Every AI decision is signed inside NEAR AI's secure hardware. Click <em>AI, verified</em> on a note and
             your browser checks the signature itself, so you don't have to trust Bexley.
