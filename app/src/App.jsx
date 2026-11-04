@@ -170,11 +170,11 @@ export default function App() {
           <>
             {!accountId && <Hero onConnect={onConnect} />}
             <Split pool={pool} error={loadError} />
-            <AskBexley {...ctx} />
             <section className="page cols">
               <TradePanel {...ctx} />
-              <GuardianFeed pool={pool} limit={5} onMore={() => go('guardian')} />
+              <GuardianFeed pool={pool} limit={3} onMore={() => go('guardian')} />
             </section>
+            <AskBexley {...ctx} />
             <RiskCheck {...ctx} onOrders={() => go('orders')} />
           </>
         )}
@@ -281,11 +281,8 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
 function Hero({ onConnect }) {
   return (
     <section className="hero">
-      <h1>One pool of NEAR, split two ways.</h1>
-      <p>
-        bxUSD holds $1. xNEAR takes every swing, with leverage and no liquidations. An AI Guardian keeps the pool safe around the clock
-        and explains each move it makes.
-      </p>
+      <h1>Double the possibilities from one pool.</h1>
+      <p>Hold bxUSD at $1 and earn, or ride NEAR with leverage in xNEAR. No liquidations, and an AI Guardian keeps the pool safe.</p>
       <div className="cta">
         <button className="btn go" onClick={onConnect}>
           Connect a testnet wallet
@@ -314,6 +311,7 @@ function modeAt(cr) {
 /** The pool as a single bar: bxUSD's claim on the left, xNEAR's on the right. */
 function Split({ pool, error }) {
   const [move, setMove] = useState(0);
+  const [open, setOpen] = useState(false);
   const s = pool?.state;
 
   const m = useMemo(() => {
@@ -354,21 +352,25 @@ function Split({ pool, error }) {
               ))}
           </div>
         </div>
+        <button className="linkbtn" onClick={() => setOpen(!open)} aria-expanded={open}>
+          {open ? 'Hide what-if' : 'What if NEAR moves?'}
+        </button>
+      </div>
+
         <div className="figs">
-          <div className="fig">
-            <div className="n">{m ? fmt$(m.tvl) : '—'}</div>
-            <div className="l">Pool value{move ? ' (what if)' : ''}</div>
-          </div>
           <div className="fig stable">
             <div className="n">{m ? fmt$(m.bx) : '—'}</div>
             <div className="l">bxUSD, held at $1</div>
+          </div>
+          <div className="fig total">
+            <div className="n">{m ? fmt$(m.tvl) : '—'}</div>
+            <div className="l">Pool value{move ? ' (what if)' : ''}</div>
           </div>
           <div className="fig lev">
             <div className="n">{m ? `$${m.nav.toFixed(4)}` : '—'}</div>
             <div className="l">xNEAR at {m && Number.isFinite(m.lev) ? `${m.lev.toFixed(2)}x` : '—'}</div>
           </div>
         </div>
-      </div>
 
       <div className="bar" role="img" aria-label={m ? `bxUSD is ${(bxFrac * 100).toFixed(0)}% of the pool; xNEAR owns the rest.` : 'Pool loading'}>
         <div className="bar-track">
@@ -385,6 +387,7 @@ function Split({ pool, error }) {
         </div>
       </div>
 
+      {open && (
       <div className="whatif">
         <div className="slider">
           <label htmlFor="whatif">
@@ -419,6 +422,7 @@ function Split({ pool, error }) {
           </div>
         </div>
       </div>
+      )}
     </section>
   );
 }
@@ -622,7 +626,7 @@ function GuardianFeed({ pool, limit, onMore }) {
       )}
       {onMore && pool?.notes?.length > limit && (
         <button className="linkbtn" onClick={onMore}>
-          See everything the Guardian did
+          View all
         </button>
       )}
     </section>
