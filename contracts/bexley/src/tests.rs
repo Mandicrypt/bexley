@@ -205,7 +205,7 @@ fn stale_price_blocks_minting() {
 }
 
 #[test]
-#[should_panic(expected = "only accepts tNEAR and xNEAR")]
+#[should_panic(expected = "only accepts its NEAR token and xNEAR")]
 fn rejects_other_tokens() {
     let mut c = setup();
     send(&mut c, "scam.test", "risk.test", T, r#"{"type":"mint_x"}"#);
@@ -489,21 +489,67 @@ fn late_depositor_does_not_take_earlier_interest() {
 
 #[test]
 fn old_layout_is_a_prefix_of_the_new_one() {
-    // `migrate` reads the old state as ContractV2_0. That only works if the
+    // `migrate` reads the live state as ContractV2_1. That only works if the
     // old fields are exactly the start of the new layout.
     use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
     let c = saving();
     let mut bytes = Vec::new();
     BorshSerialize::serialize(&c, &mut bytes).unwrap();
     let mut rest: &[u8] = &bytes;
-    let old = ContractV2_0::deserialize(&mut rest).unwrap();
-    assert_eq!(rest.len(), 4 + 8 + 16, "only the three new fields should be left");
-    assert_eq!(old.collateral, c.collateral);
-    assert_eq!(old.sp_bx, c.sp_bx);
-    assert_eq!(old.x_external, c.x_external);
-    assert_eq!(old.bx.total_supply, c.bx.total_supply);
+    let old = ContractV2_1::deserialize(&mut rest).unwrap();
+    assert_eq!(rest.len(), 16 + 1, "only the cap and pause should be left");
+    assert_eq!(old.base.collateral, c.collateral);
+    assert_eq!(old.base.sp_bx, c.sp_bx);
+    assert_eq!(old.savings_rate_bps, c.savings_rate_bps);
+    assert_eq!(old.interest_paid, c.interest_paid);
+    assert_eq!(old.base.bx.total_supply, c.bx.total_supply);
 }
 
+// ---------- Beta cap and pause ----------
+
+#[test]
+#[should_panic(expected = "beta pool is full")]
+fn the_cap_stops_deposits_over_it() {
+    let mut c = seeded();
+    ctx("owner.test", START, 0);
+    c.set_max_collateral(U128(c.collateral + 5 * T));
+    mint_x(&mut c, "alice.test", 10 * T);
+}
+
+#[test]
+fn deposits_under_the_cap_work() {
+    let mut c = seeded();
+    ctx("owner.test", START, 0);
+    c.set_max_collateral(U128(c.collateral + 50 * T));
+    mint_x(&mut c, "alice.test", 10 * T);
+}
+
+#[test]
+#[should_panic(expected = "paused for new deposits")]
+fn pause_stops_new_deposits() {
+    let mut c = seeded();
+    ctx("owner.test", START, 0);
+    c.set_paused(true);
+    mint_bx(&mut c, "alice.test", 10 * T);
+}
+
+#[test]
+fn pause_still_lets_people_exit() {
+    let mut c = seeded();
+    mint_x(&mut c, "alice.test", 10 * T);
+    ctx("owner.test", START, 0);
+    c.set_paused(true);
+    let x = 5 * T;
+    send(&mut c, "xnear.test", "alice.test", x, r#"{"type":"redeem_x"}"#);
+}
+
+#[test]
+#[should_panic(expected = "Only the owner")]
+fn only_the_owner_can_pause() {
+    let mut c = seeded();
+    ctx("alice.test", START, 0);
+    c.set_paused(true);
+}
 
 // ---------- Price safety rails ----------
 

@@ -140,6 +140,21 @@ pub struct Contract {
     pub(crate) savings_rate_bps: u32,
     pub(crate) last_accrual: u64,
     pub(crate) interest_paid: u128,
+
+    /// Beta safety: most collateral the pool will hold (0 = no cap).
+    pub(crate) max_collateral: u128,
+    /// Owner's emergency switch: stops new deposits; exits keep working.
+    pub(crate) paused: bool,
+}
+
+/// The layout before the deposit cap and pause were added, for `migrate`.
+/// Borsh writes nested structs field by field, so this is the old layout.
+#[near(serializers = [borsh])]
+pub struct ContractV2_1 {
+    pub(crate) base: ContractV2_0,
+    pub(crate) savings_rate_bps: u32,
+    pub(crate) last_accrual: u64,
+    pub(crate) interest_paid: u128,
 }
 
 /// The layout before the savings rate was added, for `migrate`.
@@ -243,15 +258,18 @@ impl Contract {
             savings_rate_bps: DEFAULT_SAVINGS_BPS,
             last_accrual: 0,
             interest_paid: 0,
+            max_collateral: 0,
+            paused: false,
         }
     }
 
-    /// One-time upgrade from the layout without a savings rate. Keeps every
-    /// balance and position. Only the contract account itself can call it.
+    /// One-time upgrade from the layout without the deposit cap and pause.
+    /// Keeps every balance and position. Only the contract itself can call it.
     #[private]
     #[init(ignore_state)]
     pub fn migrate() -> Self {
-        let o: ContractV2_0 = env::state_read().expect("Nothing to migrate");
+        let v: ContractV2_1 = env::state_read().expect("Nothing to migrate");
+        let o = v.base;
         Self {
             owner: o.owner,
             guardian: o.guardian,
@@ -279,10 +297,43 @@ impl Contract {
             next_note_id: o.next_note_id,
             users: o.users,
             stats: o.stats,
-            savings_rate_bps: DEFAULT_SAVINGS_BPS,
-            last_accrual: env::block_timestamp(),
-            interest_paid: 0,
+            savings_rate_bps: v.savings_rate_bps,
+            last_accrual: v.last_accrual,
+            interest_paid: v.interest_paid,
+            max_collateral: 0,
+            paused: false,
         }
+    }
+
+    /// Beta cap on the pool's collateral, in token units (0 = no cap).
+    pub fn set_max_collateral(&mut self, max: U128) {
+        self.assert_owner();
+        self.max_collateral = max.0;
+    }
+
+    /// Emergency switch. Paused: no new deposits; every exit still works.
+    pub fn set_paused(&mut self, paused: bool) {
+        self.assert_owner();
+        self.paused = paused;
+        self.add_note(
+            "protect",
+            if paused {
+                "The owner paused new deposits. Withdrawals and redeems still work.".to_string()
+            } else {
+                "New deposits are open again.".to_string()
+            },
+        );
+    }
+
+    pub(crate) fn assert_open(&self) {
+        require!(!self.paused, "Bexley is paused for new deposits. Withdrawals and redeems still work.");
+    }
+
+    pub(crate) fn assert_under_cap(&self) {
+        require!(
+            self.max_collateral == 0 || self.collateral <= self.max_collateral,
+            "The beta pool is full. Try a smaller amount."
+        );
     }
 
     // ---------- Owner ----------

@@ -29,6 +29,7 @@ impl Contract {
     #[payable]
     pub fn sp_deposit(&mut self, amount: U128) -> U128 {
         near_sdk::assert_one_yocto();
+        self.assert_open();
         self.accrue();
         let me = env::predecessor_account_id();
         require!(amount.0 > 0, "Enter an amount");

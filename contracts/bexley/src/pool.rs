@@ -72,6 +72,9 @@ pub struct PoolView {
     /// The rate the Guardian has set.
     pub savings_rate_set_bps: u32,
     pub interest_paid: U128,
+    /// Beta cap on collateral (0 = none), and whether new deposits are paused.
+    pub max_collateral: U128,
+    pub paused: bool,
 }
 
 #[near(serializers = [json])]
@@ -419,6 +422,8 @@ impl Contract {
             savings_rate_bps: self.get_savings_rate(),
             savings_rate_set_bps: self.savings_rate_bps,
             interest_paid: U128(self.interest_paid),
+            max_collateral: U128(self.max_collateral),
+            paused: self.paused,
         }
     }
 
@@ -500,6 +505,7 @@ impl FungibleTokenReceiver for Contract {
             }
         };
         if token == self.asset {
+            self.assert_open();
             match action {
                 DepositMsg::MintBx { min_out } => {
                     let out = self.op_mint_bx(amount.0);
@@ -514,6 +520,7 @@ impl FungibleTokenReceiver for Contract {
                 DepositMsg::VaultDeposit { vault } => self.vault_deposit_internal(&sender_id, vault, amount.0),
                 _ => env::panic_str("Send xNEAR, not tNEAR, for this"),
             }
+            self.assert_under_cap();
         } else if token == self.xtoken {
             // The xNEAR is now the pool's; take it out of circulation.
             self.x_external -= amount.0;
@@ -525,12 +532,13 @@ impl FungibleTokenReceiver for Contract {
                     self.give_t(&sender_id, out);
                 }
                 DepositMsg::Order { stop_price, take_price } => {
+                    self.assert_open();
                     self.order_create_internal(&sender_id, amount.0, stop_price, take_price)
                 }
                 _ => env::panic_str("Send tNEAR, not xNEAR, for this"),
             }
         } else {
-            env::panic_str("Bexley only accepts tNEAR and xNEAR");
+            env::panic_str("Bexley only accepts its NEAR token and xNEAR");
         }
         PromiseOrValue::Value(U128(0))
     }
