@@ -339,14 +339,29 @@ impl Contract {
     // ---------- Price ----------
 
     /// Micro-dollars per whole NEAR, e.g. $3.905 = 3905000. Price feeder only.
-    pub fn set_price(&mut self, price: U128) {
+    ///
+    /// Safety rails, so even a broken or dishonest feeder cannot crash the
+    /// pool in one step: one post moves the price at most 5% from the
+    /// current one, and at most 1% if the last post was under 4 minutes ago.
+    /// A bigger real move is followed over several posts. Returns the price
+    /// actually accepted.
+    pub fn set_price(&mut self, price: U128) -> U128 {
         require!(
             env::predecessor_account_id() == self.price_feeder,
             "Only the price feeder can post prices"
         );
         require!(price.0 > 0, "Price must be above zero");
         self.accrue();
-        self.price = price.0;
+        let accepted = capped_price(self.price, self.price_at, price.0, now());
+        if accepted != price.0 {
+            env::log_str(&format!("Price capped: asked {} accepted {}", price.0, accepted));
+        }
+        self.apply_price(accepted);
+        U128(accepted)
+    }
+
+    pub(crate) fn apply_price(&mut self, price: u128) {
+        self.price = price;
         self.price_at = now();
     }
 
@@ -519,4 +534,22 @@ impl FungibleTokenReceiver for Contract {
         }
         PromiseOrValue::Value(U128(0))
     }
+}
+
+/// Largest move one price post can make, in basis points.
+pub const PRICE_STEP_BPS: u128 = 500;
+/// Largest move when the last post was recent.
+pub const PRICE_STEP_FAST_BPS: u128 = 100;
+/// Posts closer together than this get the smaller step.
+pub const PRICE_FAST_GAP_NS: u64 = 4 * 60 * 1_000_000_000;
+
+/// The price a post is allowed to set (see `set_price`).
+pub fn capped_price(old: u128, old_at: u64, new: u128, at: u64) -> u128 {
+    if old == 0 {
+        return new; // the very first price
+    }
+    let step = if at.saturating_sub(old_at) >= PRICE_FAST_GAP_NS { PRICE_STEP_BPS } else { PRICE_STEP_FAST_BPS };
+    let lo = old * (10_000 - step) / 10_000;
+    let hi = old * (10_000 + step) / 10_000;
+    new.clamp(lo, hi)
 }

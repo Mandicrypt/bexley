@@ -22,7 +22,7 @@ This README only describes what works today.
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, with fixed rules as backup. 21 tests pass. |
 | Web app (`app/`) | Trade (mint and redeem), Ask Bexley, Your risk, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
-| Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
+| Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken, with a public receipt for every post. The pool limits each post to a 5% move. Pyth no longer serves NEAR, so there is no decentralized NEAR feed to use on testnet yet. |
 | Deposits from other chains | Not built. |
 
 On testnet the pool holds **tNEAR**, a free test token with no value, in place of real NEAR.
@@ -76,7 +76,8 @@ Park xNEAR with a **stop price**, a **take price**, or both. When NEAR reaches o
 
 Every 5 minutes the Guardian:
 
-1. **Prices**: posts the median NEAR/USD price when it moved 0.1% or is 20 minutes old. The pool refuses prices older than an hour.
+1. **Prices**: posts the median NEAR/USD price when it moved 0.1% or is 20 minutes old. The pool refuses prices older than an hour. Each post leaves a receipt (the three exchange quotes, the median, and what the pool accepted) in [`proofs/prices`](https://github.com/Mandicrypt/bexley/tree/proofs/prices).
+   **Safety rails in the pool:** one post moves the price at most 5%, or 1% if the previous post was under 4 minutes ago. A broken or dishonest feeder cannot crash the pool in one step; a real crash is followed over a few posts (30% takes about 7 posts, 35 minutes), in public.
 2. **Decides fees and the savings rate with an AI model.** Every 30 minutes (or at once if the pool's mode changes), an AI model on [NEAR AI Cloud](https://cloud.near.ai) reads the facts: NEAR's price, 24-hour move, hourly volatility and range (from Kraken candles), backing, xNEAR leverage, Stability Pool size, and the current settings. It picks a fee level (normal, 2x or 3x) and a savings rate, and writes the reason users see. Its answer must pass hard limits before anything is sent: fee level 0–2, rate 0–20%, at most 4 points of rate change per decision, and 0% outside Healthy mode. The contract enforces the fee and rate limits again on its own.
 3. **Falls back to fixed rules** if the AI is unreachable, answers badly, or no API key is set: normal / 2x / 3x fees at under 5% / 5–10% / over 10% daily moves, and a 12% / 8% / 5% / 0% rate by backing (over 300%, 200–300%, under 200%, not Healthy).
 4. **Protects**: calls `stabilize` when backing is under 130%.
@@ -129,7 +130,7 @@ Earlier designs are kept in the repo but no longer deployed: a test USDC token, 
 - **Staked NEAR as collateral (mainnet).** Back the pool with liquid-staked NEAR instead of plain NEAR, so bxUSD savers also earn NEAR's staking yield on top of the savings rate and fees.
 - **Deposits from any chain** through NEAR Intents: mint bxUSD or xNEAR with USDC, ETH or SOL from other chains.
 - **More pools**: leveraged ETH, BTC and other assets brought to NEAR through NEAR Intents, each with its own stablecoin backing.
-- **Decentralized price feed** (such as Pyth) in place of the Guardian's median of three exchanges.
+- **Decentralized price feed.** Pyth has left NEAR. On mainnet, switch to RHEA's multi-reporter `priceoracle.near` (or a TEE-attested price agent) and keep the safety rails.
 - **Security audit** before any real funds.
 
 ## Use it from the command line

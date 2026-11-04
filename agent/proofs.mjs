@@ -3,8 +3,11 @@
 //   index.json                     newest first, one line per AI decision
 //   YYYY-MM-DD/<answer id>.json    the full proof (exact request, response, signature)
 //   attest/<sha256>.json           NEAR AI's raw hardware attestation report
+//   prices/YYYY-MM-DD.jsonl        one line per price post: the exchange quotes, the
+//                                  median asked for, and what the pool accepted
+//   prices/latest.json             the newest of those
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const MAX_INDEX = 1000;
@@ -41,4 +44,13 @@ export function saveProof(dir, proof, attestation) {
   });
   writeFileSync(indexFile, JSON.stringify(index.slice(0, MAX_INDEX), null, 1));
   return file;
+}
+
+/** A receipt for one price post: where the number came from. */
+export function savePriceReceipt(dir, receipt) {
+  const d = join(dir, 'prices');
+  mkdirSync(d, { recursive: true });
+  const day = new Date(receipt.at).toISOString().slice(0, 10);
+  appendFileSync(join(d, `${day}.jsonl`), JSON.stringify(receipt) + '\n');
+  writeFileSync(join(d, 'latest.json'), JSON.stringify(receipt, null, 1));
 }

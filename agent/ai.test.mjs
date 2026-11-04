@@ -149,3 +149,16 @@ test('askAI switches to the real model name when given a nickname', async () => 
   assert.equal(r.model, 'real/model');
   assert.equal(r.proof.check.ok, true);
 });
+
+test('savePriceReceipt appends a day file and a latest file', async () => {
+  const { mkdtempSync, readFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { savePriceReceipt } = await import('./proofs.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'px-'));
+  const at = Date.UTC(2026, 10, 4, 12);
+  savePriceReceipt(dir, { at, asked: 4100000, accepted: 4100000, median_usd: 4.1, sources: { CoinGecko: 4.1 } });
+  savePriceReceipt(dir, { at: at + 1, asked: 4200000, accepted: 4180000, median_usd: 4.2, sources: { CoinGecko: 4.2 } });
+  assert.equal(readFileSync(join(dir, 'prices', '2026-11-04.jsonl'), 'utf8').trim().split('\n').length, 2);
+  assert.equal(JSON.parse(readFileSync(join(dir, 'prices', 'latest.json'), 'utf8')).accepted, 4180000);
+});

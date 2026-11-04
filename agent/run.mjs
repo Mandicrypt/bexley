@@ -24,7 +24,7 @@ import { deriveAgentKey } from './key.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { plan, shouldPostStatus, statusNote, toMicroUsd } from './logic.mjs';
 import { NEARAI_URL, askAI, ruleDecision, volatilityFromCandles } from './ai.mjs';
-import { saveProof } from './proofs.mjs';
+import { savePriceReceipt, saveProof } from './proofs.mjs';
 
 const POOL_ID = process.env.POOL_ID || 'pool.bexley.testnet';
 const GUARDIAN_ID = process.env.GUARDIAN_ID || 'guardian.bexley.testnet';
@@ -109,7 +109,7 @@ async function market() {
   if (got.length === 0) return { price: null, change24h, ...vol, sources: 'none answered' };
   const sorted = got.map(([, v]) => v).sort((a, b) => a - b);
   const mid = sorted[Math.floor(sorted.length / 2)];
-  return { price: toMicroUsd(mid), usd: mid, change24h, ...vol, sources: got.map(([n, v]) => `${n} $${v}`).join(', ') };
+  return { price: toMicroUsd(mid), usd: mid, change24h, ...vol, quotes: Object.fromEntries(got), sources: got.map(([n, v]) => `${n} $${v}`).join(', ') };
 }
 
 // ---- Tick ----
@@ -144,13 +144,26 @@ note('**Actions:**');
 let acted = 0;
 
 // 1. Price first: everything else needs a fresh one.
+let postedPrice = null;
 for (const a of plan({ pool: { ...pool, savings_rate_set_bps: null }, vaults: [], triggered: [], newPrice: m.price, change24h: null, nowMs: Date.now() })) {
   if (a.type === 'set_price' && (await call('set_price', { price: a.price.toString() }, 10n))) {
     note(`- Posted NEAR price $${m.usd}.`);
     acted++;
+    postedPrice = a.price;
   }
 }
 pool = await view('get_pool');
+if (postedPrice != null) {
+  const accepted = Number(pool.price);
+  if (!DRY_RUN && accepted !== Number(postedPrice)) note(`- The pool's safety rail capped this move: it accepted $${accepted / 1e6} for now and will follow over the next posts.`);
+  if (process.env.PROOF_DIR && !DRY_RUN) {
+    try {
+      savePriceReceipt(process.env.PROOF_DIR, { at: Date.now(), asked: Number(postedPrice), accepted, median_usd: m.usd, sources: m.quotes });
+    } catch (e) {
+      note(`- Could not save the price receipt (${shortError(e)}).`);
+    }
+  }
+}
 
 // 2. Fees and savings rate: the AI decides, within hard limits.
 const hasKey = !!process.env.NEARAI_API_KEY;

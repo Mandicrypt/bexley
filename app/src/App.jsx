@@ -859,7 +859,14 @@ function GuardianPage({ pool }) {
         <div className="panel">
           <h3>What it does</h3>
           <div className="facts" style={{ marginTop: 0 }}>
-            <Fact k="Posts the NEAR price" v="Median of 3 exchanges" />
+            <Fact
+              k="Posts the NEAR price"
+              v={
+                <a href="https://github.com/Mandicrypt/bexley/tree/proofs/prices" target="_blank" rel="noreferrer">
+                  Median of 3 exchanges
+                </a>
+              }
+            />
             <Fact k="Fees, set by AI" v={s ? ['Normal, 1x', 'Volatile, 2x', 'Stormy, 3x'][s.fee_level] : '—'} />
             <Fact k="Savers' rate, set by AI" v={s ? `${pctRate(s.savings_rate_bps)} a year` : '—'} />
             <Fact k="Protections run" v={s ? s.stats.stabilizations : '—'} />
@@ -868,7 +875,8 @@ function GuardianPage({ pool }) {
           </div>
           <p className="hint">
             Hard limits on every AI decision: fees 1x to 3x, rate 0% to 20%, at most 4 points of rate change at a time, and 0% whenever the
-            pool isn't healthy. If the AI is unreachable, fixed rules take over.
+            pool isn't healthy. If the AI is unreachable, fixed rules take over. Every price post has a public receipt with the three
+            exchange quotes, and the pool lets one post move the price at most 5%.
           </p>
           <LatestDecision pool={pool} />
           <div className="note provable">

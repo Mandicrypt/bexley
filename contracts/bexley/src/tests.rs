@@ -28,9 +28,11 @@ fn setup() -> Contract {
     c
 }
 
+// Tests move the price freely; the safety rails have their own tests below.
 fn price(c: &mut Contract, p: u128) {
     ctx("feeder.test", START, 0);
-    c.set_price(U128(p));
+    c.accrue();
+    c.apply_price(p);
 }
 
 fn send(c: &mut Contract, token: &str, from: &str, amount: u128, msg: &str) {
@@ -394,7 +396,8 @@ const YEAR_NS: u64 = 31_536_000 * NS;
 
 fn price_at(c: &mut Contract, p: u128, ts: u64) {
     ctx("feeder.test", ts, 0);
-    c.set_price(U128(p));
+    c.accrue();
+    c.apply_price(p);
 }
 
 /// Healthy pool with 100 bxUSD in the Stability Pool.
@@ -499,4 +502,56 @@ fn old_layout_is_a_prefix_of_the_new_one() {
     assert_eq!(old.sp_bx, c.sp_bx);
     assert_eq!(old.x_external, c.x_external);
     assert_eq!(old.bx.total_supply, c.bx.total_supply);
+}
+
+
+// ---------- Price safety rails ----------
+
+#[test]
+fn one_post_moves_the_price_at_most_5_percent() {
+    let mut c = setup(); // P posted at START
+    ctx("feeder.test", START + 5 * 60 * NS, 0);
+    let got = c.set_price(U128(P / 2));
+    assert_eq!(got.0, P * 95 / 100);
+    assert_eq!(c.price, P * 95 / 100);
+    ctx("feeder.test", START + 10 * 60 * NS, 0);
+    assert_eq!(c.set_price(U128(P * 2)).0, P * 95 / 100 * 105 / 100);
+}
+
+#[test]
+fn quick_posts_move_at_most_1_percent() {
+    let mut c = setup();
+    ctx("feeder.test", START + 60 * NS, 0);
+    assert_eq!(c.set_price(U128(P * 90 / 100)).0, P * 99 / 100);
+}
+
+#[test]
+fn small_moves_pass_unchanged() {
+    let mut c = setup();
+    ctx("feeder.test", START + 5 * 60 * NS, 0);
+    assert_eq!(c.set_price(U128(P * 103 / 100)).0, P * 103 / 100);
+}
+
+#[test]
+fn a_big_real_move_is_followed_over_several_posts() {
+    let mut c = setup();
+    let target = P * 70 / 100;
+    let mut ts = START;
+    let mut posts = 0;
+    while c.price != target {
+        ts += 5 * 60 * NS;
+        ctx("feeder.test", ts, 0);
+        c.set_price(U128(target));
+        posts += 1;
+        assert!(posts < 20);
+    }
+    assert_eq!(posts, 7); // 30% at up to 5% a post
+}
+
+#[test]
+#[should_panic(expected = "Only the price feeder")]
+fn only_the_feeder_posts_prices() {
+    let mut c = setup();
+    ctx("someone.test", START + 5 * 60 * NS, 0);
+    c.set_price(U128(P));
 }
