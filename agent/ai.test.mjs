@@ -132,3 +132,20 @@ test('saveProof writes the proof, the report and the index', async () => {
   assert.ok(existsSync(join(dir, 'attest', `${r.attestation.report_sha256}.json`)));
   assert.equal(verifyProof(JSON.parse(readFileSync(join(dir, file), 'utf8'))).ok, true);
 });
+
+test('askAI switches to the real model name when given a nickname', async () => {
+  const { fetchImpl: inner, seen } = fakeNearAI();
+  const models = [];
+  const fetchImpl = async (url, opts) => {
+    if (url.includes('/chat/completions')) {
+      const m = JSON.parse(opts.body).model;
+      models.push(m);
+      if (m !== 'real/model') return { ok: false, status: 400, text: async () => `{"error":{"message":"Model '${m}' is an alias of 'real/model' and the request set x-no-aliasing."}}` };
+    }
+    return inner(url, opts);
+  };
+  const r = await askAI(pool(), { change24h: -6 }, { apiKey: 'k', fetchImpl });
+  assert.equal(models[1], 'real/model');
+  assert.equal(r.model, 'real/model');
+  assert.equal(r.proof.check.ok, true);
+});

@@ -10,7 +10,7 @@ import { feeLevelFor, savingsRateFor, feeReason, rateReason, statusNote } from '
 import { attestedSigners, sha256Hex, verifyProof } from './proof.mjs';
 
 export const NEARAI_URL = process.env.NEARAI_URL || 'https://cloud-api.near.ai/v1';
-export const MODELS = (process.env.NEARAI_MODEL || 'deepseek-ai/DeepSeek-V4-Flash,z-ai/glm-5.2').split(',');
+export const MODELS = (process.env.NEARAI_MODEL || 'z-ai/glm-5.3-flash,deepseek/deepseek-v4.1-flash').split(',');
 
 /** Hard limits. The pool contract enforces the first two itself as well. */
 export const LIMITS = {
@@ -156,7 +156,12 @@ export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY,
   if (!apiKey) throw new Error('No NEARAI_API_KEY');
   const facts = buildFacts(pool, market);
   const errs = [];
-  for (const model of MODELS) {
+  const queue = [...MODELS];
+  const tried = new Set();
+  while (queue.length) {
+    const model = queue.shift();
+    if (tried.has(model)) continue;
+    tried.add(model);
     try {
       let attestation = null;
       try {
@@ -182,7 +187,12 @@ export async function askAI(pool, market, { apiKey = process.env.NEARAI_API_KEY,
         signal: AbortSignal.timeout(45_000),
       });
       const response = await r.text();
-      if (!r.ok) throw new Error(`${model}: HTTP ${r.status} ${response.slice(0, 160)}`);
+      if (!r.ok) {
+        // Proofs need the real model name; NEAR AI tells us what it is.
+        const canon = response.match(/alias of '([^']+)'/);
+        if (canon) queue.unshift(canon[1]);
+        throw new Error(`${model}: HTTP ${r.status} ${response.slice(0, 160)}`);
+      }
       const j = JSON.parse(response);
       const c = j?.choices?.[0];
       // Some models put their answer in reasoning fields when content is empty.
