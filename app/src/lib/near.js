@@ -3,15 +3,56 @@
 import { NearConnector } from '@hot-labs/near-connect';
 import { FailoverRpcProvider, JsonRpcProvider } from 'near-api-js';
 
-export const NETWORK = 'testnet';
-export const POOL_ID = 'pool.bexley.testnet'; // also the bxUSD token
-export const XNEAR_ID = 'xnear.bexley.testnet';
-export const TNEAR_ID = 'tnear.bexley.testnet';
-export const GUARDIAN_ID = 'guardian.bexley.testnet';
-export const EXPLORER = 'https://testnet.nearblocks.io';
+// Two networks: the free testnet pool (default) and the small mainnet beta.
+// The choice is kept in this browser; switching reloads the page.
+import mainnetConfig from '../config/mainnet.json';
 
-// Several public testnet RPCs: the NEAR-run one rate-limits busy pages.
-export const RPC_URLS = ['https://test.rpc.fastnear.com', 'https://near-testnet.lava.build', 'https://rpc.testnet.near.org'];
+export const MAINNET_OWNER = mainnetConfig.owner || null;
+export const MAINNET_READY = !!MAINNET_OWNER;
+
+function readNetwork() {
+  try {
+    if (MAINNET_READY && localStorage.getItem('bexley-net') === 'mainnet') return 'mainnet';
+  } catch {}
+  return 'testnet';
+}
+
+export function switchNetwork(net) {
+  try {
+    localStorage.setItem('bexley-net', net);
+  } catch {}
+  location.hash = '';
+  location.reload();
+}
+
+export const NETWORK = readNetwork();
+export const IS_MAINNET = NETWORK === 'mainnet';
+
+const NETS = {
+  testnet: {
+    POOL_ID: 'pool.bexley.testnet', // also the bxUSD token
+    XNEAR_ID: 'xnear.bexley.testnet',
+    TNEAR_ID: 'tnear.bexley.testnet',
+    GUARDIAN_ID: 'guardian.bexley.testnet',
+    EXPLORER: 'https://testnet.nearblocks.io',
+    RPC_URLS: ['https://test.rpc.fastnear.com', 'https://near-testnet.lava.build', 'https://rpc.testnet.near.org'],
+    ASSET: 'tNEAR',
+  },
+  mainnet: {
+    POOL_ID: `pool.${MAINNET_OWNER}`,
+    XNEAR_ID: `xnear.${MAINNET_OWNER}`,
+    TNEAR_ID: mainnetConfig.asset || 'wrap.near', // wNEAR; the app wraps NEAR for you
+    GUARDIAN_ID: `guardian.${MAINNET_OWNER}`,
+    EXPLORER: 'https://nearblocks.io',
+    RPC_URLS: ['https://free.rpc.fastnear.com', 'https://near.lava.build', 'https://rpc.mainnet.near.org'],
+    ASSET: 'NEAR',
+  },
+};
+const N = NETS[NETWORK];
+export const { POOL_ID, XNEAR_ID, TNEAR_ID, GUARDIAN_ID, EXPLORER, RPC_URLS } = N;
+/** What users pay with: free tNEAR on testnet, real NEAR on mainnet. */
+export const ASSET = N.ASSET;
+export const MAINNET_CAP_NEAR = mainnetConfig.cap_near;
 
 const TGAS = 1_000_000_000_000n;
 const provider = new FailoverRpcProvider(RPC_URLS.map((url) => new JsonRpcProvider({ url })));
@@ -34,8 +75,25 @@ export const setDemo = (d) => {
 };
 const d = (name, real) => (...a) => (demo ? demo[name](...a) : real(...a));
 
+/** NEAR kept back on mainnet for gas and storage when paying with NEAR. */
+export const NEAR_RESERVE = 2n * 10n ** 23n; // 0.2 NEAR
+
 export async function loadAccount(accountId) {
   if (demo) return demo.account();
+  if (IS_MAINNET) {
+    const [wnear, xnear, account, state] = await Promise.all([
+      view(TNEAR_ID, 'ft_balance_of', { account_id: accountId }),
+      view(XNEAR_ID, 'ft_balance_of', { account_id: accountId }),
+      pool('get_account', { account_id: accountId }),
+      provider.viewAccount({ accountId }),
+    ]);
+    // Storage already used is locked; keep a little more back for gas.
+    const native = BigInt(state?.amount ?? 0);
+    const locked = BigInt(state?.storage_usage ?? 0) * 10n ** 19n + NEAR_RESERVE;
+    const spendable = native > locked ? native - locked : 0n;
+    // "tnear" is what the user can pay with: wNEAR plus spendable NEAR.
+    return { tnear: (BigInt(wnear) + spendable).toString(), wnear, native: native.toString(), xnear, nextClaimAt: '0', ...account };
+  }
   const [tnear, xnear, nextClaimAt, account] = await Promise.all([
     view(TNEAR_ID, 'ft_balance_of', { account_id: accountId }),
     view(XNEAR_ID, 'ft_balance_of', { account_id: accountId }),
@@ -80,17 +138,43 @@ export async function connect() {
 
 export const disconnect = () => getConnector().disconnect();
 
-async function send(receiverId, methodName, args, { deposit = '0', gasTgas = 60n } = {}) {
+const fc = (methodName, args, { deposit = '0', gasTgas = 60n } = {}) => ({
+  type: 'FunctionCall',
+  params: { methodName, args, gas: (gasTgas * TGAS).toString(), deposit: deposit.toString() },
+});
+
+async function sendActions(receiverId, actions) {
   const wallet = await getConnector().wallet();
-  return wallet.signAndSendTransaction({
-    receiverId,
-    actions: [{ type: 'FunctionCall', params: { methodName, args, gas: (gasTgas * TGAS).toString(), deposit } }],
-  });
+  return wallet.signAndSendTransaction({ receiverId, actions });
 }
 
-/** Send tokens into the pool with an instruction (ft_transfer_call). */
-const sendToPool = (token, amount, msg) =>
-  send(token, 'ft_transfer_call', { receiver_id: POOL_ID, amount: amount.toString(), msg: JSON.stringify(msg) }, { deposit: '1', gasTgas: 250n });
+const send = (receiverId, methodName, args, opts) => sendActions(receiverId, [fc(methodName, args, opts)]);
+
+async function signerId() {
+  const { accounts } = await getConnector().getConnectedWallet();
+  return accounts?.[0]?.accountId;
+}
+
+/**
+ * Send tokens into the pool with an instruction (ft_transfer_call). On
+ * mainnet, paying with NEAR: one transaction to wrap.near that registers the
+ * user (if needed), wraps only the NEAR that isn't already wNEAR, and sends it.
+ */
+async function sendToPool(token, amount, msg) {
+  const transfer = fc('ft_transfer_call', { receiver_id: POOL_ID, amount: amount.toString(), msg: JSON.stringify(msg) }, { deposit: '1', gasTgas: 200n });
+  if (!IS_MAINNET || token !== TNEAR_ID) return sendActions(token, [transfer]);
+  const me = await signerId();
+  const have = BigInt(await view(TNEAR_ID, 'ft_balance_of', { account_id: me }));
+  const wrap = BigInt(amount) > have ? BigInt(amount) - have : 0n;
+  return sendActions(TNEAR_ID, [
+    fc('storage_deposit', { account_id: me, registration_only: true }, { deposit: 1_250_000_000_000_000_000_000n, gasTgas: 10n }),
+    ...(wrap > 0n ? [fc('near_deposit', {}, { deposit: wrap, gasTgas: 10n })] : []),
+    transfer,
+  ]);
+}
+
+/** Mainnet: turn wNEAR back into NEAR. */
+export const unwrapNear = (amount) => send(TNEAR_ID, 'near_withdraw', { amount: amount.toString() }, { deposit: '1', gasTgas: 20n });
 
 const minOut = (v) => (v ? { min_out: v.toString() } : {});
 

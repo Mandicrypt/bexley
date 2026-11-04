@@ -1,0 +1,127 @@
+name: Mainnet beta
+
+# Bexley's small mainnet beta. Real NEAR, unaudited code, so the pool has a
+# hard cap and an owner pause (exits always stay open).
+#
+# Needs the NEAR_MAINNET_PRIVATE_KEY secret: the key of the mainnet owner
+# account named in app/src/config/mainnet.json. Keep only the setup money there.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What to do
+        required: true
+        default: balance
+        type: choice
+        options:
+          - balance
+          - setup
+          - upgrade-pool
+          - pause
+          - unpause
+          - set-cap
+
+permissions:
+  contents: read
+
+jobs:
+  mainnet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_MAINNET_PRIVATE_KEY }}
+      NEAR_RPC_URL: https://free.rpc.fastnear.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the mainnet config
+        run: |
+          OWNER=$(jq -r .owner app/src/config/mainnet.json)
+          {
+            echo "NEAR_ACCOUNT_ID=$OWNER"
+            echo "POOL_ID=pool.$OWNER"
+            echo "XNEAR_ID=xnear.$OWNER"
+            echo "GUARDIAN_ID=guardian.$OWNER"
+            echo "ASSET_ID=$(jq -r .asset app/src/config/mainnet.json)"
+            echo "CAP_YOCTO=$(jq -r '.cap_near' app/src/config/mainnet.json)000000000000000000000000"
+          } >> "$GITHUB_ENV"
+      - name: Check the secret and the config
+        run: |
+          if [ -z "$NEAR_PRIVATE_KEY" ]; then echo "::error::Add the NEAR_MAINNET_PRIVATE_KEY secret first."; exit 1; fi
+          if [ "$NEAR_ACCOUNT_ID" = "null" ] || [ -z "$NEAR_ACCOUNT_ID" ]; then echo "::error::Set owner in app/src/config/mainnet.json."; exit 1; fi
+          echo "Owner: $NEAR_ACCOUNT_ID, pool: $POOL_ID, collateral: $ASSET_ID"
+      - uses: dtolnay/rust-toolchain@stable
+        if: inputs.action == 'setup' || inputs.action == 'upgrade-pool'
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        if: inputs.action == 'setup' || inputs.action == 'upgrade-pool'
+      - name: Install cargo-near
+        if: inputs.action == 'setup' || inputs.action == 'upgrade-pool'
+        run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install scripts
+        run: |
+          (cd scripts && npm ci)
+          (cd agent && npm ci)
+
+      - name: Owner balance
+        run: node scripts/balance.mjs
+
+      - name: Deploy xNEAR
+        if: inputs.action == 'setup'
+        run: |
+          (cd contracts/xtoken && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'xtoken.wasm' | head -1)
+          INIT=$(jq -nc --arg c "$POOL_ID" '{controller:$c, name:"Bexley Leveraged NEAR", symbol:"xNEAR", decimals:24}')
+          node scripts/deploy.mjs xnear "$WASM" new "$INIT"
+
+      - name: Deploy the pool (bxUSD)
+        if: inputs.action == 'setup'
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'bexley.wasm' | head -1)
+          INIT=$(jq -nc --arg a "$ASSET_ID" --arg x "$XNEAR_ID" --arg g "$GUARDIAN_ID" '{asset:$a, xtoken:$x, guardian:$g, price_feeder:$g}')
+          node scripts/deploy.mjs pool "$WASM" new "$INIT"
+
+      - name: Let the pool hold wNEAR and xNEAR, and set the beta cap
+        if: inputs.action == 'setup'
+        run: |
+          # wNEAR storage for the pool (0.00125 NEAR).
+          node scripts/call.mjs "$ASSET_ID" storage_deposit "{\"account_id\":\"$POOL_ID\"}" 1250000000000000000000
+          node scripts/call.mjs "$XNEAR_ID" register "{\"account_id\":\"$POOL_ID\"}" || true
+          node scripts/call.mjs "$POOL_ID" set_max_collateral "{\"max\":\"$CAP_YOCTO\"}"
+
+      - name: Set up the Guardian (limited key only)
+        if: inputs.action == 'setup'
+        working-directory: agent
+        env:
+          APP_ID: ${{ env.POOL_ID }}
+          AGENT_ID: ${{ env.GUARDIAN_ID }}
+          AGENT_FUND_NEAR: '0.5'
+        run: node setup.mjs
+
+      - name: Upgrade the pool (code and migration)
+        if: inputs.action == 'upgrade-pool'
+        env:
+          MIGRATE_METHOD: ${{ vars.MAINNET_MIGRATE || '' }}
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'bexley.wasm' | head -1)
+          node scripts/deploy.mjs pool "$WASM" -
+
+      - name: Pause new deposits
+        if: inputs.action == 'pause'
+        run: node scripts/call.mjs "$POOL_ID" set_paused '{"paused":true}'
+      - name: Open deposits
+        if: inputs.action == 'unpause'
+        run: node scripts/call.mjs "$POOL_ID" set_paused '{"paused":false}'
+      - name: Set the cap from app/src/config/mainnet.json
+        if: inputs.action == 'set-cap'
+        run: node scripts/call.mjs "$POOL_ID" set_max_collateral "{\"max\":\"$CAP_YOCTO\"}"
+
+      - name: Pool state
+        if: inputs.action != 'balance'
+        run: node scripts/view.mjs "$POOL_ID" get_pool || true

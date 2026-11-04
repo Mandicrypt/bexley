@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   EXPLORER, GUARDIAN_ID, POOL_ID, XNEAR_ID, TNEAR_ID, connect, disconnect, currentAccount, getConnector, loadPool, loadAccount,
   quote, claimTnear, mintBx, mintX, redeemBx, redeemX, spDeposit, spWithdraw, vaultDeposit, vaultWithdraw, placeOrder,
-  cancelOrder, claimStuck, errorText, setDemo,
+  cancelOrder, claimStuck, errorText, setDemo, ASSET, IS_MAINNET, MAINNET_READY, MAINNET_CAP_NEAR, NETWORK, switchNetwork, unwrapNear,
 } from './lib/near.js';
 import { DEMO_ID, createDemo } from './lib/demo.mjs';
 import { verifyProof } from './lib/proof.mjs';
@@ -187,6 +187,7 @@ export default function App() {
         isDark={isDark()}
         toggleTheme={toggleTheme}
       />
+      {IS_MAINNET && <BetaBar pool={pool} />}
       {demoOn && (
         <div className="demobar" role="status">
           <div className="wrap">
@@ -219,7 +220,7 @@ export default function App() {
                 <PoolPulse pool={pool} />
               </div>
             </section>
-            <AskBexley {...ctx} />
+            {!IS_MAINNET && <AskBexley {...ctx} />}
             <RiskCheck {...ctx} onOrders={() => go('orders')} />
           </>
         )}
@@ -230,7 +231,11 @@ export default function App() {
       </main>
       <footer>
         <div className="wrap">
-          <span>Bexley runs on NEAR testnet with tNEAR, a free test token with no value.</span>
+          <span>
+            {IS_MAINNET
+              ? 'Mainnet beta: real NEAR, unaudited code, capped pool. Only put in what you can afford to lose.'
+              : 'Bexley runs on NEAR testnet with tNEAR, a free test token with no value.'}
+          </span>
           <span>
             <a href={`${EXPLORER}/address/${POOL_ID}`} target="_blank" rel="noreferrer">Pool contract</a>{'  '}
             <a href="https://github.com/Mandicrypt/bexley" target="_blank" rel="noreferrer" style={{ marginLeft: 14 }}>Code</a>
@@ -243,6 +248,33 @@ export default function App() {
         </div>
       )}
     </>
+  );
+}
+
+// ---------- Mainnet beta ----------
+
+function BetaBar({ pool }) {
+  const s = pool?.state;
+  const cap = s ? BigInt(s.max_collateral || 0) : 0n;
+  const used = s ? BigInt(s.collateral) : 0n;
+  const pct = cap > 0n ? Number((used * 1000n) / cap) / 10 : 0;
+  return (
+    <div className="betabar" role="note">
+      <div className="wrap">
+        <span>
+          <b>Mainnet beta.</b> Real NEAR and unaudited code. Only put in what you can afford to lose.
+        </span>
+        <span className="cap">
+          {s ? (cap > 0n ? `Pool cap: ${formatAmount(used, 1)} of ${formatAmount(cap, 0)} NEAR used` : 'No cap set') : `Pool cap: ${MAINNET_CAP_NEAR} NEAR`}
+          {s?.paused && <b className="paused"> Deposits paused</b>}
+          {cap > 0n && (
+            <i className="capbar" aria-hidden="true">
+              <i style={{ width: `${Math.min(100, pct)}%` }} />
+            </i>
+          )}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -284,12 +316,22 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
         <a className="brand" href="#" onClick={(e) => (e.preventDefault(), go('trade'))}>
           <Logo />
           bexley
-          <span className="net hide-sm">testnet</span>
+          {!MAINNET_READY && <span className="net hide-sm">testnet</span>}
         </a>
         <nav className="nav" aria-label="Sections">{nav()}</nav>
         <div className="spacer" />
         <div className="right">
-          {!demoOn && !accountId && (
+          {MAINNET_READY && (
+            <div className="netswitch" role="group" aria-label="Network">
+              <button aria-pressed={!IS_MAINNET} onClick={() => IS_MAINNET && switchNetwork('testnet')}>
+                Testnet
+              </button>
+              <button aria-pressed={IS_MAINNET} onClick={() => !IS_MAINNET && switchNetwork('mainnet')}>
+                Mainnet<span className="hide-sm"> beta</span>
+              </button>
+            </div>
+          )}
+          {!IS_MAINNET && !demoOn && !accountId && (
             <button className="btn sm demo-btn" onClick={onDemo} title="Try Bexley with a pretend wallet">
               Demo
             </button>
@@ -299,6 +341,18 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
           </button>
           {accountId ? (
             <>
+              {IS_MAINNET ? (
+                me && BigInt(me.wnear || 0) > 0n && (
+                  <button
+                    className="btn line sm"
+                    disabled={busy === 'unwrap'}
+                    onClick={() => run('unwrap', () => unwrapNear(me.wnear), 'Unwrapped to NEAR.')}
+                    title="Turn your wNEAR back into NEAR"
+                  >
+                    {busy === 'unwrap' ? 'Unwrapping…' : `Unwrap ${formatAmount(me.wnear, 2)} wNEAR`}
+                  </button>
+                )
+              ) : (
               <button
                 className="btn go sm"
                 disabled={!canClaim || busy === 'claim'}
@@ -307,8 +361,9 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
               >
                 {busy === 'claim' ? 'Claiming…' : canClaim ? 'Get 100 tNEAR' : `Next in ${timeLeft(me.nextClaimAt)}`}
               </button>
+              )}
               <button className="btn line sm" onClick={onDisconnect} title="Disconnect wallet">
-                <span className="hide-sm">{me ? `${formatAmount(me.tnear, 0)} tNEAR  ` : ''}</span>
+                <span className="hide-sm">{me ? `${formatAmount(me.tnear, IS_MAINNET ? 2 : 0)} ${ASSET}  ` : ''}</span>
                 {shortAccount(accountId)}
               </button>
             </>
@@ -539,7 +594,7 @@ const feeLabel = (bps) => (bps === 0 ? 'Free right now' : `${(bps / 100).toFixed
 
 // ---------- Trade ----------
 
-const TOKENS = { t: ['tNEAR', 't'], x: ['xNEAR', 'x'], bx: ['bxUSD', 'bx'] };
+const TOKENS = { t: [ASSET, 't'], x: ['xNEAR', 'x'], bx: ['bxUSD', 'bx'] };
 
 function Token({ k }) {
   const [name, dot] = TOKENS[k];
@@ -570,7 +625,7 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
   let problem = '';
   if (!amount) problem = '';
   else if (accountId && !me) problem = 'Loading your wallet…';
-  else if (accountId && amount > have) problem = `That is more ${TOKENS[payK][0]} than you hold.${payK === 't' ? ' Use "Get 100 tNEAR" at the top.' : ''}`;
+  else if (accountId && amount > have) problem = `That is more ${TOKENS[payK][0]} than you hold.${payK === 't' && !IS_MAINNET ? ' Use "Get 100 tNEAR" at the top.' : ''}`;
   else if (dir === 'mint' && side === 'bx' && s && !s.fees_bps.mint_bx_open) problem = 'New bxUSD is paused while the pool rebuilds its backing.';
   else if (dir === 'mint' && side === 'bx' && noX) problem = 'bxUSD needs xNEAR behind it. Mint some xNEAR first to start the pool.';
   else if (dir === 'redeem' && side === 'x' && s && !s.fees_bps.redeem_x_open) problem = 'xNEAR exits are paused until backing is back over 130%. Your xNEAR keeps its share.';
@@ -1001,7 +1056,7 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
 
   let problem = '';
   if (amount && accountId && !me) problem = 'Loading your wallet…';
-  else if (amount && accountId && amount > BigInt(me.tnear)) problem = 'That is more tNEAR than your wallet holds.';
+  else if (amount && accountId && amount > BigInt(me.tnear)) problem = `That is more ${ASSET} than your wallet holds.`;
   else if (amount && BigInt(s.x_supply) === 0n) problem = 'The pool needs some xNEAR first.';
 
   return (
@@ -1017,12 +1072,12 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
         </div>
         <div className="facts">
           <Fact k="Leverage now" v={formatTimes(lev)} />
-          <Fact k="Vault size" v={`${formatAmount(me?.demo && hasPos ? BigInt(v.value) + BigInt(pos.value) : v.value)} tNEAR`} />
-          <Fact k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} tNEAR, ${money((BigInt(pos.value) * BigInt(s.price)) / 1_000_000n)}` : '—'} />
+          <Fact k="Vault size" v={`${formatAmount(me?.demo && hasPos ? BigInt(v.value) + BigInt(pos.value) : v.value)} ${ASSET}`} />
+          <Fact k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} ${ASSET}, ${money((BigInt(pos.value) * BigInt(s.price)) / 1_000_000n)}` : '—'} />
         </div>
         {!hasPos && s && (
           <Example>
-            100 tNEAR (about ${(100 * Number(s.price) / 1e6).toFixed(0)}) in Steady {Number(v.target_bps) / 10000}x: if NEAR rises 10%, about $
+            100 {ASSET} (about ${(100 * Number(s.price) / 1e6).toFixed(0)}) in Steady {Number(v.target_bps) / 10000}x: if NEAR rises 10%, about $
             {(100 * Number(s.price) / 1e6 * (1 + 0.1 * Number(v.target_bps) / 10000)).toFixed(0)}. If it falls 10%, about $
             {(100 * Number(s.price) / 1e6 * (1 - 0.1 * Number(v.target_bps) / 10000)).toFixed(0)}.
           </Example>
@@ -1031,7 +1086,7 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
       </div>
       <div className="field" style={{ margin: 0 }}>
         <label htmlFor={`v${v.id}`}>Deposit</label>
-        <AmountRow id={`v${v.id}`} value={text} onChange={setText} max={me?.tnear} unit="tNEAR" />
+        <AmountRow id={`v${v.id}`} value={text} onChange={setText} max={me?.tnear} unit={ASSET} />
       </div>
       {problem && <p className="err">{problem}</p>}
       <div className="btnrow">
@@ -1080,7 +1135,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
     <section className="page">
       <div className="pagehead">
         <h2>Stop-loss and take-profit</h2>
-        <p>Park xNEAR with a NEAR price to sell at. When NEAR gets there, the Guardian sells it and sends tNEAR to your wallet. The pool checks the price itself, so nobody can sell early.</p>
+        <p>Park xNEAR with a NEAR price to sell at. When NEAR gets there, the Guardian sells it and sends {IS_MAINNET ? 'wNEAR' : 'tNEAR'} to your wallet. The pool checks the price itself, so nobody can sell early.</p>
       </div>
       <div className="cols">
         <div className="panel">
@@ -1131,7 +1186,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
             s && (
               <Example>
                 Protect 50 xNEAR: sell if NEAR falls to ${Number(suggestStop(Number(s.price) / 1e6, vol).price).toFixed(2)}. If NEAR gets there, the Guardian sells
-                and sends tNEAR straight to your wallet. Until then you keep every gain.
+                and sends {IS_MAINNET ? 'wNEAR' : 'tNEAR'} straight to your wallet. Until then you keep every gain.
               </Example>
             )
           ) : (
@@ -1147,7 +1202,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
                       {[o.stop_price && `Stop at ${formatUsd(o.stop_price, 3)}`, o.take_price && `Take at ${formatUsd(o.take_price, 3)}`]
                         .filter(Boolean)
                         .join(', ')}
-                      {o.status === 'Executed' && `. Sold at ${formatUsd(o.executed_price, 3)} for ${formatAmount(o.tnear_out, 4)} tNEAR`}
+                      {o.status === 'Executed' && `. Sold at ${formatUsd(o.executed_price, 3)} for ${formatAmount(o.tnear_out, 4)} ${IS_MAINNET ? 'wNEAR' : 'tNEAR'}`}
                     </div>
                   </div>
                   {o.status === 'Open' && (
@@ -1162,7 +1217,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
           <p className="hint" style={{ marginTop: 16 }}>
             Tokens: <a href={`${EXPLORER}/address/${XNEAR_ID}`} target="_blank" rel="noreferrer">xNEAR</a>,{' '}
             <a href={`${EXPLORER}/address/${POOL_ID}`} target="_blank" rel="noreferrer">bxUSD</a>,{' '}
-            <a href={`${EXPLORER}/address/${TNEAR_ID}`} target="_blank" rel="noreferrer">tNEAR</a>
+            <a href={`${EXPLORER}/address/${TNEAR_ID}`} target="_blank" rel="noreferrer">{IS_MAINNET ? 'wNEAR' : 'tNEAR'}</a>
           </p>
         </div>
       </div>
