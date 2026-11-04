@@ -13,7 +13,7 @@ const MODELS = (process.env.NEARAI_MODEL || 'deepseek-ai/DeepSeek-V4-Flash,z-ai/
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' });
-  const key = process.env.NEARAI_API_KEY;
+  const key = process.env.NEARAI_API_KEY || process.env.NEAR_API_KEY;
   if (!key) return res.status(503).json({ error: 'Ask Bexley is not switched on yet.' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
