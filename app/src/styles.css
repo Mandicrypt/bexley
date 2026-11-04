@@ -146,6 +146,17 @@ p { margin: 0; }
 .hero h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.04; font-weight: 600; letter-spacing: -0.035em; max-width: 17ch; }
 .hero p { font-size: 17px; color: var(--ink-2); max-width: 50ch; }
 .hero .cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.choice {
+  display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer; padding: 18px 20px; border-radius: 16px;
+  background: var(--surface); border: 1.5px solid transparent; color: var(--ink); transition: border-color .15s ease, transform .15s ease;
+}
+.choice b { font-family: var(--display); font-size: 18px; font-weight: 600; }
+.choice span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.choice:hover { border-color: var(--line-strong); }
+.choice.c-earn:hover { border-color: var(--slate); }
+.choice.c-lev:hover { border-color: var(--green); }
+.choice:active { transform: translateY(1px); }
 
 /* ---------- The split ---------- */
 .split { padding: 48px 0 16px; }
@@ -366,3 +377,20 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   *, *::after { animation: none !important; transition: none !important; }
 }
 .feed + .btn, .feed + .linkbtn { margin-top: 4px; }
+
+/* Trade side column, examples, plan facts */
+.side-col { display: grid; gap: 28px; align-content: start; }
+.pulse-facts { display: grid; gap: 10px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 14px; }
+.lever-line { margin: -4px 2px 14px; }
+.example-card { display: grid; gap: 8px; justify-items: start; padding: 14px 16px; border: 1.5px dashed var(--line-strong); border-radius: 14px; color: var(--ink-2); font-size: 14px; margin: 4px 0 12px; }
+.example-card .chip { margin: 0; }
+.note.shield { margin: 0 0 14px; border-left: 3px solid var(--slate); background: var(--slate-soft); color: var(--ink); }
+.plan-facts { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--bg); font-size: 14px; }
+.plan-facts .fact { align-items: baseline; }
+.plan-facts .fact strong { max-width: 70%; }
+@media (max-width: 760px) {
+  .choices { grid-template-columns: minmax(0, 1fr); }
+  .plan-facts .fact { flex-direction: column; gap: 2px; }
+  .plan-facts .fact strong { max-width: none; text-align: left; }
+}
+.feed:has(> li:only-child)::before { display: none; }

@@ -64,7 +64,8 @@ export function checkPlan(plan, { price } = {}) {
     steps.push(step);
   }
   if (!reply && steps.length === 0) throw new Error('Empty plan');
-  return { reply: reply || 'Here is the plan.', steps };
+  const short = (v) => String(v || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+  return { reply: reply || 'Here is the plan.', steps, outcome: steps.length ? short(plan.outcome) : '', risk: steps.length ? short(plan.risk) : '' };
 }
 
 export function parseJson(text) {
@@ -97,10 +98,12 @@ Guidance:
 - Steps run in order, so a step may use tokens a previous step produces; use "all" for those amounts.
 - Never plan more than ${MAX_STEPS} steps. Never spend more than the user holds. If they hold too little tNEAR, tell them to use the "Get 100 tNEAR" button.
 - If the request is unclear, not about Bexley, or unsafe, return no steps and ask one short question or explain what you can do.
-- reply: one to three short, plain sentences describing the plan and its main risk. No jargon, no exclamation marks, do not repeat each step.
+- reply: one or two short, plain sentences describing the plan. No jargon, no exclamation marks, do not repeat each step.
+- outcome: what they would hold at the end, with rough numbers from the facts (for example "About 50 tNEAR of xNEAR, worth about $209, moving about 2x NEAR"). Empty if no steps.
+- risk: the main risk in one short sentence (for example "If NEAR falls 10%, this falls about 20%"). Empty if no steps.
 
 Current facts:
 ${JSON.stringify(ctx, null, 2)}
 
-Answer with JSON only: {"reply":"...","steps":[...]}`;
+Answer with JSON only: {"reply":"...","outcome":"...","risk":"...","steps":[...]}`;
 }

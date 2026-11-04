@@ -68,6 +68,7 @@ export default function App() {
   const [busy, setBusy] = useState('');
   const [toast, setToast] = useState(null);
   const [isDark, toggleTheme] = useTheme();
+  const [explain, setExplain] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -138,6 +139,14 @@ export default function App() {
     [refresh],
   );
 
+  // First-step choices under the hero.
+  const pick = (kind) => {
+    if (kind === 'earn') return go('earn');
+    const id = kind === 'lev' ? 'trade' : 'how';
+    if (kind === 'explain') setExplain(true);
+    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+  };
+
   const onConnect = () => connect().catch((e) => setToast({ text: errorText(e), bad: true }));
   const onDisconnect = () => disconnect().then(() => setAccountId(null));
   const ctx = { pool, me, accountId, onConnect, run, busy };
@@ -168,11 +177,14 @@ export default function App() {
         )}
         {page === 'trade' && (
           <>
-            {!accountId && <Hero onConnect={onConnect} />}
-            <Split pool={pool} error={loadError} />
-            <section className="page cols">
+            {!accountId && <Hero pool={pool} onPick={pick} />}
+            <Split pool={pool} error={loadError} open={explain} setOpen={setExplain} />
+            <section className="page cols" id="trade">
               <TradePanel {...ctx} />
-              <GuardianFeed pool={pool} limit={3} onMore={() => go('guardian')} />
+              <div className="side-col">
+                <GuardianFeed pool={pool} limit={1} title="Latest from the Guardian" onMore={() => go('guardian')} />
+                <PoolPulse pool={pool} />
+              </div>
             </section>
             <AskBexley {...ctx} />
             <RiskCheck {...ctx} onOrders={() => go('orders')} />
@@ -278,18 +290,25 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
 
 // ---------- Hero and the split ----------
 
-function Hero({ onConnect }) {
+function Hero({ pool, onPick }) {
+  const rate = pool?.state ? pctRate(pool.state.savings_rate_bps) : null;
+  const lev = pool?.state ? formatTimes(pool.state.leverage_bps) : 'about 2x';
+  const choices = [
+    ['earn', 'I want to earn', rate ? `Hold bxUSD at $1 and earn ${rate} a year.` : 'Hold bxUSD at $1 and earn a savings rate.'],
+    ['lev', 'I want leveraged NEAR', `Hold xNEAR: ${lev} NEAR's moves, no liquidations.`],
+    ['explain', 'Explain the pool', 'See how one pool makes both, and what happens if NEAR moves.'],
+  ];
   return (
     <section className="hero">
       <h1>Double the possibilities from one pool.</h1>
       <p>Hold bxUSD at $1 and earn, or ride NEAR with leverage in xNEAR. No liquidations, and an AI Guardian keeps the pool safe.</p>
-      <div className="cta">
-        <button className="btn go" onClick={onConnect}>
-          Connect a testnet wallet
-        </button>
-        <a className="btn quiet" href="#how" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>
-          See how it splits
-        </a>
+      <div className="choices" role="group" aria-label="Where to start">
+        {choices.map(([k, t, d]) => (
+          <button key={k} className={`choice c-${k}`} onClick={() => onPick(k)}>
+            <b>{t}</b>
+            <span>{d}</span>
+          </button>
+        ))}
       </div>
     </section>
   );
@@ -309,9 +328,8 @@ function modeAt(cr) {
 }
 
 /** The pool as a single bar: bxUSD's claim on the left, xNEAR's on the right. */
-function Split({ pool, error }) {
+function Split({ pool, error, open, setOpen }) {
   const [move, setMove] = useState(0);
-  const [open, setOpen] = useState(false);
   const s = pool?.state;
 
   const m = useMemo(() => {
@@ -580,6 +598,9 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
         <Fact k="You receive at least" v={q ? `${formatAmount(withSlippage(q), 4)} ${TOKENS[getK][0]}` : '—'} />
       </div>
 
+      {side === 'x' && s && (
+        <p className="hint lever-line">Your xNEAR moves about {formatTimes(s.leverage_bps)} as much as NEAR, up and down.</p>
+      )}
       {problem && <p className="err">{problem}</p>}
       {accountId ? (
         <button className="btn go wide" disabled={!amount || !!problem || q == null || q === 0n || busy === 'trade'} onClick={submit}>
@@ -596,7 +617,7 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
 
 const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', rate: 'Savings rate', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
 
-function GuardianFeed({ pool, limit, onMore, more }) {
+function GuardianFeed({ pool, limit, onMore, more, title = 'Pool Guardian' }) {
   const s = pool?.state;
   const [shown, setShown] = useState(limit);
   const all = pool?.notes ?? [];
@@ -605,7 +626,7 @@ function GuardianFeed({ pool, limit, onMore, more }) {
   return (
     <section aria-label="Guardian">
       <div className="feed-head">
-        <h3>Pool Guardian</h3>
+        <h3>{title}</h3>
         <span className="alive">
           <i className={`pulse${live ? '' : ' off'}`} aria-hidden="true" />
           {s ? (live ? `Active, last price ${timeAgo(s.price_updated_at)}` : 'Waiting for its next check') : 'Loading'}
@@ -642,6 +663,30 @@ function GuardianFeed({ pool, limit, onMore, more }) {
         </button>
       )}
     </section>
+  );
+}
+
+/** Three numbers the Guardian manages, beside the trade box. */
+function PoolPulse({ pool }) {
+  const s = pool?.state;
+  if (!s) return null;
+  const feeWord = ['Normal', 'Volatile, 2x', 'Very volatile, 3x'][s.fee_level] || 'Normal';
+  return (
+    <div className="pulse-facts">
+      <Fact k="Backing" v={`${formatBacking(s.cr_bps)}, ${s.mode.toLowerCase()}`} />
+      <Fact k="Savings rate, set by AI" v={`${pctRate(s.savings_rate_bps)} a year`} />
+      <Fact k="Fees, set by AI" v={feeWord} />
+    </div>
+  );
+}
+
+/** A clearly labeled example, shown only where the user has nothing yet. */
+function Example({ children }) {
+  return (
+    <div className="example-card">
+      <span className="chip">Example</span>
+      <p>{children}</p>
+    </div>
   );
 }
 
@@ -700,10 +745,7 @@ function Earn({ pool, me, accountId, onConnect, run, busy }) {
     <section className="page">
       <div className="pagehead">
         <h2>Earn on bxUSD</h2>
-        <p>
-          Put bxUSD in the Stability Pool. You earn a savings rate paid by xNEAR holders, plus 80% of every fee. If backing ever drops
-          under 130%, part of your bxUSD turns into xNEAR at fair value to protect the pool, and that xNEAR is yours.
-        </p>
+        <p>Put bxUSD in the Stability Pool. You earn a savings rate paid by xNEAR holders, plus 80% of every fee.</p>
       </div>
       <div className="cols">
         <div className="panel">
@@ -714,6 +756,10 @@ function Earn({ pool, me, accountId, onConnect, run, busy }) {
           <div className="field">
             <label htmlFor="sp-amount">Deposit</label>
             <AmountRow id="sp-amount" value={text} onChange={setText} max={me?.bx} unit="bxUSD" />
+          </div>
+          <div className="note shield">
+            <b>How it protects the pool.</b> If backing ever drops under 130%, part of your bxUSD turns into xNEAR at fair value. That
+            xNEAR is yours, and you can withdraw any time.
           </div>
           {problem && <p className="err">{problem}</p>}
           {accountId ? (
@@ -731,6 +777,12 @@ function Earn({ pool, me, accountId, onConnect, run, busy }) {
             <Fact k="bxUSD" v={hasPos ? formatAmount(pos.bx, 4) : '—'} />
             <Fact k="xNEAR from protection" v={hasPos ? formatAmount(pos.x, 4) : '—'} />
           </div>
+          {!hasPos && s && (
+            <Example>
+              100 bxUSD in for 30 days at {pctRate(s.savings_rate_bps)} grows to about{' '}
+              {(100 * (1 + Number(s.savings_rate_bps) / 10000 * 30 / 365)).toFixed(2)} bxUSD, plus a share of fees.
+            </Example>
+          )}
           {hasPos && (
             <button className="btn line" disabled={busy === 'spw'} onClick={() => run('spw', spWithdraw, 'Withdrawn to your wallet.')}>
               {busy === 'spw' ? 'Confirm in your wallet…' : 'Withdraw all'}
@@ -755,10 +807,7 @@ function Vaults({ pool, me, accountId, onConnect, run, busy }) {
     <section className="page">
       <div className="pagehead">
         <h2>Steady vaults</h2>
-        <p>
-          xNEAR's leverage floats as the pool changes. A Steady vault mixes tNEAR and xNEAR to hold one leverage, and the Guardian
-          rebalances it when it drifts more than 3%.
-        </p>
+        <p>Steady means one fixed leverage, 2x or 3x, kept on target by the Guardian. xNEAR's own leverage floats; these vaults don't.</p>
       </div>
       {!pool ? (
         <p className="empty">Loading vaults…</p>
@@ -805,6 +854,13 @@ function VaultCard({ v, pool, me, accountId, onConnect, run, busy }) {
           <Fact k="Vault size" v={`${formatAmount(v.value)} tNEAR`} />
           <Fact k="Your share" v={hasPos ? `${formatAmount(pos.value, 4)} tNEAR, ${money(usdValue(pos.value, s.price))}` : '—'} />
         </div>
+        {!hasPos && s && (
+          <Example>
+            100 tNEAR (about ${(100 * Number(s.price) / 1e6).toFixed(0)}) in Steady {Number(v.target_bps) / 10000}x: if NEAR rises 10%, about $
+            {(100 * Number(s.price) / 1e6 * (1 + 0.1 * Number(v.target_bps) / 10000)).toFixed(0)}. If it falls 10%, about $
+            {(100 * Number(s.price) / 1e6 * (1 - 0.1 * Number(v.target_bps) / 10000)).toFixed(0)}.
+          </Example>
+        )}
         {capped && <p className="hint">xNEAR itself is under {formatTimes(v.target_bps)} right now, so this vault holds only xNEAR.</p>}
       </div>
       <div className="field" style={{ margin: 0 }}>
@@ -905,10 +961,13 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
         </div>
         <div>
           <h3 style={{ fontSize: 17, marginBottom: 10 }}>Your orders</h3>
-          {!accountId ? (
-            <p className="empty">Connect your wallet to see your orders.</p>
-          ) : orders.length === 0 ? (
-            <p className="empty">No orders yet.</p>
+          {orders.length === 0 ? (
+            s && (
+              <Example>
+                Protect 50 xNEAR: sell if NEAR falls to ${Number(suggestStop(Number(s.price) / 1e6, vol).price).toFixed(2)}. If NEAR gets there, the Guardian sells
+                and sends tNEAR straight to your wallet. Until then you keep every gain.
+              </Example>
+            )
           ) : (
             <div className="rowlist">
               {orders.map((o) => (
@@ -1157,6 +1216,12 @@ function AskBexley({ pool, me, accountId, onConnect, run, busy }) {
       {plan && (
         <div className="plan">
           <p>{plan.reply}</p>
+          {plan.steps.length > 0 && (plan.outcome || plan.risk) && (
+            <div className="plan-facts">
+              {plan.outcome && <Fact k="You'd end with" v={plan.outcome} />}
+              {plan.risk && <Fact k="Main risk" v={plan.risk} />}
+            </div>
+          )}
           {plan.steps.length > 0 && (
             <>
               <ol className="steps">
