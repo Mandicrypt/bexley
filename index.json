@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793817988341,
+  "id": "aff70b8a52494649baef4d2e011659a5",
+  "file": "2026-11-04/aff70b8a52494649baef4d2e011659a5.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR's wide 15.95% daily range justifies keeping 3x fees. Backing is 194%, so the 20% savings rate stays at its cap to attract savers and give xNEAR more leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793817749671,
   "id": "cbcfebcc4cc3441eb7d2734ad0675805",
   "file": "2026-11-04/cbcfebcc4cc3441eb7d2734ad0675805.json",
