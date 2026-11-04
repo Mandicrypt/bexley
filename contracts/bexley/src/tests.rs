@@ -181,7 +181,7 @@ fn no_new_bxusd_in_stabilize() {
 fn guardian_fee_levels_multiply_fees() {
     let mut c = seeded();
     ctx("guardian.test", START, 0);
-    c.set_fee_level(2, "NEAR is swinging hard; fees x3 for now.".into());
+    c.set_fee_level(2, "NEAR is swinging hard; fees x3 for now.".into(), None);
     assert_eq!(c.get_pool().fees_bps.mint_x, 150);
     assert_eq!(c.get_notes(None)[0].kind, "fees");
 }
@@ -191,7 +191,7 @@ fn guardian_fee_levels_multiply_fees() {
 fn only_guardian_sets_fees() {
     let mut c = seeded();
     ctx("random.test", START, 0);
-    c.set_fee_level(2, "x".into());
+    c.set_fee_level(2, "x".into(), None);
 }
 
 #[test]
@@ -386,4 +386,117 @@ fn whole_formats() {
     assert_eq!(whole(1234 * T / 100), "12.34");
     assert_eq!(times(21_500), "2.15");
     assert_eq!(dollars(3_905_250), "3.905");
+}
+
+// ---------- Savings rate ----------
+
+const YEAR_NS: u64 = 31_536_000 * NS;
+
+fn price_at(c: &mut Contract, p: u128, ts: u64) {
+    ctx("feeder.test", ts, 0);
+    c.set_price(U128(p));
+}
+
+/// Healthy pool with 100 bxUSD in the Stability Pool.
+fn saving() -> Contract {
+    let mut c = setup();
+    mint_x(&mut c, "risk.test", 300 * T); // $1200 of xNEAR
+    mint_bx(&mut c, "saver.test", 100 * T); // ~$400 of bxUSD
+    ctx("saver.test", START, 1);
+    c.sp_deposit(U128(100 * T));
+    c
+}
+
+#[test]
+fn savers_earn_the_rate() {
+    let mut c = saving();
+    assert_eq!(c.get_pool().savings_rate_bps, DEFAULT_SAVINGS_BPS);
+    price_at(&mut c, P, START + YEAR_NS); // a year later, same price
+    let earned = c.get_interest_paid().0;
+    // 100 bxUSD at 8% for a year = 8 bxUSD.
+    assert!(close(earned, 8 * T), "earned {earned}");
+    assert!(close(c.sp_bx, 108 * T));
+}
+
+#[test]
+fn xnear_pays_the_interest() {
+    let mut c = saving();
+    let nav0 = c.x_price();
+    let tvl0 = c.tvl();
+    price_at(&mut c, P, START + YEAR_NS);
+    assert_eq!(c.tvl(), tvl0, "interest moves value, it does not create it");
+    assert!(c.x_price() < nav0);
+    // xNEAR's loss in dollars equals what savers gained.
+    let x_loss = c.x_supply() * (nav0 - c.x_price()) / MICRO;
+    // Equal up to rounding (within 0.1%).
+    assert!(x_loss.abs_diff(c.interest_paid) * 1000 <= c.interest_paid, "{x_loss} vs {}", c.interest_paid);
+}
+
+#[test]
+fn no_interest_outside_healthy_mode() {
+    let mut c = saving();
+    price_at(&mut c, P * 30 / 100, START + NS); // NEAR -70%: well under 150%
+    assert_ne!(c.mode(), Mode::Healthy);
+    let paid = c.interest_paid;
+    price_at(&mut c, P * 30 / 100, START + YEAR_NS);
+    assert_eq!(c.interest_paid, paid);
+    assert_eq!(c.get_savings_rate(), 0);
+}
+
+#[test]
+fn interest_never_pushes_backing_under_150() {
+    let mut c = saving();
+    ctx("guardian.test", START, 0);
+    c.set_fee_level(0, "Max rate test".into(), Some(MAX_SAVINGS_BPS));
+    // Many years at 20% would eat xNEAR; the cap stops it at 150%.
+    price_at(&mut c, P, START + 50 * YEAR_NS);
+    assert!(c.cr_bps() >= CAUTION_CR_BPS, "cr {}", c.cr_bps());
+}
+
+#[test]
+fn guardian_sets_rate_with_a_note() {
+    let mut c = saving();
+    ctx("guardian.test", START, 0);
+    c.set_fee_level(0, "Backing is high, so bxUSD is scarce. Savings rate up to 12%.".into(), Some(1_200));
+    assert_eq!(c.get_pool().savings_rate_set_bps, 1_200);
+    assert_eq!(c.get_notes(None)[0].kind, "rate");
+}
+
+#[test]
+#[should_panic(expected = "at most 20%")]
+fn rate_is_capped() {
+    let mut c = saving();
+    ctx("guardian.test", START, 0);
+    c.set_fee_level(0, "x".into(), Some(5_000));
+}
+
+#[test]
+fn late_depositor_does_not_take_earlier_interest() {
+    let mut c = saving();
+    mint_bx(&mut c, "late.test", 50 * T);
+    let late_bx = c.ft_balance_of(acc("late.test")).0;
+    ctx("late.test", START + YEAR_NS, 1);
+    c.sp_deposit(U128(late_bx));
+    let early = c.get_sp_position(acc("saver.test")).value.0;
+    let late = c.get_sp_position(acc("late.test")).value.0;
+    // 8% interest, plus a little fee income from the late saver's mint.
+    assert!(early >= 108 * T && early < 109 * T, "early {early}");
+    assert!(close(late, late_bx), "late {late}");
+}
+
+#[test]
+fn old_layout_is_a_prefix_of_the_new_one() {
+    // `migrate` reads the old state as ContractV2_0. That only works if the
+    // old fields are exactly the start of the new layout.
+    use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
+    let c = saving();
+    let mut bytes = Vec::new();
+    BorshSerialize::serialize(&c, &mut bytes).unwrap();
+    let mut rest: &[u8] = &bytes;
+    let old = ContractV2_0::deserialize(&mut rest).unwrap();
+    assert_eq!(rest.len(), 4 + 8 + 16, "only the three new fields should be left");
+    assert_eq!(old.collateral, c.collateral);
+    assert_eq!(old.sp_bx, c.sp_bx);
+    assert_eq!(old.x_external, c.x_external);
+    assert_eq!(old.bx.total_supply, c.bx.total_supply);
 }

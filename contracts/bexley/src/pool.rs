@@ -67,6 +67,11 @@ pub struct PoolView {
     pub fees_bps: FeeView,
     pub stability_pool: SpView,
     pub stats: Stats,
+    /// Yearly rate the Stability Pool earns now (0 outside Healthy mode).
+    pub savings_rate_bps: u32,
+    /// The rate the Guardian has set.
+    pub savings_rate_set_bps: u32,
+    pub interest_paid: U128,
 }
 
 #[near(serializers = [json])]
@@ -340,6 +345,7 @@ impl Contract {
             "Only the price feeder can post prices"
         );
         require!(price.0 > 0, "Price must be above zero");
+        self.accrue();
         self.price = price.0;
         self.price_at = now();
     }
@@ -350,6 +356,7 @@ impl Contract {
     #[payable]
     pub fn redeem_bx(&mut self, amount: U128, min_out: Option<U128>) -> U128 {
         near_sdk::assert_one_yocto();
+        self.accrue();
         let me = env::predecessor_account_id();
         require!(amount.0 > 0, "Enter an amount");
         self.bx.internal_withdraw(&me, amount.0);
@@ -394,6 +401,9 @@ impl Contract {
                 value: U128(self.sp_value()),
             },
             stats: self.stats.clone(),
+            savings_rate_bps: self.get_savings_rate(),
+            savings_rate_set_bps: self.savings_rate_bps,
+            interest_paid: U128(self.interest_paid),
         }
     }
 
@@ -463,6 +473,7 @@ impl FungibleTokenReceiver for Contract {
     /// tNEAR and xNEAR arrive here via `ft_transfer_call`. Any error panics
     /// and the token contract refunds the whole amount.
     fn ft_on_transfer(&mut self, sender_id: AccountId, amount: U128, msg: String) -> PromiseOrValue<U128> {
+        self.accrue();
         let token = env::predecessor_account_id();
         let action: DepositMsg = near_sdk::serde_json::from_str(&msg)
             .unwrap_or_else(|_| env::panic_str("Could not read the deposit message"));

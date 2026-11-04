@@ -5,7 +5,7 @@ Bexley splits one pool of NEAR into two tokens:
 - **bxUSD**: a stablecoin worth $1, for people who want safety.
 - **xNEAR**: leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes, so it moves more than NEAR in both directions.
 
-On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereum), Bexley adds a **Stability Pool**, **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, and an **AI Pool Guardian** that runs the pool's safety work and explains every move in public notes.
+On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereum), Bexley adds a **Stability Pool** with a **savings rate paid by xNEAR**, **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, and an **AI Pool Guardian** that runs the pool's safety work, sets the savings rate from demand, and explains every move in public notes.
 
 Built for the NEAR Hackathon (Nov 2026).
 
@@ -15,10 +15,10 @@ This README only describes what works today.
 
 | Part | Status |
 |---|---|
-| Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 29 unit tests pass. |
+| Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 37 unit tests pass. |
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
-| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. 9 logic tests pass. |
+| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. 12 logic tests pass. |
 | Web app (`app/`) | Mint, Redeem, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Published on GitHub Pages. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken. Not decentralized yet. |
 | Deposits from other chains | Not built. |
@@ -54,6 +54,14 @@ bxUSD can never be minted if it would push backing under 130%. If backing ever f
 
 bxUSD holders deposit to earn **80% of all fees** while the pool is healthy. In return, when backing drops under 130%, part of their bxUSD is converted into xNEAR at fair value. Withdraw any time and get back your share of both.
 
+### Savings rate
+
+xNEAR's leverage comes from bxUSD, so in effect xNEAR borrows from bxUSD holders. xNEAR pays bxUSD in the Stability Pool a yearly savings rate, a little at a time: the pool mints new bxUSD into the Stability Pool, and since the pool's value is unchanged, that bxUSD comes out of xNEAR's share.
+
+- The rate only runs while the pool is Healthy, and never pushes backing under 150%.
+- The Guardian sets it between 0% and 20% from how much leverage people want (see below). It starts at 8%.
+- Stability Pool savers earn this rate **plus** 80% of all fees.
+
 ### Steady vaults
 
 xNEAR's leverage floats with the pool. **Steady 2x** and **Steady 3x** hold a mix of tNEAR and xNEAR so the whole vault stays at its target. When the vault drifts more than 3%, it rebalances on-chain. If xNEAR itself is less levered than the target, the vault holds only xNEAR.
@@ -68,12 +76,13 @@ Every 5 minutes the Guardian:
 
 1. **Prices**: posts the median NEAR/USD price when it moved 0.1% or is 20 minutes old. The pool refuses prices older than an hour.
 2. **Sets fees**: reads NEAR's 24-hour move. Under 5% is calm (normal fees), 5–10% volatile (2x fees), over 10% stormy (3x fees). Higher fees in rough markets slow churn and pay the Stability Pool more for its extra risk.
-3. **Protects**: calls `stabilize` when backing is under 130%.
-4. **Rebalances** Steady vaults that drifted.
-5. **Executes** stop-loss and take-profit orders whose price is reached.
-6. **Explains**: writes a plain-English note on the pool contract for every fee change, protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
+3. **Sets the savings rate** from demand for leverage: backing over 300% means bxUSD is scarce and xNEAR barely levered, so 12% to attract savers; 200–300% is balanced, 8%; under 200% means xNEAR is already well levered, so 5% to ease its cost; 0% whenever the pool is not Healthy.
+4. **Protects**: calls `stabilize` when backing is under 130%.
+5. **Rebalances** Steady vaults that drifted.
+6. **Executes** stop-loss and take-profit orders whose price is reached.
+7. **Explains**: writes a plain-English note on the pool contract for every fee or rate change, protection, rebalance and order, plus a pool check when the mode changes, the pool changes a lot, or every 6 hours. Read them with `get_notes`.
 
-**It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level`, `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
+**It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level` (which also sets the savings rate), `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 
 Each run's decision log is on its GitHub Actions page.
 
@@ -89,6 +98,14 @@ Each run's decision log is on its GitHub Actions page.
 
 Earlier designs are kept in the repo but no longer deployed: a test USDC token, and a one-to-one deals contract (`contracts/bexley-deals-v1`) whose matching agent was `agent.bexley.testnet`.
 
+## Roadmap
+
+- **Staked NEAR as collateral (mainnet).** Back the pool with liquid-staked NEAR instead of plain NEAR, so bxUSD savers also earn NEAR's staking yield on top of the savings rate and fees.
+- **Deposits from any chain** through NEAR Intents: mint bxUSD or xNEAR with USDC, ETH or SOL from other chains.
+- **More pools**: leveraged ETH, BTC and other assets brought to NEAR through NEAR Intents, each with its own stablecoin backing.
+- **Decentralized price feed** (such as Pyth) in place of the Guardian's median of three exchanges.
+- **Security audit** before any real funds.
+
 ## Use it from the command line
 
 Deposits use `ft_transfer_call` on the token with a JSON message:
@@ -102,7 +119,7 @@ near call tnear.bexley.testnet ft_transfer_call \
 
 Messages: `mint_bx`, `mint_x`, `vault_deposit` (with `vault`: 0 or 1) for tNEAR; `redeem_x` and `order` (with `stop_price` and/or `take_price` in micro-dollars) for xNEAR.
 
-Other calls: `redeem_bx`, `sp_deposit`, `sp_withdraw`, `vault_withdraw`, `cancel_order` (each needs 1 yoctoNEAR attached). Views: `get_pool`, `get_vaults`, `get_account`, `get_notes`, `quote`.
+Other calls: `redeem_bx`, `sp_deposit`, `sp_withdraw`, `vault_withdraw`, `cancel_order` (each needs 1 yoctoNEAR attached). Views: `get_pool`, `get_vaults`, `get_account`, `get_notes`, `get_savings_rate`, `quote`. Anyone can call `accrue_interest` to bring the savings interest up to date.
 
 ## Run the tests
 

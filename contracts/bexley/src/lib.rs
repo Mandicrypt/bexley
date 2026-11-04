@@ -21,6 +21,9 @@
 //!   Stabilize CR <  130%  no new bxUSD, no xNEAR exits; the Stability Pool
 //!                         converts its bxUSD into xNEAR to lift the CR
 //!
+//! Stability Pool savers also earn a savings rate paid by xNEAR holders,
+//! set by the Guardian from how much leverage people want.
+//!
 //! On top: Steady 2x/3x vaults that hold a fixed leverage, stop-loss and
 //! take-profit orders for xNEAR, and an AI Pool Guardian that posts prices,
 //! tunes fees within set limits, triggers protection and explains each move
@@ -45,12 +48,14 @@ use near_sdk::{
 };
 
 mod features;
+mod savings;
 mod math;
 mod pool;
 #[cfg(test)]
 mod tests;
 
 pub use features::*;
+pub use savings::*;
 pub use pool::*;
 
 /// 1 whole token in base units (tNEAR, bxUSD and xNEAR all use 24 decimals).
@@ -84,6 +89,62 @@ pub trait XToken {
 #[near(contract_state)]
 #[derive(PanicOnDefault)]
 pub struct Contract {
+    pub(crate) owner: AccountId,
+    pub(crate) guardian: AccountId,
+    pub(crate) price_feeder: AccountId,
+    /// The collateral token (tNEAR on testnet).
+    pub(crate) asset: AccountId,
+    /// The xNEAR token this pool controls.
+    pub(crate) xtoken: AccountId,
+
+    /// bxUSD itself.
+    pub(crate) bx: FungibleToken,
+
+    pub(crate) price: u128,
+    pub(crate) price_at: u64,
+    /// 0 calm, 1 volatile, 2 stormy: multiplies fees, set by the Guardian.
+    pub(crate) fee_level: u8,
+
+    /// tNEAR backing bxUSD and xNEAR.
+    pub(crate) collateral: u128,
+    /// xNEAR held by people as real tokens.
+    pub(crate) x_external: u128,
+
+    // Stability Pool
+    pub(crate) sp_bx: u128,
+    pub(crate) sp_x: u128,
+    pub(crate) sp_total_shares: u128,
+    pub(crate) sp_shares: LookupMap<AccountId, u128>,
+
+    // Steady vaults (index 0 = 2x, 1 = 3x)
+    pub(crate) vaults: Vec<Vault>,
+    pub(crate) vault_shares: LookupMap<String, u128>,
+
+    // Exit orders
+    pub(crate) orders: IterableMap<u64, Order>,
+    pub(crate) next_order_id: u64,
+    pub(crate) order_x: u128,
+
+    /// tNEAR or xNEAR owed to people whose transfer failed; they can claim it.
+    pub(crate) claim_t: LookupMap<AccountId, u128>,
+    pub(crate) claim_x: LookupMap<AccountId, u128>,
+
+    pub(crate) notes: Vec<Note>,
+    pub(crate) next_note_id: u64,
+
+    pub(crate) users: LookupSet<AccountId>,
+    pub(crate) stats: Stats,
+
+    // Savings rate (added in v2.1): Stability Pool bxUSD earns this yearly
+    // rate, paid by xNEAR holders. Set by the Guardian.
+    pub(crate) savings_rate_bps: u32,
+    pub(crate) last_accrual: u64,
+    pub(crate) interest_paid: u128,
+}
+
+/// The layout before the savings rate was added, for `migrate`.
+#[near(serializers = [borsh])]
+pub struct ContractV2_0 {
     pub(crate) owner: AccountId,
     pub(crate) guardian: AccountId,
     pub(crate) price_feeder: AccountId,
@@ -179,6 +240,48 @@ impl Contract {
             next_note_id: 0,
             users: LookupSet::new(StorageKey::Users),
             stats: Stats::default(),
+            savings_rate_bps: DEFAULT_SAVINGS_BPS,
+            last_accrual: 0,
+            interest_paid: 0,
+        }
+    }
+
+    /// One-time upgrade from the layout without a savings rate. Keeps every
+    /// balance and position. Only the contract account itself can call it.
+    #[private]
+    #[init(ignore_state)]
+    pub fn migrate() -> Self {
+        let o: ContractV2_0 = env::state_read().expect("Nothing to migrate");
+        Self {
+            owner: o.owner,
+            guardian: o.guardian,
+            price_feeder: o.price_feeder,
+            asset: o.asset,
+            xtoken: o.xtoken,
+            bx: o.bx,
+            price: o.price,
+            price_at: o.price_at,
+            fee_level: o.fee_level,
+            collateral: o.collateral,
+            x_external: o.x_external,
+            sp_bx: o.sp_bx,
+            sp_x: o.sp_x,
+            sp_total_shares: o.sp_total_shares,
+            sp_shares: o.sp_shares,
+            vaults: o.vaults,
+            vault_shares: o.vault_shares,
+            orders: o.orders,
+            next_order_id: o.next_order_id,
+            order_x: o.order_x,
+            claim_t: o.claim_t,
+            claim_x: o.claim_x,
+            notes: o.notes,
+            next_note_id: o.next_note_id,
+            users: o.users,
+            stats: o.stats,
+            savings_rate_bps: DEFAULT_SAVINGS_BPS,
+            last_accrual: env::block_timestamp(),
+            interest_paid: 0,
         }
     }
 

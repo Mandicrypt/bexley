@@ -210,7 +210,7 @@ function Hero({ onConnect }) {
       <div className="sides">
         <div className="side">
           <b>bxUSD</b>
-          <span className="hint">Stays at $1. Put it in the Stability Pool to earn 80% of the pool's fees.</span>
+          <span className="hint">Stays at $1. Put it in the Stability Pool to earn a savings rate paid by xNEAR, plus 80% of the pool's fees.</span>
         </div>
         <div className="side">
           <b>xNEAR</b>
@@ -483,8 +483,9 @@ function Earn({ pool, me, accountId, onConnect, run, busy }) {
       <section className="card">
         <h2>Stability Pool</h2>
         <p className="lead">
-          Deposit bxUSD to earn 80% of every fee the pool charges. If backing ever falls under 130%, part of your bxUSD is converted
-          into xNEAR at fair value to protect the pool, and you keep that xNEAR.
+          Deposit bxUSD to earn two ways: a savings rate paid by xNEAR holders, set by the Guardian from how much leverage people
+          want, plus 80% of every fee the pool charges. If backing ever falls under 130%, part of your bxUSD is converted into xNEAR
+          at fair value to protect the pool, and you keep that xNEAR.
         </p>
         <div className="field">
           <label htmlFor="sp-amount">Deposit</label>
@@ -502,9 +503,12 @@ function Earn({ pool, me, accountId, onConnect, run, busy }) {
       <aside className="card soft">
         <h3>Pool</h3>
         <Rows>
+          <Row big k="Savings rate" v={s ? `${(s.savings_rate_bps / 100).toFixed(0)}% a year` : '—'} />
+          <Row k="Plus" v="80% of all fees" />
           <Row k="Total in the pool" v={sp ? money(sp.value) : '—'} />
           <Row k="Held as bxUSD" v={sp ? formatAmount(sp.bx) : '—'} />
           <Row k="Held as xNEAR" v={sp ? formatAmount(sp.x) : '—'} />
+          <Row k="Interest paid so far" v={s ? money(s.interest_paid, 4) : '—'} />
           <Row k="Fees paid so far" v={s ? money(s.stats.fees_usd) : '—'} />
         </Rows>
         <h3 style={{ marginTop: 20 }}>Your share</h3>
@@ -689,7 +693,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
 
 // ---------- Guardian ----------
 
-const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
+const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', rate: 'Savings rate', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
 
 function Guardian({ pool }) {
   if (!pool) return <p className="empty">Loading the Guardian's notes…</p>;
@@ -723,19 +727,21 @@ function Guardian({ pool }) {
         <ul className="plain">
           <li>posts the price on-chain</li>
           <li>sets fees from the 24-hour move: normal under 5%, 2x at 5–10%, 3x above 10%</li>
+          <li>sets the savers' rate from demand for leverage: 12% when bxUSD is scarce, 8% balanced, 5% when xNEAR is well levered, 0% in a crisis</li>
           <li>protects bxUSD if backing falls under 130%</li>
           <li>rebalances Steady vaults that drifted</li>
           <li>runs stop-loss and take-profit orders</li>
         </ul>
         <Rows>
           <Row k="Fee level now" v={['Calm (1x)', 'Volatile (2x)', 'Stormy (3x)'][s.fee_level]} />
+          <Row k="Savings rate" v={`${(s.savings_rate_bps / 100).toFixed(0)}% a year`} />
           <Row k="Protections run" v={s.stats.stabilizations} />
           <Row k="Rebalances" v={s.stats.rebalances} />
           <Row k="Orders run" v={s.stats.orders_executed} />
         </Rows>
         <p className="note" style={{ marginTop: 16 }}>
           It can't move anyone's money. Its account,{' '}
-          <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>, only has a key for those six jobs, and the pool
+          <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>, only has a key for these jobs, and the pool
           contract checks every rule itself.
         </p>
         <p className="hint" style={{ marginTop: 12 }}>

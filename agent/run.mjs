@@ -119,7 +119,8 @@ const first = plan({ pool, vaults: [], triggered: [], newPrice: m.price, change2
 note('**Actions:**');
 for (const a of first) {
   if (a.type === 'set_price' && (await call('set_price', { price: a.price.toString() }, 10n))) note(`- Posted NEAR price $${m.usd}.`);
-  if (a.type === 'set_fee_level' && (await call('set_fee_level', { level: a.level, reason: a.reason }, 10n))) note(`- Fee level ${a.level}: ${a.reason}`);
+  if (a.type === 'set_fee_level' && (await call('set_fee_level', { level: a.level, reason: a.reason, savings_rate_bps: a.rate }, 10n)))
+    note(`- Fee level ${a.level}, savings rate ${(a.rate / 100).toFixed(0)}%: ${a.reason}`);
 }
 
 pool = await view('get_pool');

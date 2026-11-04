@@ -29,6 +29,7 @@ impl Contract {
     #[payable]
     pub fn sp_deposit(&mut self, amount: U128) -> U128 {
         near_sdk::assert_one_yocto();
+        self.accrue();
         let me = env::predecessor_account_id();
         require!(amount.0 > 0, "Enter an amount");
         let value = self.sp_value();
@@ -51,6 +52,7 @@ impl Contract {
     #[payable]
     pub fn sp_withdraw(&mut self, shares: Option<U128>) {
         near_sdk::assert_one_yocto();
+        self.accrue();
         let me = env::predecessor_account_id();
         let mine = self.sp_shares.get(&me).copied().unwrap_or(0);
         let s = shares.map(|v| v.0).unwrap_or(mine);
@@ -69,6 +71,7 @@ impl Contract {
     /// xNEAR until it is back at 140% (or the pool runs out). Anyone can
     /// call it; the Guardian does so automatically.
     pub fn stabilize(&mut self) -> U128 {
+        self.accrue();
         self.fresh_price();
         require!(
             self.mode() == Mode::Stabilize,
@@ -290,6 +293,7 @@ impl Contract {
     #[payable]
     pub fn vault_withdraw(&mut self, vault: u8, shares: Option<U128>) {
         near_sdk::assert_one_yocto();
+        self.accrue();
         require!((vault as usize) < self.vaults.len(), "That vault does not exist");
         self.fresh_price();
         let me = env::predecessor_account_id();
@@ -320,6 +324,7 @@ impl Contract {
 
     /// Bring a vault back to its target leverage. Anyone can call it.
     pub fn rebalance(&mut self, vault: u8) -> bool {
+        self.accrue();
         require!((vault as usize) < self.vaults.len(), "That vault does not exist");
         self.fresh_price();
         let before = self.vault_leverage_bps(&self.vaults[vault as usize].clone());
@@ -452,6 +457,7 @@ impl Contract {
 impl Contract {
     /// Execute an order whose price has been reached. Anyone can call it.
     pub fn execute_order(&mut self, order_id: u64) -> U128 {
+        self.accrue();
         let price = self.fresh_price();
         let mut o = self.orders.get(&order_id).expect("Order not found").clone();
         let kind = self
@@ -553,16 +559,6 @@ impl Contract {
 
 #[near]
 impl Contract {
-    /// Set the fee level: 0 calm (1x fees), 1 volatile (2x), 2 stormy (3x).
-    pub fn set_fee_level(&mut self, level: u8, reason: String) {
-        self.assert_guardian();
-        require!(level <= 2, "Fee level must be 0, 1 or 2");
-        if level != self.fee_level {
-            self.fee_level = level;
-            self.add_note("fees", reason);
-        }
-    }
-
     /// The Guardian explains something in plain English.
     pub fn post_note(&mut self, kind: String, text: String) {
         self.assert_guardian();

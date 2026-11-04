@@ -43,11 +43,22 @@ async function exists(accountId) {
 }
 
 if (await exists(contractId)) {
-  console.log(`${contractId} already exists. Redeploying code only.`);
+  // Optional: top up the contract's NEAR first (bigger code needs more storage).
+  if (process.env.TOPUP_NEAR) {
+    await owner.transfer({ receiverId: contractId, amount: nearToYocto(process.env.TOPUP_NEAR) });
+    console.log(`Sent ${process.env.TOPUP_NEAR} NEAR to ${contractId} for storage.`);
+  }
+  // Optional: run a migration in the same transaction as the new code, so the
+  // contract is never live with old data and new code.
+  const migrate = process.env.MIGRATE_METHOD;
+  console.log(`${contractId} already exists. Redeploying code${migrate ? ` and calling ${migrate}` : ' only'}.`);
   const contract = new Account(contractId, provider, privateKey.trim());
   await contract.signAndSendTransaction({
     receiverId: contractId,
-    actions: [actions.deployContract(code)],
+    actions: [
+      actions.deployContract(code),
+      ...(migrate ? [actions.functionCall(migrate, {}, teraToGas('200'), 0n)] : []),
+    ],
   });
   console.log(`Redeployed ${contractId}.`);
 } else {

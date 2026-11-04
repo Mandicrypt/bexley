@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldPostPrice, toMicroUsd, feeLevelFor, feeReason, plan, statusNote, shouldPostStatus } from './logic.mjs';
+import { shouldPostPrice, toMicroUsd, feeLevelFor, feeReason, plan, statusNote, shouldPostStatus, savingsRateFor, rateReason } from './logic.mjs';
 
 const NOW = 1_000_000_000;
 const nsAgo = (ms) => String(BigInt(NOW - ms) * 1_000_000n);
@@ -14,6 +14,8 @@ const pool = (over = {}) => ({
   leverage_bps: '25000',
   x_supply: '1',
   stability_pool: { bx: '0' },
+  savings_rate_bps: 500,
+  savings_rate_set_bps: 500,
   ...over,
 });
 
@@ -65,9 +67,11 @@ test('price first, then protection, vaults and orders', () => {
     change24h: 0,
     nowMs: NOW,
   });
-  assert.deepEqual(a.map((x) => x.type), ['set_price', 'stabilize', 'rebalance', 'execute_order']);
-  assert.equal(a[2].vault, 0);
-  assert.equal(a[3].order_id, 7);
+  // In Stabilize mode the Guardian also drops the savings rate to 0%.
+  assert.deepEqual(a.map((x) => x.type), ['set_price', 'set_fee_level', 'stabilize', 'rebalance', 'execute_order']);
+  assert.equal(a[1].rate, 0);
+  assert.equal(a[3].vault, 0);
+  assert.equal(a[4].order_id, 7);
 });
 
 test('status notes read plainly', () => {
@@ -93,4 +97,23 @@ test('status note when the pool changed a lot', () => {
   const b = [{ kind: 'watch', at: nsAgo(60_000), text: 'Pool check: backing 341%, xNEAR at 1.41x. All healthy.' }];
   assert.equal(shouldPostStatus(b, 'Healthy', NOW, undefined, pool({ cr_bps: '33500' })), false);
   assert.equal(shouldPostStatus(b, 'Healthy', NOW, undefined, pool({ cr_bps: '30000' })), true);
+});
+
+test('savings rate follows demand for leverage', () => {
+  assert.equal(savingsRateFor(pool({ cr_bps: '34100' })), 1200);
+  assert.equal(savingsRateFor(pool({ cr_bps: '25000' })), 800);
+  assert.equal(savingsRateFor(pool({ cr_bps: '16700' })), 500);
+  assert.equal(savingsRateFor(pool({ cr_bps: '0' })), 800);
+  assert.equal(savingsRateFor(pool({ mode: 'Caution', cr_bps: '14000' })), 0);
+  assert.match(rateReason(1200, pool({ cr_bps: '34100', leverage_bps: '14100' })), /backing is 341%/i);
+});
+
+test('rate change goes out with the fee level in one call', () => {
+  const a = plan({ pool: pool({ cr_bps: '34100' }), vaults: [], triggered: [], newPrice: null, change24h: -6, nowMs: NOW });
+  assert.equal(a.length, 1);
+  assert.equal(a[0].type, 'set_fee_level');
+  assert.equal(a[0].level, 1);
+  assert.equal(a[0].rate, 1200);
+  assert.match(a[0].reason, /12%/);
+  assert.match(a[0].reason, /2x/);
 });

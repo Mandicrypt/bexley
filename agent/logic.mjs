@@ -42,6 +42,37 @@ export function feeReason(level, change24hPct) {
   return `NEAR moved ${c}% in 24h, so the market is ${LEVEL_WORDS[level]}. Fees are now ${level + 1}x to slow churn and pay the Stability Pool more for the extra risk.`;
 }
 
+/**
+ * Savings rate (basis points a year) from how much leverage people want.
+ * xNEAR pays it to bxUSD savers.
+ * - Backing over 300%: bxUSD is scarce and xNEAR barely levered, so pay
+ *   savers more to attract bxUSD (12%).
+ * - 200-300%: balanced (8%).
+ * - Under 200%: plenty of bxUSD and xNEAR already levered, so ease the cost
+ *   on xNEAR (5%).
+ * - Not Healthy: the pool pays nothing (0%).
+ * - No bxUSD yet: the standard 8%, to attract the first savers.
+ */
+export function savingsRateFor(pool) {
+  if (pool.mode !== 'Healthy') return 0;
+  const cr = Number(BigInt(pool.cr_bps));
+  if (cr === 0) return 800;
+  if (cr >= 30_000) return 1200;
+  if (cr >= 20_000) return 800;
+  return 500;
+}
+
+export function rateReason(rate, pool) {
+  const r = `${(rate / 100).toFixed(0)}%`;
+  if (pool.mode !== 'Healthy') return `The pool is in ${pool.mode} mode, so savers' interest is paused to protect xNEAR. Savings rate set to 0% until it is healthy again.`;
+  const cr = Number(BigInt(pool.cr_bps));
+  if (cr === 0) return `No bxUSD yet. Savings rate set to ${r} a year to attract the first savers.`;
+  const b = `Backing is ${pct(pool.cr_bps)} and xNEAR is at ${times(pool.leverage_bps)}`;
+  if (rate >= 1200) return `${b}, so bxUSD is scarce. Raised the savings rate to ${r} a year to attract savers, which gives xNEAR more leverage.`;
+  if (rate >= 800) return `${b}, a good balance. Savings rate set to ${r} a year.`;
+  return `${b}, so xNEAR is already well levered. Lowered the savings rate to ${r} a year to ease the cost on xNEAR holders.`;
+}
+
 /** "167%" from basis points (string or bigint). */
 export function pct(bps) {
   return `${(Number(BigInt(bps)) / 100).toFixed(0)}%`;
@@ -61,9 +92,16 @@ export function plan({ pool, vaults, triggered, newPrice, change24h, nowMs }) {
   if (newPrice != null && shouldPostPrice(pool, newPrice, nowMs)) {
     actions.push({ type: 'set_price', price: newPrice });
   }
-  if (change24h != null) {
-    const level = feeLevelFor(change24h);
-    if (level !== pool.fee_level) actions.push({ type: 'set_fee_level', level, reason: feeReason(level, change24h) });
+  // Fee level and savings rate go out in one call (set_fee_level).
+  const level = change24h != null ? feeLevelFor(change24h) : pool.fee_level;
+  const rate = savingsRateFor(pool);
+  const levelChanged = level !== pool.fee_level;
+  const rateChanged = pool.savings_rate_set_bps != null && rate !== pool.savings_rate_set_bps;
+  if (levelChanged || rateChanged) {
+    const reasons = [];
+    if (rateChanged) reasons.push(rateReason(rate, pool));
+    if (levelChanged) reasons.push(feeReason(level, change24h));
+    actions.push({ type: 'set_fee_level', level, rate, reason: reasons.join(' ') });
   }
   if (pool.mode === 'Stabilize' && BigInt(pool.stability_pool.bx) > 0n) {
     actions.push({ type: 'stabilize' });
@@ -80,8 +118,9 @@ export function statusNote(pool, change24h) {
   const backing = BigInt(pool.cr_bps) === 0n ? 'no bxUSD yet' : `backing ${pct(pool.cr_bps)}`;
   const lev = BigInt(pool.x_supply) === 0n ? 'no xNEAR yet' : `xNEAR at ${times(pool.leverage_bps)}`;
   const price = `NEAR $${(Number(BigInt(pool.price)) / 1e6).toFixed(3)}${change24h != null ? ` (${change24h >= 0 ? '+' : ''}${Number(change24h).toFixed(1)}% today)` : ''}`;
+  const rate = pool.savings_rate_bps != null && BigInt(pool.cr_bps) > 0n ? ` Savers earn ${(Number(pool.savings_rate_bps) / 100).toFixed(0)}% a year.` : '';
   const state = {
-    Healthy: 'All healthy.',
+    Healthy: `All healthy.${rate}`,
     Caution: 'Caution: fees now favor minting xNEAR and redeeming bxUSD to rebuild backing.',
     Stabilize: 'Protecting bxUSD: new bxUSD and xNEAR exits are paused, and the Stability Pool is absorbing risk.',
   }[pool.mode];

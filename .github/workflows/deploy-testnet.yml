@@ -13,6 +13,7 @@ on:
         type: choice
         options:
           - pool-v2
+          - pool-upgrade
           - pool-code-only
           - tnear
           - balance
@@ -74,6 +75,19 @@ jobs:
           INIT=$(jq -nc --arg a "$TNEAR_ID" --arg x "$XNEAR_ID" --arg g "$GUARDIAN_ID" \
             '{asset:$a, xtoken:$x, guardian:$g, price_feeder:$g}')
           node scripts/deploy.mjs pool "$WASM" new "$INIT"
+
+      # Upgrade the live pool to new code and migrate its data in one
+      # transaction. Every balance and position is kept.
+      - name: Upgrade the pool (keeps all balances)
+        if: inputs.target == 'pool-upgrade'
+        env:
+          MIGRATE_METHOD: migrate
+          TOPUP_NEAR: '0.5'
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          WASM=$(find target/near -name 'bexley.wasm' | head -1)
+          node scripts/deploy.mjs pool "$WASM" -
+          node scripts/view.mjs "$POOL_ID" get_pool
 
       - name: Let the pool hold tNEAR and xNEAR
         if: inputs.target == 'pool-v2'
