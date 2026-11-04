@@ -23,7 +23,8 @@ This README only describes what works today.
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, with fixed rules as backup. 21 tests pass. |
 | Web app (`app/`) | Trade (mint and redeem), Ask Bexley, Your risk, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken, with a public receipt for every post. The pool limits each post to a 5% move. Pyth no longer serves NEAR, so there is no decentralized NEAR feed to use on testnet yet. |
-| Deposits from other chains | Not built. |
+| Deposits from other chains | Built with NEAR Intents (1Click API): pay with USDC, USDT, ETH, SOL or BTC from their own chains and receive NEAR, then mint. Live quotes on testnet; real deposits on the mainnet beta. |
+| Mainnet beta | Code ready: wNEAR collateral (the app wraps NEAR for you), a hard cap on the whole pool, and an owner pause that stops new deposits while every exit stays open. Deploy with GitHub Actions → **Mainnet beta**. |
 
 On testnet the pool holds **tNEAR**, a free test token with no value, in place of real NEAR.
 
@@ -99,6 +100,26 @@ On the Guardian page, click **AI, verified** on a note and your browser download
 **It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level` (which also sets the savings rate), `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 
 Each run's decision log is on its GitHub Actions page.
+
+## Deposit from another chain (NEAR Intents)
+
+NEAR Intents has no testnet, so this runs on the mainnet beta (the testnet app shows live quotes).
+
+1. Pick what you'll send (for example 25 USDC on Base) and see a live quote: about how much NEAR arrives and how fast.
+2. Enter your address on that chain for refunds, and get a one-time deposit address from NEAR Intents.
+3. Send the funds from any wallet. NEAR Intents' solvers swap them and send wNEAR to your NEAR account; the app follows the status.
+4. When it lands, mint bxUSD or xNEAR with one click.
+
+Bexley never holds these funds: the deposit address belongs to NEAR Intents, and failed swaps are refunded to your own address. The API calls go through a small server function (`app/api/intents.js`).
+
+## Mainnet beta
+
+Real NEAR, unaudited code, so it is deliberately small:
+
+- **Hard cap** on the pool's total collateral (`app/src/config/mainnet.json`, 100 NEAR at launch). Deposits over it are refused and refunded.
+- **Pause**: the owner can stop new deposits (minting, vault deposits, Stability Pool deposits, new orders). Redeems, withdrawals and order cancels keep working.
+- The same Guardian runs it, with its own limited key, the same price safety rails and its own public proofs (`proofs/mainnet`).
+- In the app, use the **Testnet / Mainnet** switch at the top. Mainnet uses NEAR: the app wraps exactly what a mint needs into wNEAR in the same transaction, and an **Unwrap** button turns wNEAR back into NEAR.
 
 ## Ask Bexley
 
