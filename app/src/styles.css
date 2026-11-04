@@ -458,3 +458,55 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .cc-status.s-REFUNDED, .cc-status.s-FAILED, .cc-status.s-INCOMPLETE_DEPOSIT { color: var(--red); }
 .cc-foot { margin-top: -4px; }
 @media (max-width: 900px) { .cc-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Landing ---------- */
+.landing { display: grid; gap: 0; }
+.landing section { padding-block: 72px; }
+.landing section + section { border-top: 1px solid var(--line); }
+.landing h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; }
+.l-hero { padding-top: 96px !important; display: grid; gap: 24px; border-top: 0 !important; }
+.l-hero h1 { font-size: clamp(40px, 7vw, 84px); line-height: 1; font-weight: 600; letter-spacing: -0.045em; max-width: 13ch; }
+.l-hero p { font-size: 19px; color: var(--ink-2); max-width: 46ch; }
+.t-bx { color: var(--slate); font-weight: 600; }
+.t-x { color: var(--green-ink); font-weight: 600; }
+.l-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.l-cta .btn { min-height: 50px; padding: 0 22px; font-size: 16px; }
+.landing .l-pool { padding-top: 0; border-top: 0 !important; display: grid; gap: 12px; }
+.l-bar { display: flex; height: 88px; border-radius: 22px; overflow: hidden; }
+.l-bx { background: repeating-linear-gradient(135deg, var(--slate) 0 2px, transparent 2px 10px), var(--slate-soft); display: flex; align-items: center; padding-left: 20px; transition: width .6s cubic-bezier(.2,.7,.2,1); min-width: 120px; }
+.l-x { flex: 1; background: var(--green); display: flex; align-items: center; justify-content: flex-end; padding-right: 20px; min-width: 120px; }
+.l-bar span { background: var(--raised); color: var(--ink); padding: 6px 12px; border-radius: 10px; font-size: 14px; font-family: var(--display); white-space: nowrap; }
+.l-ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+.way { display: grid; gap: 14px; align-content: start; justify-items: start; padding-left: 20px; border-left: 3px solid var(--line-strong); }
+.way.bx { border-color: var(--slate); }
+.way.x { border-color: var(--green); }
+.way p { color: var(--ink-2); max-width: 44ch; }
+.l-steps { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 48px; }
+.l-steps ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 28px; counter-reset: s; }
+.l-steps li { display: grid; gap: 4px; padding-left: 52px; position: relative; counter-increment: s; }
+.l-steps li::before { content: counter(s); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); font-family: var(--display); font-weight: 600; }
+.l-steps li b { font-family: var(--display); font-size: 19px; font-weight: 600; }
+.l-steps li span { color: var(--ink-2); max-width: 52ch; }
+.l-trust { display: grid; gap: 32px; justify-items: start; }
+.trust-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; width: 100%; }
+.trust-grid h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.trust-grid p { color: var(--ink-2); font-size: 14.5px; }
+.l-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.l-stats div { display: grid; gap: 4px; }
+.l-stats b { font-family: var(--display); font-size: clamp(26px, 3.4vw, 38px); font-weight: 600; letter-spacing: -0.02em; }
+.l-stats span { color: var(--muted); font-size: 14px; }
+.l-end { display: grid; gap: 20px; justify-items: center; text-align: center; padding-bottom: 96px !important; }
+.trade-head { margin: 40px 0 0; }
+@media (max-width: 900px) {
+  .l-ways, .l-steps { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .trust-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .l-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing section { padding-block: 52px; }
+  .l-hero { padding-top: 56px !important; }
+}
+@media (max-width: 560px) {
+  .trust-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .l-bar { height: 64px; border-radius: 16px; }
+  .l-bar span { font-size: 12px; padding: 4px 8px; }
+}
+@media (max-width: 560px) { .top .demo-btn { display: none; } }

@@ -15,6 +15,7 @@ import { ACTIONS } from './lib/intent.mjs';
 const REFRESH_MS = 15_000;
 const SLIPPAGE_BPS = 100n; // accept up to 1% less than quoted
 const PAGES = [
+  ['home', 'Home'],
   ['trade', 'Trade'],
   ['earn', 'Earn'],
   ['vaults', 'Vaults'],
@@ -56,7 +57,7 @@ function useTheme() {
 
 function pageFromHash() {
   const h = location.hash.replace('#', '');
-  return PAGES.some(([id]) => id === h) ? h : 'trade';
+  return PAGES.some(([id]) => id === h) ? h : 'home';
 }
 
 export default function App() {
@@ -123,7 +124,7 @@ export default function App() {
   }, [toast]);
 
   const go = (id) => {
-    location.hash = id === 'trade' ? '' : id;
+    location.hash = id === 'home' ? '' : id;
     setPage(id);
     window.scrollTo({ top: 0 });
   };
@@ -143,14 +144,6 @@ export default function App() {
     },
     [refresh],
   );
-
-  // First-step choices under the hero.
-  const pick = (kind) => {
-    if (kind === 'earn') return go('earn');
-    const id = kind === 'lev' ? 'trade' : 'how';
-    if (kind === 'explain') setExplain(true);
-    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
-  };
 
   const startDemo = () => {
     if (!demoRef.current) demoRef.current = createDemo(() => poolRef.current, quote);
@@ -209,9 +202,23 @@ export default function App() {
             </button>
           </div>
         )}
+        {page === 'home' && (
+          <Landing
+            pool={pool}
+            onLaunch={() => go('trade')}
+            onDemo={() => {
+              if (!demoOn) startDemo();
+              go('trade');
+            }}
+            go={go}
+          />
+        )}
         {page === 'trade' && (
           <>
-            {!acct && <Hero pool={pool} onPick={pick} />}
+            <div className="pagehead trade-head">
+              <h2>Trade</h2>
+              <p>Mint or redeem bxUSD and xNEAR from one pool, at fair value.</p>
+            </div>
             <Split pool={pool} error={loadError} open={explain} setOpen={setExplain} />
             <section className="page cols" id="trade">
               <TradePanel {...ctx} />
@@ -574,7 +581,7 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
   return (
     <header className="top">
       <div className="wrap row">
-        <a className="brand" href="#" onClick={(e) => (e.preventDefault(), go('trade'))}>
+        <a className="brand" href="#" onClick={(e) => (e.preventDefault(), go('home'))}>
           <Logo />
           bexley
           {!MAINNET_READY && <span className="net hide-sm">testnet</span>}
@@ -644,27 +651,149 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
 
 // ---------- Hero and the split ----------
 
-function Hero({ pool, onPick }) {
-  const rate = pool?.state ? pctRate(pool.state.savings_rate_bps) : null;
-  const lev = pool?.state ? formatTimes(pool.state.leverage_bps) : 'about 2x';
-  const choices = [
-    ['earn', 'I want to earn', rate ? `Hold bxUSD at $1 and earn ${rate} a year.` : 'Hold bxUSD at $1 and earn a savings rate.'],
-    ['lev', 'I want leveraged NEAR', `Hold xNEAR: ${lev} NEAR's moves, no liquidations.`],
-    ['explain', 'Explain the pool', 'See how one pool makes both, and what happens if NEAR moves.'],
-  ];
+// ---------- Landing ----------
+
+function Landing({ pool, onLaunch, onDemo, go }) {
+  const s = pool?.state;
+  const proofs = useProofIndex(pool?.notes?.[0]?.id);
+  const verified = proofs.filter((p) => p.verified).length;
+  const tvl = s ? toNum(s.tvl) : null;
+  const bx = s ? toNum(s.bx_supply) : null;
+  const bxFrac = tvl ? Math.min(1, bx / tvl) : 0.5;
+  const lev = s ? formatTimes(s.leverage_bps) : '2x';
+  const rate = s ? pctRate(s.savings_rate_bps) : null;
+  const usd = (v) => `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+
   return (
-    <section className="hero">
-      <h1>Double the possibilities from one pool.</h1>
-      <p>Hold bxUSD at $1 and earn, or ride NEAR with leverage in xNEAR. No liquidations, and an AI Guardian keeps the pool safe.</p>
-      <div className="choices" role="group" aria-label="Where to start">
-        {choices.map(([k, t, d]) => (
-          <button key={k} className={`choice c-${k}`} onClick={() => onPick(k)}>
-            <b>{t}</b>
-            <span>{d}</span>
+    <div className="landing">
+      <section className="l-hero">
+        <h1>Double the possibilities from one pool.</h1>
+        <p>
+          Bexley splits one pool of NEAR in two. Hold <b className="t-bx">bxUSD</b> at $1 and earn, or ride NEAR with leverage in{' '}
+          <b className="t-x">xNEAR</b>. No liquidations. An AI Guardian keeps the pool safe.
+        </p>
+        <div className="l-cta">
+          <button className="btn go" onClick={onLaunch}>
+            Launch app
           </button>
-        ))}
-      </div>
-    </section>
+          {!IS_MAINNET && (
+            <button className="btn quiet" onClick={onDemo}>
+              Try the demo
+            </button>
+          )}
+        </div>
+      </section>
+
+      <section className="l-pool" aria-label="The pool right now">
+        <div className="l-bar">
+          <div className="l-bx" style={{ width: `${bxFrac * 100}%` }}>
+            <span>
+              <b>bxUSD</b> {s ? usd(bx) : ''}
+            </span>
+          </div>
+          <div className="l-x">
+            <span>
+              <b>xNEAR</b> {s && tvl > bx ? usd(tvl - bx) : ''}
+            </span>
+          </div>
+        </div>
+        <p className="hint">{s ? `One pool worth ${usd(tvl)} right now, live on NEAR ${IS_MAINNET ? 'mainnet' : 'testnet'}.` : 'Loading the live pool…'}</p>
+      </section>
+
+      <section className="l-ways">
+        <article className="way bx">
+          <h2>Hold $1. Earn {rate ? `${rate} a year` : 'a savings rate'}.</h2>
+          <p>bxUSD stays at $1. Put it in the Stability Pool and earn a savings rate paid by xNEAR holders, plus 80% of every fee.</p>
+          <button className="btn line" onClick={() => go('earn')}>
+            Start earning
+          </button>
+        </article>
+        <article className="way x">
+          <h2>Ride NEAR at {lev}. No liquidations.</h2>
+          <p>xNEAR owns everything the pool is worth above its bxUSD, so it moves more than NEAR, both ways. Nobody can force you out.</p>
+          <button className="btn line" onClick={onLaunch}>
+            Get xNEAR
+          </button>
+        </article>
+      </section>
+
+      <section className="l-steps">
+        <h2>How it works</h2>
+        <ol>
+          <li>
+            <b>Bring NEAR.</b>
+            <span>Or USDC, ETH, SOL and BTC from other chains, through NEAR Intents.</span>
+          </li>
+          <li>
+            <b>Pick your side.</b>
+            <span>bxUSD to stay steady and earn, xNEAR for leverage, or a Steady 2x or 3x vault.</span>
+          </li>
+          <li>
+            <b>The Guardian watches.</b>
+            <span>Every 5 minutes it checks the pool, adjusts fees and the savings rate, and protects backing if NEAR falls.</span>
+          </li>
+        </ol>
+      </section>
+
+      <section className="l-trust">
+        <h2>Built so you don't have to trust us</h2>
+        <div className="trust-grid">
+          <div>
+            <h3>Provable AI</h3>
+            <p>Every AI decision is signed inside NEAR AI's secure hardware. Your browser can check the proof.</p>
+          </div>
+          <div>
+            <h3>Safety rails</h3>
+            <p>The Guardian can't move funds, and one price update can move the pool's price at most 5%.</p>
+          </div>
+          <div>
+            <h3>Exits you control</h3>
+            <p>Steady vaults hold a fixed leverage, and stop-loss or take-profit orders sell at your price.</p>
+          </div>
+          <div>
+            <h3>Any chain in</h3>
+            <p>Deposit from Base, Ethereum, Solana or Bitcoin with NEAR Intents. Bexley never holds those funds.</p>
+          </div>
+        </div>
+        <button className="linkbtn" onClick={() => go('guardian')}>
+          See the Guardian at work
+        </button>
+      </section>
+
+      <section className="l-stats" aria-label="Live numbers">
+        <div>
+          <b>{s ? usd(tvl) : '—'}</b>
+          <span>Pool value</span>
+        </div>
+        <div>
+          <b>{s ? formatBacking(s.cr_bps) : '—'}</b>
+          <span>Backing for every bxUSD</span>
+        </div>
+        <div>
+          <b>{rate || '—'}</b>
+          <span>Savings rate, set by AI</span>
+        </div>
+        <div>
+          <b>{verified || '—'}</b>
+          <span>AI decisions with public proof</span>
+        </div>
+      </section>
+
+      <section className="l-end">
+        <h2>See it for yourself.</h2>
+        <div className="l-cta">
+          <button className="btn go" onClick={onLaunch}>
+            Launch app
+          </button>
+          {!IS_MAINNET && (
+            <button className="btn quiet" onClick={onDemo}>
+              Try the demo
+            </button>
+          )}
+        </div>
+        <p className="hint">{IS_MAINNET ? 'Mainnet beta: real NEAR, unaudited code.' : 'On testnet with free tNEAR. No real money needed.'}</p>
+      </section>
+    </div>
   );
 }
 
