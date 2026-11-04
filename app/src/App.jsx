@@ -596,9 +596,11 @@ function TradePanel({ pool, me, accountId, onConnect, run, busy }) {
 
 const KIND_LABEL = { watch: 'Pool check', fees: 'Fees', rate: 'Savings rate', protect: 'Protection', rebalance: 'Rebalance', order: 'Order', price: 'Price' };
 
-function GuardianFeed({ pool, limit, onMore }) {
+function GuardianFeed({ pool, limit, onMore, more }) {
   const s = pool?.state;
-  const notes = pool?.notes?.slice(0, limit) ?? [];
+  const [shown, setShown] = useState(limit);
+  const all = pool?.notes ?? [];
+  const notes = all.slice(0, shown);
   const live = s?.price_fresh;
   return (
     <section aria-label="Guardian">
@@ -624,9 +626,19 @@ function GuardianFeed({ pool, limit, onMore }) {
           ))}
         </ol>
       )}
-      {onMore && pool?.notes?.length > limit && (
+      {onMore && all.length > limit && (
         <button className="linkbtn" onClick={onMore}>
           View all
+        </button>
+      )}
+      {more && all.length > shown && (
+        <button className="btn quiet sm" onClick={() => setShown(shown + 6)}>
+          View more
+        </button>
+      )}
+      {more && shown > limit && all.length <= shown && all.length > limit && (
+        <button className="btn quiet sm" onClick={() => setShown(limit)}>
+          Show less
         </button>
       )}
     </section>
@@ -664,7 +676,7 @@ function GuardianPage({ pool }) {
             Account: <a href={`${EXPLORER}/address/${GUARDIAN_ID}`} target="_blank" rel="noreferrer">{GUARDIAN_ID}</a>
           </p>
         </div>
-        <GuardianFeed pool={pool} limit={40} />
+        <GuardianFeed pool={pool} limit={6} more />
       </div>
     </section>
   );

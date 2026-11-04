@@ -268,9 +268,9 @@ p { margin: 0; }
 .pulse.off::after { display: none; }
 @keyframes ping { 0% { transform: scale(0.5); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
 .feed { list-style: none; margin: 0; padding: 0; position: relative; }
-.feed::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+.feed::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 24px; width: 2px; background: var(--line); }
 .feed li { position: relative; padding: 0 0 18px 26px; }
-.feed li::before { content: ''; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line-strong); }
+.feed li::before { content: ''; box-sizing: border-box; position: absolute; left: 1px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line-strong); }
 .feed li.k-fees::before, .feed li.k-rate::before { border-color: var(--green); }
 .feed li.k-protect::before { border-color: var(--red); background: var(--red); }
 .feed li.k-rebalance::before, .feed li.k-order::before { border-color: var(--slate); }
@@ -365,3 +365,4 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 @media (prefers-reduced-motion: reduce) {
   *, *::after { animation: none !important; transition: none !important; }
 }
+.feed + .btn, .feed + .linkbtn { margin-top: 4px; }
