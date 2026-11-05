@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793906263460,
+  "id": "eec78195cf494d57b756e0320fd7defc",
+  "file": "2026-11-05/eec78195cf494d57b756e0320fd7defc.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 8.89% with a 12.55% range, so 3x fees stay to pay savers for the risk. Backing is high at 176.3%, so the 20% savings rate stays to attract more bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793904213009,
   "id": "c2a81d9147b44f1580a5dd5303d64d8f",
   "file": "2026-11-05/c2a81d9147b44f1580a5dd5303d64d8f.json",
