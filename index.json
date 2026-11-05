@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793841388423,
+  "id": "76ade3258c914c6b9cd2c9609e837941",
+  "file": "2026-11-05/76ade3258c914c6b9cd2c9609e837941.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 191.8% and leverage only 2.09x, so we keep the 20% savings rate to attract savers. NEAR swung 15.95% in a day, so 3x fees stay to slow churn and pay the Stability Pool.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793840691687,
   "id": "c2d03979f6274c77a15bdd5a308f86bc",
   "file": "2026-11-05/c2d03979f6274c77a15bdd5a308f86bc.json",
