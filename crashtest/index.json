@@ -1,0 +1,50 @@
+[
+ {
+  "at": 1793883993921,
+  "id": "e072ff45e6f240dca4678ee788310e4b",
+  "file": "2026-11-05/e072ff45e6f240dca4678ee788310e4b.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 37% in a day with 18% volatility, so 3x fees stay on to slow churn and pay savers for the risk. Backing is 140% in Caution mode, so the savings rate must stay 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
+  "at": 1793883982279,
+  "id": "1b770e45835d48dba448297127124935",
+  "file": "2026-11-05/1b770e45835d48dba448297127124935.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 37% in a day with 18% volatility, pushing backing down to 125%. Fees rise to 3x to slow churn and pay savers for the risk; the savings rate stays 0% in Stabilize mode.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
+  "at": 1793883214134,
+  "id": "0c7de76149524bb5a3d1806c14999ae1",
+  "file": "2026-11-05/0c7de76149524bb5a3d1806c14999ae1.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 26% in a day with 13% volatility, so fees double to 2x to slow churn and pay savers for the risk. Caution mode at 146% backing requires the savings rate to drop to 0%.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
+  "at": 1793881683328,
+  "id": "6541dd195edf4ecb94938d8640f58384",
+  "file": "2026-11-05/6541dd195edf4ecb94938d8640f58384.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 199%, well above the 150% healthy line, so bxUSD is scarce and xNEAR can take more leverage. Raising the savings rate from 8% to 12% should attract savers. Fees stay normal with 0% NEAR volatility.",
+  "level": 0,
+  "rate": 1200,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ }
+]
