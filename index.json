@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793853605406,
+  "id": "84794b0ba0d740e6aa073e84bb4e08c1",
+  "file": "2026-11-05/84794b0ba0d740e6aa073e84bb4e08c1.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 193.7%, so bxUSD is scarce and the 20% savings rate stays to attract savers. NEAR rose 8.63% with a 14.79% range, still volatile, so 3x fees stay.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793851585852,
   "id": "95c7a0103175477da6f556447bf9b88d",
   "file": "2026-11-05/95c7a0103175477da6f556447bf9b88d.json",
