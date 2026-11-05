@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793857662672,
+  "id": "b94d0abe07a84602ae37af5e183a23fb",
+  "file": "2026-11-05/b94d0abe07a84602ae37af5e183a23fb.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is a strong 192.3% and NEAR still swung 12% in a day, so we keep 3x fees and the maximum 20% savings rate to attract savers and pay them for the risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793855630411,
   "id": "fa99e02e844a43f49c852f26371f6055",
   "file": "2026-11-05/fa99e02e844a43f49c852f26371f6055.json",
