@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793866497554,
+  "id": "f126c695ae8c4314826224d0b179ad8d",
+  "file": "2026-11-05/f126c695ae8c4314826224d0b179ad8d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 192%, so savers are still needed and the 20% rate stays at its cap. NEAR swung 7.8% in a day with 5.7% volatility, so 3x fees remain to pay the Stability Pool for that risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793864473381,
   "id": "82ec1c17b8c043f396a0043c603fbd64",
   "file": "2026-11-05/82ec1c17b8c043f396a0043c603fbd64.json",
