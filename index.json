@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793916519907,
+  "id": "gen-1793916513-PqtyKSwvGcwa6kvQaK5w",
+  "file": "2026-11-05/gen-1793916513-PqtyKSwvGcwa6kvQaK5w.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR is still volatile with 6.0% daily swings, so fees stay at 3x. Backing is high at 176.5%, so the saver rate stays at 20% to attract more bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1793914432928,
   "id": "c50361613b914d2e96ccd340ef28dd8a",
   "file": "2026-11-05/c50361613b914d2e96ccd340ef28dd8a.json",
