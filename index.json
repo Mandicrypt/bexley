@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793882782705,
+  "id": "fe76626d40ad478996989a6cd98686ec",
+  "file": "2026-11-05/fe76626d40ad478996989a6cd98686ec.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 189.5% so the pool still wants more savers, and NEAR swung 8.7% in a day, so 3x fees and the 20% savings rate stay to cover that risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793880738804,
   "id": "9663e67bc4564733b11aa505c414bc99",
   "file": "2026-11-05/9663e67bc4564733b11aa505c414bc99.json",
