@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793851585852,
+  "id": "95c7a0103175477da6f556447bf9b88d",
+  "file": "2026-11-05/95c7a0103175477da6f556447bf9b88d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR moved in a 14.79% range today with 6.32% volatility, so 3x fees stay. Backing is 192.2% and leverage only 2.08, so savers are still needed and the 20% savings rate stays at its maximum.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793849549623,
   "id": "4622d8fd5def49ffa80fff89cd0ba4f0",
   "file": "2026-11-05/4622d8fd5def49ffa80fff89cd0ba4f0.json",
