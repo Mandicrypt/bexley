@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793840691687,
+  "id": "c2d03979f6274c77a15bdd5a308f86bc",
+  "file": "2026-11-05/c2d03979f6274c77a15bdd5a308f86bc.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR swung about 16% in a day, so 3x fees stay to pay savers for the risk. Backing is 191.8%, so bxUSD is scarce and the 20% rate stays to attract more savers.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793838673032,
   "id": "892719516097460985921ed8787664b4",
   "file": "2026-11-05/892719516097460985921ed8787664b4.json",
