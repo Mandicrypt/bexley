@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793901822297,
+  "id": "ca65ecc7772144b3b86969a9f8948f9e",
+  "file": "2026-11-05/ca65ecc7772144b3b86969a9f8948f9e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: NEAR is volatile (down 10.6% with a 14.2% range), so 3x fees stay to slow churn and pay savers for the risk. Backing is high at 176.7%, so the 20% rate stays to attract more bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793899763095,
   "id": "fa27b95829eb4aa7a12cfe5b446ba79b",
   "file": "2026-11-05/fa27b95829eb4aa7a12cfe5b446ba79b.json",
