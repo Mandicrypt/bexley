@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793885515628,
+  "id": "fe2e9b1ecc144ebea9ff11b6e398706f",
+  "file": "2026-11-05/fe2e9b1ecc144ebea9ff11b6e398706f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. NEAR volatility is still 5.66% with a 9% daily range, so 3x fees stay. The savings rate stays at 20%, the maximum, since backing of 188% means savers are needed to lift xNEAR leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793883487804,
   "id": "f6c4eae2548f4380805156392a1a5770",
   "file": "2026-11-05/f6c4eae2548f4380805156392a1a5770.json",
