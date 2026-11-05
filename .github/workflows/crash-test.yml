@@ -11,6 +11,10 @@ on:
         description: How far NEAR falls in the test (%)
         default: '40'
         required: true
+      fresh:
+        description: Delete the old test pool first (returns its NEAR) and start clean
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -48,6 +52,12 @@ jobs:
           (cd agent && npm ci)
       - name: Owner balance
         run: node scripts/balance.mjs
+      - name: Remove the old test pool (its NEAR goes back to the owner)
+        if: inputs.fresh
+        run: |
+          node scripts/retire.mjs crash
+          node scripts/retire.mjs xcrash
+          node scripts/balance.mjs
       - name: Deploy the test xNEAR and test pool (first time only)
         run: |
           (cd contracts/xtoken && cargo near build non-reproducible-wasm)
@@ -64,6 +74,12 @@ jobs:
           PROOF_DIR: ${{ github.workspace }}/proofs-repo
           DROP_PCT: ${{ inputs.drop }}
         run: node crashtest.mjs
+      - name: Keep a copy of the recording
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crashtest
+          path: proofs-repo/crashtest
       - name: Publish the timeline
         if: always()
         run: scripts/publish-proofs.sh
