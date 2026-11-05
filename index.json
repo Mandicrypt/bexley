@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793847512474,
+  "id": "5810b248b4e44d19a6f11aad980fb144",
+  "file": "2026-11-05/5810b248b4e44d19a6f11aad980fb144.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. NEAR swung about 16% in a day, so 3x fees stay to pay savers for the risk. Backing is 193.8%, so the 20% savings rate stays to attract bxUSD and give xNEAR more leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793845466169,
   "id": "3d1d64ae3a5f47c8b746c8778c9fa5bc",
   "file": "2026-11-05/3d1d64ae3a5f47c8b746c8778c9fa5bc.json",
