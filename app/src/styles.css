@@ -531,3 +531,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .crash-feed .meta a { color: var(--green-ink); }
 .crash-link { margin-top: 14px; }
 @media (max-width: 900px) { .crash-now { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Centered menu on wide screens: brand left, menu in the middle, actions right. */
+@media (min-width: 1100px) {
+  .top .row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .top .row > .brand { justify-self: start; }
+  .top .row > .spacer { display: none; }
+  .top .row > .right { justify-self: end; }
+}
