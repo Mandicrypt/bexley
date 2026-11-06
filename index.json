@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793929152304,
+  "id": "f7ea1785d2984ab8b376e7b0441edd83",
+  "file": "2026-11-06/f7ea1785d2984ab8b376e7b0441edd83.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady. NEAR fell 7.17% with 6.68% volatility, so 3x fees stay. Backing is 178.7%, so bxUSD is scarce and the 20% rate stays to attract savers.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793927101670,
   "id": "b11fda3874134acf891f9dc4310814f9",
   "file": "2026-11-06/b11fda3874134acf891f9dc4310814f9.json",
