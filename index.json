@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793960138153,
+  "id": "d00deb53d0f94018b508771c67181cb4",
+  "file": "2026-11-06/d00deb53d0f94018b508771c67181cb4.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 7.57% with 6.74% volatility, so 3x fees stay on to slow churn and pay savers for the risk. Backing is 178.8% and the 20% savings rate is already at its cap, so no change.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793958094694,
   "id": "ef2a0b6caa1e497bab648d0ebe957d7d",
   "file": "2026-11-06/ef2a0b6caa1e497bab648d0ebe957d7d.json",
