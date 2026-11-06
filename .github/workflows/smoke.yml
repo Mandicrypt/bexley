@@ -1,0 +1,26 @@
+name: Live check
+
+# Checks that everything the README promises works right now: the website,
+# the pool, the Guardian, AI proofs, Ask Bexley, NEAR Intents quotes and the
+# crash-test replay. See scripts/smoke.mjs.
+
+on:
+  schedule:
+    - cron: '23 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: scripts
+      - run: node scripts/smoke.mjs
