@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793981334831,
+  "id": "814a30756c364db194a836ec11cf91c0",
+  "file": "2026-11-06/814a30756c364db194a836ec11cf91c0.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 179%, well above the 150% healthy line, so bxUSD is scarce. We raised the savings rate from 9% to 12% to attract savers and give xNEAR more leverage.",
+  "level": 0,
+  "rate": 1200,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793979270934,
   "id": "gen-1793979254-8RylR8UAEiKfyVnyter1",
   "file": "2026-11-06/gen-1793979254-8RylR8UAEiKfyVnyter1.json",
