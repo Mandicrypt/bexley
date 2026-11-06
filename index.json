@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793997641792,
+  "id": "f9dbb21a627d479ba6e364e5d14cd721",
+  "file": "2026-11-06/f9dbb21a627d479ba6e364e5d14cd721.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 177% and the savings rate is already at the 20% maximum, so we hold to keep attracting savers. NEAR moved under 5% today, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793995610121,
   "id": "21ddcc81161b45faa24bff2c5f9bc587",
   "file": "2026-11-06/21ddcc81161b45faa24bff2c5f9bc587.json",
