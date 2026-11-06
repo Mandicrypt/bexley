@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793985446524,
+  "id": "24001b9543fd4e039da98e69ffa50f94",
+  "file": "2026-11-06/24001b9543fd4e039da98e69ffa50f94.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 180.2%, well above the 150% healthy line, so bxUSD is scarce. Raising savings to 20% should attract savers, add bxUSD, and give xNEAR more leverage.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793983401681,
   "id": "c5870d1462364b9d9eccef6a53a8ac3c",
   "file": "2026-11-06/c5870d1462364b9d9eccef6a53a8ac3c.json",
