@@ -13,15 +13,16 @@ Built for the NEAR Hackathon (Nov 2026).
 
 ## Status
 
-This README only describes what works today.
+This README only describes what works today. A [live check](.github/workflows/smoke.yml) tests it every day against the real site and chain: the website, a fresh pool price, the Guardian's recent posts, AI proofs, Ask Bexley, NEAR Intents quotes and the crash-test replay ([`scripts/smoke.mjs`](scripts/smoke.mjs)).
 
 | Part | Status |
 |---|---|
-| Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 37 unit tests pass. |
+| Pool and bxUSD (`contracts/bexley`) | Live on testnet at [`pool.bexley.testnet`](https://testnet.nearblocks.io/address/pool.bexley.testnet). 47 unit tests pass. |
 | xNEAR token (`contracts/xtoken`) | Live at [`xnear.bexley.testnet`](https://testnet.nearblocks.io/address/xnear.bexley.testnet). Only the pool can mint or burn it. 3 unit tests pass. |
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
-| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, with fixed rules as backup. 21 tests pass. |
+| AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, each with a public proof, and fixed rules as backup. 25 tests pass. |
 | Web app (`app/`) | Trade (mint and redeem), Ask Bexley, Your risk, Earn (Stability Pool), Vaults, Orders and a live Guardian feed. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
+| Crash test | NEAR pushed down 37% on a separate testnet pool (`crash.bexley.testnet`): the safety rails slowed the fall, the AI raised fees, and the Stability Pool lifted backing from 125% back to 140%. bxUSD held $1. Every step is a real transaction; replay it in the app at `#crash-test`. Run it again with GitHub Actions → **Crash test**. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken, with a public receipt for every post. The pool limits each post to a 5% move. Pyth no longer serves NEAR, so there is no decentralized NEAR feed to use on testnet yet. |
 | Deposits from other chains | Built with NEAR Intents (1Click API): pay with USDC, USDT, ETH, SOL or BTC from their own chains and receive NEAR, then mint. Live quotes on testnet; real deposits on the mainnet beta. |
 | Mainnet beta | Code ready: wNEAR collateral (the app wraps NEAR for you), a hard cap on the whole pool, and an owner pause that stops new deposits while every exit stays open. Deploy with GitHub Actions → **Mainnet beta**. |
@@ -174,7 +175,8 @@ Other calls: `redeem_bx`, `sp_deposit`, `sp_withdraw`, `vault_withdraw`, `cancel
 ```bash
 cargo test --workspace          # contracts
 cd agent && npm test             # Guardian decisions
-cd app && npm test               # app: formatting, risk math, Ask Bexley plan checks
+cd app && npm test               # app: formatting, risk math, Ask Bexley plan checks, AI proof checks
+node scripts/smoke.mjs           # live check of the real site and chain (after cd scripts && npm ci)
 ```
 
 ## Deploy
