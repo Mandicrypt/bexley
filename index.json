@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793983401681,
+  "id": "c5870d1462364b9d9eccef6a53a8ac3c",
+  "file": "2026-11-06/c5870d1462364b9d9eccef6a53a8ac3c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 179.6%, well above 150%, so bxUSD is scarce and xNEAR leverage is only 2.26. Raising the savings rate from 12% to 16% should attract savers and add leverage. Fees stay normal as prices are calm.",
+  "level": 0,
+  "rate": 1600,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793981334831,
   "id": "814a30756c364db194a836ec11cf91c0",
   "file": "2026-11-06/814a30756c364db194a836ec11cf91c0.json",
