@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793941433896,
+  "id": "c8c5b441a8d84c36b16f5c0a9592787f",
+  "file": "2026-11-06/c8c5b441a8d84c36b16f5c0a9592787f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 9% with a 12% range, so 3x fees stay on to pay savers for the extra churn. Backing is 175%, well above the 150% healthy line, so the 20% savings rate still fits and stays unchanged.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793939379282,
   "id": "00f176d2463e493494f6a33f28dc9a28",
   "file": "2026-11-06/00f176d2463e493494f6a33f28dc9a28.json",
