@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793987482225,
+  "id": "a7c51776707a44c0afe4f15765559f91",
+  "file": "2026-11-06/a7c51776707a44c0afe4f15765559f91.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 177.7%, so the pool still wants more bxUSD and the 20% savings rate stays to attract savers. NEAR moved just 0.25% with 4.43% volatility, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793985446524,
   "id": "24001b9543fd4e039da98e69ffa50f94",
   "file": "2026-11-06/24001b9543fd4e039da98e69ffa50f94.json",
