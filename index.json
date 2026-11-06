@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794003774515,
+  "id": "099409dbd19e4a509ee4cddee597b77a",
+  "file": "2026-11-06/099409dbd19e4a509ee4cddee597b77a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is a strong 177.7% and NEAR moved just 0.19% with calm 4.34% volatility. The 20% savings rate stays at its cap to keep drawing savers while leverage sits at 2.29.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794001726944,
   "id": "405fe3f7600949119d84895a0c789719",
   "file": "2026-11-06/405fe3f7600949119d84895a0c789719.json",
