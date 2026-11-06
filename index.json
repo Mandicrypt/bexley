@@ -1,5 +1,17 @@
 [
  {
+  "at": 1793974735145,
+  "id": "4e51183517ee492a83b3a3857190e6cc",
+  "file": "2026-11-06/4e51183517ee492a83b3a3857190e6cc.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 6.5% with 6.2% volatility, so 3x fees stay to pay savers for the risk. Backing is 177% and leverage is only 2.29x, so the 20% savings rate stays at its maximum to attract more savers.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1793972706050,
   "id": "cb3d8618188447d48a3f8484aca924f0",
   "file": "2026-11-06/cb3d8618188447d48a3f8484aca924f0.json",
