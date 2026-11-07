@@ -15,10 +15,10 @@ Built for the NEAR Hackathon (Nov 2026).
 
 No wallet needed for steps 1 to 6. Open [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app).
 
-1. Click **Demo** in the header. You see a yellow demo bar, and the app now uses a pretend wallet with example positions and live prices. Nothing is sent on-chain.
+1. Click **Demo** in the header. You see an amber demo bar, and the app now uses a pretend wallet with example positions and live prices. Nothing is sent on-chain.
 2. Click **Portfolio**. You see everything the pretend wallet holds, in dollars, and how much it moves when NEAR moves.
 3. Click **Trade**. Pick bxUSD or xNEAR and type an amount. You see exactly what you would get, at fair value, before anything happens.
-4. On the Trade page, find **Ask Bexley** and type "I want 2x on 50 NEAR with a stop at -15%". You see a plan with the result and the main risk. Nothing runs until you approve it.
+4. On the Trade page, find **Ask Bexley** and click the example "Make me 2x long with 50 tNEAR" (or type your own). You see a plan with the result and the main risk. Nothing runs until you approve it.
 5. Click **Guardian**. Under **Latest AI decision**, click **AI, verified**. You see the proof checked in your browser: "Checked in your browser: this decision came from NEAR AI secure hardware."
 6. On the Guardian page, click **Watch the crash test**. You see a replay of a real testnet crash: NEAR falls 37%, the Stability Pool steps in, and bxUSD holds $1.
 7. On the Trade page, find **Deposit from another chain**. Pick a token like USDC on Ethereum and an amount. You see a live NEAR Intents quote ("You get, in your NEAR wallet"). Deposits open with the mainnet beta; on testnet this shows quotes only.
