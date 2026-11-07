@@ -11,6 +11,15 @@ On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereu
 
 Built for the NEAR Hackathon (Nov 2026).
 
+## Credit
+
+The core design of Bexley is inspired by [Hylo](https://hylo.so) on Solana: one pool split into a stablecoin and a leveraged token, with no liquidations. f(x) Protocol on Ethereum uses a similar idea. Bexley rebuilds that core for NEAR as its own contracts, written from scratch, and adds what is new here:
+
+- an **AI Pool Guardian** whose every decision is signed inside NEAR AI's secure hardware and checked in your browser,
+- a **public on-chain crash test** that anyone can replay,
+- **deposits from other chains** through NEAR Intents,
+- **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, a **savings rate paid by xNEAR**, and **Ask Bexley**.
+
 ## Status
 
 This README only describes what works today. A [live check](.github/workflows/smoke.yml) tests it every day against the real site and chain: the website, a fresh pool price, the Guardian's recent posts, AI proofs, Ask Bexley, NEAR Intents quotes and the crash-test replay ([`scripts/smoke.mjs`](scripts/smoke.mjs)).
