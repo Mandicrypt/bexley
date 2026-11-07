@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794078709766,
+  "id": "7284fb65de42443a86b404313524d16f",
+  "file": "2026-11-07/7284fb65de42443a86b404313524d16f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 184.3% and the savings rate is already 20%, the maximum, to attract savers and add leverage. NEAR moved only 2.7% today, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794076683012,
   "id": "88db13458b0a46c7b53317cd9f431bab",
   "file": "2026-11-07/88db13458b0a46c7b53317cd9f431bab.json",
