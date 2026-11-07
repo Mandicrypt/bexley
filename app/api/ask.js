@@ -5,6 +5,11 @@
 // already shows (prices, balances), asks the model for a plan, checks the
 // plan, and returns it. It never signs or sends anything: the user approves
 // every step in their own wallet.
+//
+// PRIVACY: nothing is kept. No database, no files, no logging of messages or
+// plans. No account name or wallet address is sent here, only rounded
+// balances. The question goes to NEAR AI (a model running in secure hardware)
+// and the answer goes back to the browser; both are forgotten after that.
 
 import { checkPlan, parseJson, systemPrompt } from '../src/lib/intent.mjs';
 

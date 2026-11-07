@@ -152,6 +152,7 @@ A chat box on the Trade page. Type what you want, like *"Make me 2x long with 50
 - Every plan is checked twice, on the server and in the browser (`app/src/lib/intent.mjs`): only known actions, positive amounts, at most 4 steps, sensible stop and take prices. Anything else is dropped.
 - Nothing happens until you approve each step in your own wallet. Amounts are re-checked against fresh balances right before each step, and mints and redeems keep the 1% price guard.
 - The AI key stays on the server, in a Vercel function (`app/api/ask.js`).
+- **Nothing is kept.** The server function has no database, no files and no logs of your messages: it forwards the question to NEAR AI, checks the answer and forgets both. It never sees your account name or wallet address, only rounded balances. NEAR AI runs the model inside secure hardware (TEE), so the question stays private there too.
 
 ## Your risk
 
