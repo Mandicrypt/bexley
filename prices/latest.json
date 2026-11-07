@@ -1,11 +1,11 @@
 {
- "at": 1794089532197,
- "asked": 3651350,
- "accepted": 3651350,
- "median_usd": 3.65135,
+ "at": 1794089870836,
+ "asked": 3658850,
+ "accepted": 3658850,
+ "median_usd": 3.65885,
  "sources": {
   "CoinGecko": 3.66,
-  "Coinbase": 3.65135,
-  "Kraken": 3.651
+  "Coinbase": 3.65885,
+  "Kraken": 3.654
  }
 }
