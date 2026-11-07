@@ -145,7 +145,7 @@ We treat the Guardian as fully hijacked, with its AI fooled and its key stolen, 
 | Contract | Set the fee level to 9 | Blocked: must be 0, 1 or 2 |
 | Contract | Set the savings rate to 1000% | Blocked: at most 20% a year |
 
-**Limits of this key, honestly:** it can still post prices and set fees inside the rules. So a stolen key could push the price down 5% per post, about 1% a minute at most, in public, where every post has a receipt and the owner can switch the Guardian off with `set_guardian`. It can never take anyone's funds. If its gas allowance runs out, the Guardian stops and the owner tops it up. The account can't do that itself, because it has no full-access key.
+**Limits of this key, honestly:** it can still post prices and set fees inside the rules. Each post can move the price at most 5%, or 1% if it comes within 4 minutes of the last one. A stolen key could still send many 1% posts in a row, so the price rail slows a fake crash but does not stop one on its own; the owner can switch the Guardian off with `set_guardian`, and every post is public. The key itself can never send anyone's funds anywhere. If its gas allowance runs out, the Guardian stops and the owner tops it up. The account can't do that itself, because it has no full-access key.
 
 Run it with GitHub Actions → **Attack test** ([`agent/attack.mjs`](agent/attack.mjs)). The log, with transaction links, is published to [`proofs/attacktest/log.json`](https://github.com/Mandicrypt/bexley/blob/proofs/attacktest/log.json) and shown in the app at `#attack-test`.
 
