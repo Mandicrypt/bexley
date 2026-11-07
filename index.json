@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794018410967,
+  "id": "9ce1870268864df6846621fecb7c73c2",
+  "file": "2026-11-07/9ce1870268864df6846621fecb7c73c2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 180% with xNEAR leverage at 2.25x, so attracting savers still helps and the 20% rate stays at its cap. NEAR moved only 1.1% with 3.13% volatility, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794016363630,
   "id": "b914e6889d434568a14410aadf56a3ce",
   "file": "2026-11-07/b914e6889d434568a14410aadf56a3ce.json",
