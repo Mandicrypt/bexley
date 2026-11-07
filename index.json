@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794033044102,
+  "id": "9d87b076c3854fdabb4582b73d876d57",
+  "file": "2026-11-07/9d87b076c3854fdabb4582b73d876d57.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 179% and xNEAR sits at 2.27x, so a higher rate would help, but 20% is already the maximum allowed. Volatility is only 3%, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794031028707,
   "id": "21dbc57c9e6341459eb7dbef104bbb90",
   "file": "2026-11-07/21dbc57c9e6341459eb7dbef104bbb90.json",
