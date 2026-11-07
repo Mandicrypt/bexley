@@ -1,0 +1,42 @@
+name: Attack test
+
+# What if the AI Guardian is hijacked? A test Guardian with the same limited
+# key as the real one tries to do damage on the SEPARATE test pool
+# (crash.bexley.testnet), never the live one. See agent/attack.mjs. The log is
+# published to the proofs branch (attacktest/) and shown in the app.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEAR_ACCOUNT_ID: bexley.testnet
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+      NEAR_RPC_URL: https://test.rpc.fastnear.com
+      TNEAR_ID: tnear.bexley.testnet
+      CRASH_POOL: crash.bexley.testnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: proofs
+          path: proofs-repo
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: cd agent && npm ci
+      - name: Run the attacks
+        working-directory: agent
+        env:
+          PROOF_DIR: ${{ github.workspace }}/proofs-repo
+        run: node attack.mjs
+      - name: Publish the log
+        if: always()
+        run: scripts/publish-proofs.sh
