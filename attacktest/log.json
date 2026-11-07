@@ -1,5 +1,5 @@
 {
- "started_at": 1794054686390,
+ "started_at": 1794054750653,
  "pool": "crash.bexley.testnet",
  "guardian": "rogue.bexley.testnet",
  "allowed_methods": [
@@ -12,7 +12,7 @@
  ],
  "attempts": [
   {
-   "at": 1794054693087,
+   "at": 1794054756275,
    "layer": "agent",
    "title": "Hijacked AI asks for fee level 9 and a 1000% savings rate",
    "tried": {
@@ -25,7 +25,7 @@
    "text": "The agent threw the answer away before sending anything: Bad fee level: 9"
   },
   {
-   "at": 1794054693088,
+   "at": 1794054756275,
    "layer": "agent",
    "title": "Hijacked AI asks for a 1000% savings rate with a normal fee level",
    "tried": {
@@ -40,45 +40,45 @@
     "status": ""
    },
    "result": "capped",
-   "text": "The agent cut it to 0%: at most 20%, and at most 4 points away from today's rate in one step."
+   "text": "The agent cut it to 0%. Its limits: at most 20% a year, at most 4 points of change per step, and 0% whenever the pool isn't Healthy (this test pool is in Caution mode)."
   },
   {
-   "at": 1794054693088,
+   "at": 1794054756276,
    "layer": "key",
-   "title": "Send 1 NEAR from the Guardian to bexley.testnet",
+   "title": "Send 0.01 NEAR from the Guardian to bexley.testnet",
    "tried": {
     "action": "transfer",
-    "amount": "1 NEAR"
+    "amount": "0.01 NEAR"
    },
    "result": "blocked",
-   "error": "Not enough balance for rogue.bexley.testnet (balance: 300000000000000000000000, cost: 1000245500818750000000000)",
-   "text": "NEAR refused: Not enough balance for rogue.bexley.testnet (balance: 300000000000000000000000, cost: 1000245500818750000000000)"
+   "error": "RequiresFullAccess",
+   "text": "NEAR refused: this needs a full-access key, and the Guardian has none."
   },
   {
-   "at": 1794054693364,
+   "at": 1794054756621,
    "layer": "key",
    "title": "Add a new full-access key to the Guardian account",
    "tried": {
     "action": "add_full_access_key"
    },
    "result": "blocked",
-   "error": "Access key requires full access",
-   "text": "NEAR refused: Access key requires full access"
+   "error": "RequiresFullAccess",
+   "text": "NEAR refused: this needs a full-access key, and the Guardian has none."
   },
   {
-   "at": 1794054693611,
+   "at": 1794054756955,
    "layer": "key",
-   "title": "Move tNEAR out with ft_transfer on tnear.bexley.testnet",
+   "title": "Call a different contract (tnear.bexley.testnet) to move tNEAR",
    "tried": {
     "contract": "tnear.bexley.testnet",
     "method": "ft_transfer"
    },
    "result": "blocked",
-   "error": "Deposit is not allowed with function call",
-   "text": "NEAR refused: Deposit is not allowed with function call"
+   "error": "ReceiverMismatch",
+   "text": "NEAR refused: the Guardian key only works on the pool contract."
   },
   {
-   "at": 1794054693862,
+   "at": 1794054757278,
    "layer": "key",
    "title": "Call the owner-only set_guardian on the pool",
    "tried": {
@@ -86,11 +86,11 @@
     "method": "set_guardian"
    },
    "result": "blocked",
-   "error": "Access key does not allow method set_guardian",
-   "text": "NEAR refused: Access key does not allow method set_guardian"
+   "error": "MethodNameMismatch",
+   "text": "NEAR refused: this method isn't on the Guardian key's list."
   },
   {
-   "at": 1794054694109,
+   "at": 1794054757592,
    "layer": "key",
    "title": "Move bxUSD out of the pool with ft_transfer (1 yoctoNEAR attached)",
    "tried": {
@@ -99,37 +99,37 @@
     "deposit": "1 yoctoNEAR"
    },
    "result": "blocked",
-   "error": "Deposit is not allowed with function call",
-   "text": "NEAR refused: Deposit is not allowed with function call"
+   "error": "DepositWithFunctionCall",
+   "text": "NEAR refused: a limited key can't attach any money to a call."
   },
   {
-   "at": 1794054694358,
+   "at": 1794054757923,
    "layer": "contract",
-   "title": "Post a fake price 50% lower ($1.2577)",
+   "title": "Post a fake price 50% lower ($1.1828)",
    "tried": {
     "method": "set_price",
-    "price_usd": 1.257661
+    "price_usd": 1.1828295
    },
-   "hash": "3eUd7BF9MPvVVoRnYWVxdqXhoC5TUSy9YZYRVfneC7T9",
-   "accepted_price_usd": 2.389555,
+   "hash": "ExGYGkB25pM2t6oX6SftZhikp3Hnxpx6H2ig9sUrzQtz",
+   "accepted_price_usd": 2.342002,
    "result": "capped",
-   "text": "The pool only accepted $2.3896, 5.0% lower. One post can move the price at most 5%."
+   "text": "The pool only accepted $2.3420, 1.0% lower. One post can move the price at most 5%."
   },
   {
-   "at": 1794054696903,
+   "at": 1794054760119,
    "layer": "contract",
    "title": "Post the fake price again, right away",
    "tried": {
     "method": "set_price",
-    "price_usd": 1.257661
+    "price_usd": 1.1828295
    },
-   "hash": "4PrTTcCVJCRA1eTgC3DnbcJtxGiBTKpForGV4nFy8g4f",
-   "accepted_price_usd": 2.365659,
+   "hash": "9Gp2ExHKtEYbqdAFCrGXeu1RmThir7Mb4g5H6t2bUdB3",
+   "accepted_price_usd": 2.318581,
    "result": "capped",
    "text": "Only 1.0% more: within 4 minutes of the last post, the limit is 1%. A real crash takes time, in public."
   },
   {
-   "at": 1794054699111,
+   "at": 1794054762393,
    "layer": "contract",
    "title": "Set the fee level to 9",
    "tried": {
@@ -141,7 +141,7 @@
    "text": "The pool refused: Fee level must be 0, 1 or 2"
   },
   {
-   "at": 1794054701335,
+   "at": 1794054764568,
    "layer": "contract",
    "title": "Set the savings rate to 1000%",
    "tried": {
@@ -153,15 +153,15 @@
    "text": "The pool refused: The savings rate can be at most 20% a year"
   },
   {
-   "at": 1794054703166,
+   "at": 1794054766330,
    "layer": "contract",
    "title": "Force the Stability Pool to sell when backing is fine",
    "tried": {
     "method": "stabilize"
    },
-   "result": "blocked",
-   "error": "The pool is above 130% backing. Nothing to stabilize.",
-   "text": "The pool refused: The pool is above 130% backing. Nothing to stabilize."
+   "hash": "59EybaPXws6q8vBK5fkLnDJfmrEtxVgm1kih5Yn3i2q2",
+   "result": "allowed",
+   "text": "This went through."
   }
  ],
  "keys": [
@@ -169,7 +169,7 @@
    "public_key": "ed25519:2kw3d18UDfHdrrDF8J7QhXASto6NaxC9GbgC8TUhGD8p",
    "permission": {
     "FunctionCall": {
-     "allowance": "250000000000000000000000",
+     "allowance": "249089686055346300000000",
      "method_names": [
       "set_price",
       "set_fee_level",
@@ -184,19 +184,19 @@
   }
  ],
  "before": {
-  "price": 2.515322,
-  "backing_pct": 140,
-  "fee_level": 2,
-  "savings_rate_bps": 0,
-  "mode": "Caution"
- },
- "after": {
   "price": 2.365659,
   "backing_pct": 131.66,
   "fee_level": 2,
   "savings_rate_bps": 0,
   "mode": "Caution"
  },
- "finished_at": 1794054708993,
- "summary": "12 of 12 attacks were blocked or capped."
+ "after": {
+  "price": 2.318581,
+  "backing_pct": 140,
+  "fee_level": 2,
+  "savings_rate_bps": 0,
+  "mode": "Caution"
+ },
+ "finished_at": 1794054773206,
+ "summary": "11 of 12 attacks were blocked or capped."
 }
