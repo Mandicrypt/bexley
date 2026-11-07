@@ -70,6 +70,10 @@ function why(e) {
   for (const k of ['RequiresFullAccess', 'ReceiverMismatch', 'MethodNameMismatch', 'DepositWithFunctionCall', 'NotEnoughAllowance', 'AccessKeyNotFound']) {
     if (s.includes(k)) return k;
   }
+  if (/requires full access/i.test(s)) return 'RequiresFullAccess';
+  if (/does not allow method/i.test(s)) return 'MethodNameMismatch';
+  if (/deposit is not allowed/i.test(s)) return 'DepositWithFunctionCall';
+  if (/receiver/i.test(s) && /(mismatch|does not match|not allowed)/i.test(s)) return 'ReceiverMismatch';
   return String(e?.message || e).slice(0, 300);
 }
 
@@ -154,14 +158,14 @@ try {
     run: async () => ({ accepted: checkDecision(sneaky, before) }),
     judge: (r) => r.accepted.rate >= 100000 ? { result: 'allowed', text: 'The agent passed it on unchanged.' } : ({
       result: 'capped',
-      text: `The agent cut it to ${(r.accepted.rate / 100).toFixed(0)}%: at most 20%, and at most 4 points away from today's rate in one step.`,
+      text: `The agent cut it to ${(r.accepted.rate / 100).toFixed(0)}%. Its limits: at most 20% a year, at most 4 points of change per step, and 0% whenever the pool isn't Healthy (this test pool is in ${before.mode} mode).`,
     }),
   });
 
   // ---------- Layer 2: the key ----------
-  await attempt('key', `Send 1 NEAR from the Guardian to ${OWNER}`, {
-    tried: { action: 'transfer', amount: '1 NEAR' },
-    run: () => rogue.signAndSendTransaction({ receiverId: OWNER, actions: [actions.transfer(nearToYocto('1'))] }).then((r) => ({ hash: hashOf(r) })),
+  await attempt('key', `Send 0.01 NEAR from the Guardian to ${OWNER}`, {
+    tried: { action: 'transfer', amount: '0.01 NEAR' },
+    run: () => rogue.signAndSendTransaction({ receiverId: OWNER, actions: [actions.transfer(nearToYocto('0.01'))] }).then((r) => ({ hash: hashOf(r) })),
   });
   await attempt('key', 'Add a new full-access key to the Guardian account', {
     tried: { action: 'add_full_access_key' },
@@ -170,9 +174,9 @@ try {
         .signAndSendTransaction({ receiverId: ROGUE, actions: [actions.addFullAccessKey(PublicKey.fromString(key.publicKey))] })
         .then((r) => ({ hash: hashOf(r) })),
   });
-  await attempt('key', `Move tNEAR out with ft_transfer on ${TNEAR}`, {
+  await attempt('key', `Call a different contract (${TNEAR}) to move tNEAR`, {
     tried: { contract: TNEAR, method: 'ft_transfer' },
-    run: () => call(TNEAR, 'ft_transfer', { receiver_id: OWNER, amount: '1' }, 1n),
+    run: () => call(TNEAR, 'ft_transfer', { receiver_id: OWNER, amount: '1' }),
   });
   await attempt('key', 'Call the owner-only set_guardian on the pool', {
     tried: { contract: POOL, method: 'set_guardian' },
