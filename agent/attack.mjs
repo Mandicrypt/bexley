@@ -188,6 +188,13 @@ try {
   });
 
   // ---------- Layer 3: the contract ----------
+  // First, before any price moves: only a pool under 130% backing may be stabilized.
+  if (Number(before.cr_bps) >= 13000) {
+    await attempt('contract', 'Force the Stability Pool to sell when backing is fine', {
+      tried: { method: 'stabilize' },
+      run: () => call(POOL, 'stabilize', {}, 0n, 100n),
+    });
+  }
   const p0 = Number(before.price);
   const crash = String(Math.round(p0 / 2));
   await attempt('contract', `Post a fake price 50% lower ($${(p0 / 2e6).toFixed(4)})`, {
@@ -199,7 +206,7 @@ try {
     },
     judge: (r) => r.accepted_price_usd <= p0 / 2e6 * 1.001 ? { result: 'allowed', text: 'The full fake price went through.' } : ({
       result: 'capped',
-      text: `The pool only accepted $${r.accepted_price_usd.toFixed(4)}, ${((1 - r.accepted_price_usd / (p0 / 1e6)) * 100).toFixed(1)}% lower. One post can move the price at most 5%.`,
+      text: `The pool only accepted $${r.accepted_price_usd.toFixed(4)}, ${((1 - r.accepted_price_usd / (p0 / 1e6)) * 100).toFixed(1)}% lower. A single post can move the price at most 5% (or 1% if the last post was under 4 minutes ago).`,
     }),
   });
   const p1 = Number((await view(POOL, 'get_pool')).price);
@@ -223,14 +230,18 @@ try {
     tried: { method: 'set_fee_level', savings_rate_bps: 100000 },
     run: () => call(POOL, 'set_fee_level', { level: 0, reason: 'hijacked', savings_rate_bps: 100000 }),
   });
-  await attempt('contract', 'Force the Stability Pool to sell when backing is fine', {
-    tried: { method: 'stabilize' },
-    run: () => call(POOL, 'stabilize', {}, 0n, 100n),
-  });
 } finally {
   // Put the test pool back: real price, owner as Guardian again.
   const back = await view(POOL, 'get_pool');
   log.after = { price: Number(back.price) / 1e6, backing_pct: Number(back.cr_bps) / 100, fee_level: back.fee_level, savings_rate_bps: back.savings_rate_set_bps, mode: back.mode };
+  config = await view(POOL, 'get_config');
+  // Walk the test price back to where it started (the same 5% rail applies to us).
+  if (config.price_feeder !== OWNER) await owner.callFunction({ contractId: POOL, methodName: 'set_price_feeder', args: { price_feeder: OWNER } });
+  for (let i = 0; i < 4 && Number((await view(POOL, 'get_pool')).price) < Number(before.price); i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, 250_000));
+    await owner.callFunction({ contractId: POOL, methodName: 'set_price', args: { price: before.price }, gas: 10n * TGAS });
+  }
+  log.restored_price = Number((await view(POOL, 'get_pool')).price) / 1e6;
   config = await view(POOL, 'get_config');
   if (config.guardian !== OWNER) await owner.callFunction({ contractId: POOL, methodName: 'set_guardian', args: { guardian: OWNER } });
   if (config.price_feeder !== OWNER) await owner.callFunction({ contractId: POOL, methodName: 'set_price_feeder', args: { price_feeder: OWNER } });
