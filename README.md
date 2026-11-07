@@ -11,6 +11,19 @@ On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereu
 
 Built for the NEAR Hackathon (Nov 2026).
 
+## Try it step by step
+
+No wallet needed for steps 1 to 6. Open [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app).
+
+1. Click **Demo** in the header. You see a yellow demo bar, and the app now uses a pretend wallet with example positions and live prices. Nothing is sent on-chain.
+2. Click **Portfolio**. You see everything the pretend wallet holds, in dollars, and how much it moves when NEAR moves.
+3. Click **Trade**. Pick bxUSD or xNEAR and type an amount. You see exactly what you would get, at fair value, before anything happens.
+4. On the Trade page, find **Ask Bexley** and type "I want 2x on 50 NEAR with a stop at -15%". You see a plan with the result and the main risk. Nothing runs until you approve it.
+5. Click **Guardian**. Under **Latest AI decision**, click **AI, verified**. You see the proof checked in your browser: "Checked in your browser: this decision came from NEAR AI secure hardware."
+6. On the Guardian page, click **Watch the crash test**. You see a replay of a real testnet crash: NEAR falls 37%, the Stability Pool steps in, and bxUSD holds $1.
+7. On the Trade page, find **Deposit from another chain**. Pick a token like USDC on Ethereum and an amount. You see a live NEAR Intents quote ("You get, in your NEAR wallet"). Deposits open with the mainnet beta; on testnet this shows quotes only.
+8. To use real testnet tokens: click **Exit demo**, then **Connect wallet** with a NEAR testnet account, and click **Get 100 tNEAR**. Then mint bxUSD or xNEAR on the Trade page. You see the new balance on Portfolio, and the transaction on [testnet.nearblocks.io](https://testnet.nearblocks.io/address/pool.bexley.testnet).
+
 ## Credit
 
 The core design of Bexley is inspired by [Hylo](https://hylo.so) on Solana: one pool split into a stablecoin and a leveraged token, with no liquidations. f(x) Protocol on Ethereum uses a similar idea. Bexley rebuilds that core for NEAR as its own contracts, written from scratch, and adds what is new here:
@@ -191,3 +204,21 @@ node scripts/smoke.mjs           # live check of the real site and chain (after 
 ## Deploy
 
 GitHub Actions → **Deploy to NEAR testnet** → Run workflow. It needs the owner's key in the `NEAR_PRIVATE_KEY` repository secret.
+
+## Built with
+
+- **Contracts:** Rust, [near-sdk](https://github.com/near/near-sdk-rs) and near-contract-standards (NEP-141 tokens), [uint](https://crates.io/crates/uint).
+- **App:** React, Vite, [near-api-js](https://github.com/near/near-api-js), [@hot-labs/near-connect](https://github.com/hot-dao/near-connect) for wallets, hosted on Vercel.
+- **AI Guardian:** Node.js, [NEAR AI Cloud](https://cloud.near.ai) for private, provable inference, and [@noble/curves](https://github.com/paulmillr/noble-curves) and [@noble/hashes](https://github.com/paulmillr/noble-hashes) to check the proofs. Runs on GitHub Actions.
+- **Cross-chain:** the [NEAR Intents 1Click API](https://docs.near-intents.org/).
+- **AI coding tools:** most of the code was written with Claude (Anthropic) as a coding assistant, directed and reviewed by the team.
+
+## Hackathon notes
+
+- All code in this repository was written during the hackathon. The first commit is from 2 Nov 2026; there is no earlier baseline.
+- This is one project. The team has no other submission.
+- Bexley runs on NEAR testnet. NEAR Intents has no testnet, so the app shows live mainnet quotes for cross-chain deposits.
+
+## License
+
+[Business Source License 1.1](LICENSE). You can read, run and test Bexley on testnet, and use it for review, research and learning. Running it as a production service needs a license from the author. On 7 Nov 2030 the code moves to GPL v2.0 or later.
