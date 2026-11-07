@@ -21,6 +21,7 @@ No wallet needed for steps 1 to 6. Open [bexley-sigma.vercel.app](https://bexley
 4. On the Trade page, find **Ask Bexley** and click the example "Make me 2x long with 50 tNEAR" (or type your own). You see a plan with the result and the main risk. Nothing runs until you approve it.
 5. Click **Guardian**. Under **Latest AI decision**, click **AI, verified**. You see the proof checked in your browser: "Checked in your browser: this decision came from NEAR AI secure hardware."
 6. On the Guardian page, click **Watch the crash test**. You see a replay of a real testnet crash: NEAR falls 37%, the Stability Pool steps in, and bxUSD holds $1.
+   Next to it, click **See the attack test**. You see 12 attacks by a hijacked Guardian, each marked Blocked or Capped, with links to the real testnet transactions.
 7. On the Trade page, find **Deposit from another chain**. Pick a token like USDC on Ethereum and an amount. You see a live NEAR Intents quote ("You get, in your NEAR wallet"). Deposits open with the mainnet beta; on testnet this shows quotes only.
 8. To use real testnet tokens: click **Exit demo**, then **Connect wallet** with a NEAR testnet account, and click **Get 100 tNEAR**. Then mint bxUSD or xNEAR on the Trade page. You see the new balance on Portfolio, and the transaction on [testnet.nearblocks.io](https://testnet.nearblocks.io/address/pool.bexley.testnet).
 
@@ -29,7 +30,7 @@ No wallet needed for steps 1 to 6. Open [bexley-sigma.vercel.app](https://bexley
 The core design of Bexley is inspired by [Hylo](https://hylo.so) on Solana: one pool split into a stablecoin and a leveraged token, with no liquidations. f(x) Protocol on Ethereum uses a similar idea. Bexley rebuilds that core for NEAR as its own contracts, written from scratch, and adds what is new here:
 
 - an **AI Pool Guardian** whose every decision is signed inside NEAR AI's secure hardware and checked in your browser,
-- a **public on-chain crash test** that anyone can replay,
+- a **public on-chain crash test** that anyone can replay, and an **attack test** where a hijacked Guardian tries 12 attacks and is stopped every time,
 - **deposits from other chains** through NEAR Intents,
 - **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, a **savings rate paid by xNEAR**, and **Ask Bexley**.
 
@@ -44,6 +45,7 @@ This README only describes what works today. A [live check](.github/workflows/sm
 | tNEAR faucet token (`contracts/faucet-token`) | Live at [`tnear.bexley.testnet`](https://testnet.nearblocks.io/address/tnear.bexley.testnet). Anyone can claim 100 per hour. 4 unit tests pass. |
 | AI Pool Guardian (`agent/`) | Live as [`guardian.bexley.testnet`](https://testnet.nearblocks.io/address/guardian.bexley.testnet). Runs every 5 minutes in a self-restarting GitHub Actions loop. Fee and rate decisions by an AI model on NEAR AI Cloud, each with a public proof, and fixed rules as backup. 25 tests pass. |
 | Web app (`app/`) | Landing page, Trade (mint and redeem), Ask Bexley, Your risk, Deposit from another chain, Portfolio (everything you hold in dollars, how much it moves with NEAR, and your stop-loss and take-profit orders), Earn (Stability Pool), Vaults, the Guardian page with AI proofs, and the crash-test replay. **Demo** mode gives a pretend wallet with example positions, no wallet needed. 26 tests pass. Live at [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app), deployed by Vercel on every push. |
+| Attack test | A test Guardian with the same limited key as the real one (`rogue.bexley.testnet`) tries 12 attacks on the test pool: 12 of 12 blocked or capped. See [Attack test](#attack-test-what-if-the-guardian-is-hijacked). |
 | Crash test | NEAR pushed down 37% on a separate testnet pool (`crash.bexley.testnet`): the safety rails slowed the fall, the AI raised fees, and the Stability Pool lifted backing from 125% back to 140%. bxUSD held $1. Every step is a real transaction; replay it in the app at `#crash-test`. Run it again with GitHub Actions → **Crash test**. |
 | Price feed | The Guardian posts the median NEAR/USD price from CoinGecko, Coinbase and Kraken, with a public receipt for every post. The pool limits each post to a 5% move. Pyth no longer serves NEAR, so there is no decentralized NEAR feed to use on testnet yet. |
 | Deposits from other chains | Built with NEAR Intents (1Click API): pay with USDC, USDT, ETH, SOL or BTC from their own chains and receive NEAR, then mint. Live quotes on testnet; real deposits on the mainnet beta. |
@@ -123,6 +125,29 @@ On the Guardian page, click **AI, verified** on a note and your browser download
 **It cannot move funds.** `guardian.bexley.testnet` has no full-access key. Its only key can call `set_price`, `set_fee_level` (which also sets the savings rate), `post_note`, `stabilize`, `rebalance` and `execute_order` on the pool, with a small gas allowance. None of these send money to the caller, and the contract checks every rule itself. The Guardian's key is derived from the owner key in CI and only the derived key is passed to the running agent.
 
 Each run's decision log is on its GitHub Actions page.
+
+### Attack test: what if the Guardian is hijacked?
+
+We treat the Guardian as fully hijacked, with its AI fooled and its key stolen, and try to do damage. This runs on the separate test pool (`crash.bexley.testnet`), never the live one. A test Guardian, `rogue.bexley.testnet`, is set up exactly like the real one: no full-access key, only a function-call key for the same six pool methods, with a 0.25 NEAR gas allowance.
+
+| Layer | Attack | Result |
+|---|---|---|
+| Agent | AI answers "fee level 9, 1000% savings rate" | Blocked: the answer is thrown away before anything is sent |
+| Agent | AI answers "normal fees, 1000% savings rate" | Capped: at most 20%, at most 4 points per step, 0% unless Healthy |
+| Key | Send NEAR to another account | Blocked by NEAR: needs a full-access key |
+| Key | Add a new full-access key | Blocked by NEAR: needs a full-access key |
+| Key | Call another contract (tNEAR) | Blocked by NEAR: the key only works on the pool |
+| Key | Call an owner-only method (`set_guardian`) | Blocked by NEAR: not on the key's method list |
+| Key | Move bxUSD with `ft_transfer` (1 yoctoNEAR attached) | Blocked by NEAR: a limited key can't attach money |
+| Contract | Force the Stability Pool to sell when backing is fine | Blocked: only allowed under 130% backing |
+| Contract | Post a fake price 50% lower | Capped: at most 5% per post (1% within 4 minutes) |
+| Contract | Post it again right away | Capped: 1% |
+| Contract | Set the fee level to 9 | Blocked: must be 0, 1 or 2 |
+| Contract | Set the savings rate to 1000% | Blocked: at most 20% a year |
+
+**Limits of this key, honestly:** it can still post prices and set fees inside the rules. So a stolen key could push the price down 5% per post, about 1% a minute at most, in public, where every post has a receipt and the owner can switch the Guardian off with `set_guardian`. It can never take anyone's funds. If its gas allowance runs out, the Guardian stops and the owner tops it up. The account can't do that itself, because it has no full-access key.
+
+Run it with GitHub Actions → **Attack test** ([`agent/attack.mjs`](agent/attack.mjs)). The log, with transaction links, is published to [`proofs/attacktest/log.json`](https://github.com/Mandicrypt/bexley/blob/proofs/attacktest/log.json) and shown in the app at `#attack-test`.
 
 ## Deposit from another chain (NEAR Intents)
 

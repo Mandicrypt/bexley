@@ -530,6 +530,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .crash-controls input { flex: 1; min-width: 160px; accent-color: var(--green); }
 .crash-feed .meta a { color: var(--green-ink); }
 .crash-link { margin-top: 14px; }
+.crash-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.attack-sum { margin: 0 0 8px; }
+.attack-layer { margin-top: 24px; }
+.attack-layer h3 { margin: 0 0 2px; }
+.attack-layer > .hint { margin: 0 0 10px; }
+.attack-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.attack-list li { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--card, transparent); }
+.attack-list .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.attack-list .meta a { margin-left: auto; color: var(--green-ink); font-size: 13px; }
+.attack-list p { margin: 6px 0 0; color: var(--muted, inherit); }
 @media (max-width: 900px) { .crash-now { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* Centered menu on wide screens: brand left, menu in the middle, actions right. */

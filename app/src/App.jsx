@@ -57,7 +57,7 @@ function useTheme() {
 
 function pageFromHash() {
   const h = location.hash.replace('#', '');
-  if (h === 'crash-test') return h;
+  if (h === 'crash-test' || h === 'attack-test') return h;
   if (h === 'orders') return 'portfolio'; // Orders now live inside Portfolio
   return PAGES.some(([id]) => id === h) ? h : 'home';
 }
@@ -251,6 +251,7 @@ export default function App() {
         )}
         {page === 'guardian' && <GuardianPage pool={pool} go={go} />}
         {page === 'crash-test' && <CrashTest />}
+        {page === 'attack-test' && <AttackTest />}
       </main>
       <footer>
         <div className="wrap">
@@ -1465,6 +1466,84 @@ function CrashTest() {
   );
 }
 
+// ---------- Attack test ----------
+const ATTACK_RAW = 'https://raw.githubusercontent.com/Mandicrypt/bexley/proofs/attacktest';
+const LAYERS = [
+  ['agent', 'The agent', "Bexley's code checks every AI answer before anything is sent."],
+  ['key', 'The key', "NEAR itself refuses anything outside the Guardian key's limits."],
+  ['contract', 'The contract', 'The pool enforces its own rules, even for the Guardian.'],
+];
+
+function AttackTest() {
+  const [log, setLog] = useState(null);
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    fetch(`${ATTACK_RAW}/log.json?t=${Math.floor(Date.now() / 60000)}`)
+      .then((r) => {
+        if (!r.ok) throw new Error('The attack test has not run yet.');
+        return r.json();
+      })
+      .then(setLog)
+      .catch((e) => setErr(e.message));
+  }, []);
+  const word = { blocked: 'Blocked', capped: 'Capped', allowed: 'Went through' };
+  const tone = { blocked: 'green', capped: 'amber', allowed: 'red' };
+  return (
+    <section className="page attack">
+      <div className="pagehead">
+        <h2>Attack test</h2>
+        <p>
+          What if the AI Guardian is hijacked, or its key is stolen? A test Guardian with the same limited key as the real one tried to do
+          damage, on a separate test pool so the live pool is never touched. Every attempt below is a real testnet transaction or a real
+          check in Bexley's code.
+        </p>
+      </div>
+      {err && <p className="empty">{err}</p>}
+      {log && (
+        <>
+          <p className="attack-sum">
+            <b>{log.summary}</b> Run {new Date(log.started_at).toLocaleString()}.
+          </p>
+          {LAYERS.map(([id, name, what]) => {
+            const rows = log.attempts.filter((a) => a.layer === id);
+            if (!rows.length) return null;
+            return (
+              <div className="attack-layer" key={id}>
+                <h3>{name}</h3>
+                <p className="hint">{what}</p>
+                <ul className="attack-list">
+                  {rows.map((a, i) => (
+                    <li key={i}>
+                      <div className="meta">
+                        <span className={`chip ${tone[a.result]}`}>{word[a.result]}</span>
+                        <b>{a.title}</b>
+                        {a.hash && (
+                          <a href={`${TESTNET_EXPLORER}/txns/${a.hash}`} target="_blank" rel="noreferrer">
+                            Transaction
+                          </a>
+                        )}
+                      </div>
+                      <p>{a.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+          <p className="hint">
+            Test Guardian: <a href={`${TESTNET_EXPLORER}/address/${log.guardian}`} target="_blank" rel="noreferrer">{log.guardian}</a>, whose
+            only key can call {log.allowed_methods.join(', ')} on {log.pool}. Full log:{' '}
+            <a href="https://github.com/Mandicrypt/bexley/blob/proofs/attacktest/log.json" target="_blank" rel="noreferrer">
+              log.json
+            </a>
+            . Script: <a href="https://github.com/Mandicrypt/bexley/blob/main/agent/attack.mjs" target="_blank" rel="noreferrer">agent/attack.mjs</a>.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
 function GuardianPage({ pool, go }) {
   const s = pool?.state;
   return (
@@ -1501,9 +1580,14 @@ function GuardianPage({ pool, go }) {
             exchange quotes, and the pool lets one post move the price at most 5%.
           </p>
           <LatestDecision pool={pool} />
-          <button className="btn line sm crash-link" onClick={() => go('crash-test')}>
-            Watch the crash test
-          </button>
+          <div className="crash-links">
+            <button className="btn line sm" onClick={() => go('crash-test')}>
+              Watch the crash test
+            </button>
+            <button className="btn line sm" onClick={() => go('attack-test')}>
+              See the attack test
+            </button>
+          </div>
           <div className="note provable">
             <b>Provable AI.</b> Every AI decision is signed inside NEAR AI's secure hardware. Click <em>AI, verified</em> on a note and
             your browser checks the signature itself, so you don't have to trust Bexley.
