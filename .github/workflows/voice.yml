@@ -2,6 +2,8 @@ name: Voice-over
 on:
   push:
     branches: [media]
+permissions:
+  contents: write
 jobs:
   voice:
     runs-on: ubuntu-latest
@@ -16,7 +18,9 @@ jobs:
       - run: python voice/make.py voice/lines.json "$(cat voice/voices.txt)" out
         env:
           SPEED: ${{ '1.0' }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: voice
-          path: out
+      - name: Save the audio to this branch
+        run: |
+          mkdir -p audio
+          for f in out/*.wav; do ffmpeg -v error -y -i "$f" -b:a 160k "audio/$(basename "${f%.wav}").mp3"; done
+          git config user.name "Bexley media"; git config user.email "media@bexley.invalid"
+          git add audio && git commit -q -m "Voice audio" && git push -q
