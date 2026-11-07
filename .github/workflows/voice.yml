@@ -17,7 +17,7 @@ jobs:
       - run: pip install -q "kokoro>=0.9.4" soundfile
       - run: python voice/make.py voice/lines.json "$(cat voice/voices.txt)" out
         env:
-          SPEED: ${{ '1.0' }}
+          SPEED: ${{ '1.2' }}
       - name: Save the audio to this branch
         run: |
           mkdir -p audio

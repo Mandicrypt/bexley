@@ -1,10 +1,11 @@
 {
- "s1": "This is Bexley. One pool of NEAR, split into two tokens. bee-ex USD holds one dollar, and earns. ex-NEAR is leveraged NEAR, with no liquidations.",
- "s2": "You deposit NEAR, and pick a side. Every mint happens at fair value, so nobody else's position moves.",
- "s3": "Your portfolio shows everything you hold, in dollars. Your tokens, savings, vaults and orders. And exactly how much it moves, when NEAR moves.",
- "s4": "Or just ask. Bexley's AI, running on NEAR AI, turns plain English into a plan, with the result and the main risk. Nothing happens until you approve it.",
- "s5": "An AI Guardian runs the pool every five minutes. It sets fees and the savings rate inside hard limits, with a key that can't move funds. Every decision is signed inside NEAR AI's secure hardware, and your browser checks the proof.",
- "s6": "We tested it. We pushed NEAR down thirty-seven percent. The safety rails slowed the fall. The AI raised fees. At a hundred and twenty-five percent backing, the Stability Pool stepped in, and lifted it back to a hundred and forty. bee-ex USD held one dollar, the whole time.",
- "s7": "And with NEAR Intents, you can bring USDC, ETH, SOL, or Bitcoin from other chains, straight into Bexley. No bridging.",
- "s8": "Bexley. Double the possibilities, from one pool. Built on NEAR."
+ "s1": "This is Bexley. One pool of Near, split into two tokens. bee-ex USD holds one dollar, and earns. ex-Near is leveraged Near.",
+ "s1b": "And there are no liquidations. Ever.",
+ "s2": "You deposit Near, and pick a side. Every mint happens at fair value, so nobody else's position moves.",
+ "s3": "Your portfolio shows everything you hold, in dollars. And exactly how much it moves, when Near moves.",
+ "s4": "Or just ask. Bexley's AI, running on Near AI, turns plain English into a plan, with the result and the main risk. Nothing happens until you approve it.",
+ "s5": "An AI Guardian runs the pool every five minutes, inside hard limits, with a key that can't move funds. Every decision is signed in Near AI's secure hardware, and your browser checks the proof.",
+ "s6": "We tested it. We pushed Near down thirty-seven percent. The safety rails slowed the fall. The AI raised fees. Then the Stability Pool stepped in, and lifted backing back to a hundred and forty percent. bee-ex USD held one dollar, the whole time.",
+ "s7": "And with Near Intents, bring USDC, ETH, SOL, or Bitcoin from other chains, straight into Bexley. No bridging.",
+ "s8": "Bexley. Leverage, with no liquidations. Built on Near."
 }
