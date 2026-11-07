@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794035056941,
+  "id": "1686287252e1492a9f9d10499077a46e",
+  "file": "2026-11-07/1686287252e1492a9f9d10499077a46e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 179% and leverage only 2.26, so we keep the savings rate at the maximum 20% to attract more savers. Volatility is low at 2.93%, so normal fees remain right.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794033044102,
   "id": "9d87b076c3854fdabb4582b73d876d57",
   "file": "2026-11-07/9d87b076c3854fdabb4582b73d876d57.json",
