@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng >/dev/null
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng ffmpeg >/dev/null
       - run: pip install -q "kokoro>=0.9.4" soundfile
       - run: python voice/make.py voice/lines.json "$(cat voice/voices.txt)" out
         env:
