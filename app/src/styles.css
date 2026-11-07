@@ -534,8 +534,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
 /* Centered menu on wide screens: brand left, menu in the middle, actions right. */
 @media (min-width: 1100px) {
-  .top .row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  /* Sides never shrink below their content, so nothing overlaps; the menu is
+     centered whenever there's room. */
+  .top .row { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); gap: 16px; }
   .top .row > .brand { justify-self: start; }
   .top .row > .spacer { display: none; }
   .top .row > .right { justify-self: end; }
 }
+
+.navbtn { padding: 8px 10px; }
+.show-xl { display: none; }
+@media (min-width: 1680px) { .show-xl { display: inline; } }

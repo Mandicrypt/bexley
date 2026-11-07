@@ -623,17 +623,25 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
                   </button>
                 )
               ) : (
-              <button
-                className="btn go sm"
-                disabled={!canClaim || busy === 'claim'}
-                onClick={() => run('claim', claimTnear, '100 tNEAR added to your wallet.')}
-                title={canClaim ? 'Free test tokens' : `Next claim in ${timeLeft(me.nextClaimAt)}`}
-              >
-                {busy === 'claim' ? 'Claiming…' : canClaim ? 'Get 100 tNEAR' : `Next in ${timeLeft(me.nextClaimAt)}`}
-              </button>
+                (canClaim || busy === 'claim') && (
+                  <button
+                    className="btn go sm"
+                    disabled={busy === 'claim'}
+                    onClick={() => run('claim', claimTnear, '100 tNEAR added to your wallet.')}
+                    title="Free test tokens, 100 every hour"
+                  >
+                    {busy === 'claim' ? 'Claiming…' : 'Get 100 tNEAR'}
+                  </button>
+                )
               )}
-              <button className="btn line sm" onClick={onDisconnect} title="Disconnect wallet">
-                <span className="hide-sm">{me ? `${formatAmount(me.tnear, IS_MAINNET ? 2 : 0)} ${ASSET}  ` : ''}</span>
+              <button
+                className="btn line sm"
+                onClick={onDisconnect}
+                title={`${me ? `${formatAmount(me.tnear, IS_MAINNET ? 2 : 0)} ${ASSET}. ` : ''}${
+                  !IS_MAINNET && me && !canClaim ? `Next free tNEAR in ${timeLeft(me.nextClaimAt)}. ` : ''
+                }Click to disconnect.`}
+              >
+                <span className="show-xl">{me ? `${formatAmount(me.tnear, IS_MAINNET ? 2 : 0)} ${ASSET} · ` : ''}</span>
                 {shortAccount(accountId)}
               </button>
             </>
