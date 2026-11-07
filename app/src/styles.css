@@ -545,3 +545,39 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .navbtn { padding: 8px 10px; }
 .show-xl { display: none; }
 @media (min-width: 1680px) { .show-xl { display: inline; } }
+
+/* Portfolio */
+.pf-top { display: flex; gap: 48px; flex-wrap: wrap; margin-bottom: 24px; }
+.pf-top > div { display: grid; gap: 2px; }
+.pf-total { font-family: var(--display); font-size: clamp(36px, 5vw, 52px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+.pf-exp { font-family: var(--display); font-size: 28px; font-weight: 600; }
+.pf-mix { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--surface); }
+.pf-mix i, .pf-legend i { display: block; }
+.m-stable { background: repeating-linear-gradient(135deg, var(--slate) 0 2px, transparent 2px 7px), var(--slate-soft); }
+.m-near { background: var(--line-strong); }
+.m-lev { background: var(--green); }
+.pf-legend { display: flex; gap: 20px; flex-wrap: wrap; margin: 10px 0 28px; font-size: 13.5px; color: var(--ink-2); }
+.pf-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.pf-legend i { width: 12px; height: 12px; border-radius: 4px; }
+.pf-table { display: grid; border-top: 1px solid var(--line); }
+.pf-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.8fr) auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.pf-row > div { display: grid; gap: 2px; min-width: 0; }
+.pf-amt { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.pf-usd { text-align: right; }
+.pf-usd b { font-family: var(--display); font-weight: 600; }
+.pf-what { margin-top: 36px; display: grid; gap: 12px; }
+.pf-what h3 { font-size: 17px; }
+.pf-empty { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 28px 0; }
+.pf-empty p { width: 100%; color: var(--ink-2); }
+@media (max-width: 640px) {
+  .pf-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .pf-amt { grid-column: 1; }
+  .pf-usd { grid-column: 2; grid-row: 1; }
+  .pf-row > div:last-child { grid-column: 2; justify-self: end; }
+}
+.risk.stop-only { padding-top: 0; }
+@media (max-width: 560px) {
+  .top .row { gap: 10px; }
+  .top .right { gap: 6px; min-width: 0; }
+  .acct { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+}

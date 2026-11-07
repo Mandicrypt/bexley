@@ -17,9 +17,9 @@ const SLIPPAGE_BPS = 100n; // accept up to 1% less than quoted
 const PAGES = [
   ['home', 'Home'],
   ['trade', 'Trade'],
+  ['portfolio', 'Portfolio'],
   ['earn', 'Earn'],
   ['vaults', 'Vaults'],
-  ['orders', 'Orders'],
   ['guardian', 'Guardian'],
 ];
 
@@ -58,6 +58,7 @@ function useTheme() {
 function pageFromHash() {
   const h = location.hash.replace('#', '');
   if (h === 'crash-test') return h;
+  if (h === 'orders') return 'portfolio'; // Orders now live inside Portfolio
   return PAGES.some(([id]) => id === h) ? h : 'home';
 }
 
@@ -128,6 +129,11 @@ export default function App() {
     location.hash = id === 'home' ? '' : id;
     setPage(id);
     window.scrollTo({ top: 0 });
+  };
+  // Stop-loss and take-profit orders sit at the bottom of Portfolio.
+  const goOrders = () => {
+    if (page !== 'portfolio') go('portfolio');
+    setTimeout(() => document.getElementById('orders')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   };
 
   const run = useCallback(
@@ -230,12 +236,19 @@ export default function App() {
             </section>
             <CrossChain {...ctx} />
             {!IS_MAINNET && <AskBexley {...ctx} />}
-            <RiskCheck {...ctx} onOrders={() => go('orders')} />
+            <RiskCheck {...ctx} onOrders={() => goOrders()} />
           </>
         )}
         {page === 'earn' && <Earn {...ctx} />}
         {page === 'vaults' && <Vaults {...ctx} />}
-        {page === 'orders' && <Orders {...ctx} />}
+        {page === 'portfolio' && (
+          <Portfolio
+            {...ctx}
+            go={go}
+            onDemo={() => (demoOn ? null : startDemo())}
+            onOrders={goOrders}
+          />
+        )}
         {page === 'guardian' && <GuardianPage pool={pool} go={go} />}
         {page === 'crash-test' && <CrashTest />}
       </main>
@@ -630,12 +643,12 @@ function Header({ page, go, accountId, me, onConnect, onDisconnect, run, busy, i
                     onClick={() => run('claim', claimTnear, '100 tNEAR added to your wallet.')}
                     title="Free test tokens, 100 every hour"
                   >
-                    {busy === 'claim' ? 'Claiming…' : 'Get 100 tNEAR'}
+                    {busy === 'claim' ? 'Claiming…' : <><span className="hide-sm">Get </span>100 tNEAR</>}
                   </button>
                 )
               )}
               <button
-                className="btn line sm"
+                className="btn line sm acct"
                 onClick={onDisconnect}
                 title={`${me ? `${formatAmount(me.tnear, IS_MAINNET ? 2 : 0)} ${ASSET}. ` : ''}${
                   !IS_MAINNET && me && !canClaim ? `Next free tNEAR in ${timeLeft(me.nextClaimAt)}. ` : ''
@@ -1507,6 +1520,184 @@ function GuardianPage({ pool, go }) {
 
 // ---------- Earn ----------
 
+// ---------- Portfolio ----------
+
+/**
+ * Everything one account holds in Bexley, valued in dollars at today's
+ * prices, plus how much it moves with NEAR. Exposure: tNEAR 1x, xNEAR and
+ * parked xNEAR at xNEAR's leverage, Steady vaults at their target, bxUSD 0x.
+ */
+export function portfolioRows(state, me, vaults) {
+  const price = Number(state.price) / 1e6;
+  const xp = Number(state.x_price) / 1e6;
+  const xlev = Number(state.leverage_bps) / 10000 || 1;
+  const rows = [];
+  const add = (r) => r.usd > 0.005 && rows.push(r);
+  add({ key: 'tnear', group: 'near', name: IS_MAINNET ? 'NEAR (wallet)' : 'tNEAR', where: 'Wallet', amount: `${toNum(me.tnear).toFixed(2)} ${IS_MAINNET ? 'NEAR' : 'tNEAR'}`, usd: toNum(me.tnear) * price, lev: 1, page: 'trade' });
+  add({ key: 'xnear', group: 'lev', name: 'xNEAR', where: 'Wallet', amount: `${toNum(me.xnear).toFixed(2)} xNEAR`, usd: toNum(me.xnear) * xp, lev: xlev, page: 'trade' });
+  add({ key: 'bx', group: 'stable', name: 'bxUSD', where: 'Wallet', amount: `${toNum(me.bx).toFixed(2)} bxUSD`, usd: toNum(me.bx), lev: 0, page: 'earn' });
+  const sp = toNum(me.stability_pool?.value);
+  add({ key: 'sp', group: 'stable', name: 'Stability Pool', where: `Earning ${pctRate(state.savings_rate_bps)} a year plus fees`, amount: `${sp.toFixed(2)} bxUSD`, usd: sp, lev: 0, page: 'earn' });
+  for (const v of me.vaults || []) {
+    const info = (vaults || []).find((x) => x.id === v.vault);
+    const target = info ? Number(info.target_bps) / 10000 : v.vault + 2;
+    add({ key: `v${v.vault}`, group: 'lev', name: `Steady ${target}x`, where: 'Vault', amount: `${toNum(v.value).toFixed(2)} ${IS_MAINNET ? 'NEAR' : 'tNEAR'}`, usd: toNum(v.value) * price, lev: target, page: 'vaults' });
+  }
+  for (const o of (me.orders || []).filter((o) => o.status === 'Open')) {
+    const parts = [o.stop_price && `stop $${(Number(o.stop_price) / 1e6).toFixed(2)}`, o.take_price && `take $${(Number(o.take_price) / 1e6).toFixed(2)}`].filter(Boolean).join(', ');
+    add({ key: `o${o.id}`, group: 'lev', name: `Order #${o.id}`, where: `Sells at ${parts}`, amount: `${toNum(o.x_amount).toFixed(2)} xNEAR`, usd: toNum(o.x_amount) * xp, lev: xlev, page: 'orders' });
+  }
+  const claim = toNum(me.claim_tnear) * price + toNum(me.claim_xnear) * xp;
+  add({ key: 'claim', group: 'near', name: 'Waiting to be claimed', where: 'From earlier transfers', amount: '', usd: claim, lev: 1, page: 'claim' });
+  const total = rows.reduce((a, r) => a + r.usd, 0);
+  const exposure = total > 0 ? rows.reduce((a, r) => a + r.usd * r.lev, 0) / total : 0;
+  const by = (g) => rows.filter((r) => r.group === g).reduce((a, r) => a + r.usd, 0);
+  return { rows, total, exposure, mix: { stable: by('stable'), lev: by('lev'), near: by('near') } };
+}
+
+function Portfolio({ pool, me, accountId, onConnect, run, busy, go, onDemo, onOrders }) {
+  const s = pool?.state;
+  useEffect(() => {
+    if (location.hash === '#orders') setTimeout(() => document.getElementById('orders')?.scrollIntoView({ block: 'start' }), 300);
+  }, []);
+  const $ = (v) => `${v < 0 ? '-' : ''}$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  if (!accountId) {
+    return (
+      <section className="page portfolio">
+        <div className="pagehead">
+          <h2>Portfolio</h2>
+          <p>Everything you hold in Bexley in one place: your tokens, savings, vaults and orders, in dollars.</p>
+        </div>
+        <div className="pf-empty">
+          <button className="btn go" onClick={onConnect}>
+            Connect wallet
+          </button>
+          {!IS_MAINNET && (
+            <button className="btn quiet" onClick={onDemo}>
+              Try the demo
+            </button>
+          )}
+        </div>
+      </section>
+    );
+  }
+  if (!me || !s) {
+    return (
+      <section className="page portfolio">
+        <div className="pagehead">
+          <h2>Portfolio</h2>
+        </div>
+        <p className="empty">Loading your portfolio…</p>
+      </section>
+    );
+  }
+
+  const { rows, total, exposure, mix } = portfolioRows(s, me, pool.vaults);
+  const pct = (v) => (total > 0 ? (v / total) * 100 : 0);
+  const manage = (r) => {
+    if (r.page === 'orders') return onOrders();
+    if (r.page === 'claim') return run('claim-stuck', claimStuck, 'Claimed.');
+    go(r.page);
+  };
+
+  return (
+    <>
+      <section className="page portfolio">
+        <div className="pagehead">
+          <h2>Portfolio</h2>
+          <p>Everything you hold in Bexley, valued at today's prices.</p>
+        </div>
+
+        <div className="pf-top">
+          <div>
+            <span className="hint">Total value</span>
+            <b className="pf-total">{$(total)}</b>
+          </div>
+          <div>
+            <span className="hint">Moves with NEAR</span>
+            <b className="pf-exp">{exposure.toFixed(2)}x</b>
+            <span className="hint">{exposure < 0.2 ? 'Mostly steady' : exposure < 1.2 ? 'About like holding NEAR' : 'More than NEAR, both ways'}</span>
+          </div>
+        </div>
+
+        {total > 0 ? (
+          <>
+            <div className="pf-mix" role="img" aria-label="How your money is split">
+              {mix.stable > 0 && <i className="m-stable" style={{ width: `${pct(mix.stable)}%` }} />}
+              {mix.near > 0 && <i className="m-near" style={{ width: `${pct(mix.near)}%` }} />}
+              {mix.lev > 0 && <i className="m-lev" style={{ width: `${pct(mix.lev)}%` }} />}
+            </div>
+            <div className="pf-legend">
+              <span>
+                <i className="m-stable" /> Steady {pct(mix.stable).toFixed(0)}%
+              </span>
+              <span>
+                <i className="m-near" /> {IS_MAINNET ? 'NEAR' : 'tNEAR'} {pct(mix.near).toFixed(0)}%
+              </span>
+              <span>
+                <i className="m-lev" /> Leveraged {pct(mix.lev).toFixed(0)}%
+              </span>
+            </div>
+
+            <div className="pf-table" role="table" aria-label="Your holdings">
+              {rows.map((r) => (
+                <div className="pf-row" role="row" key={r.key}>
+                  <div role="cell">
+                    <b>{r.name}</b>
+                    <span className="hint">{r.where}</span>
+                  </div>
+                  <div role="cell" className="pf-amt">
+                    {r.amount}
+                  </div>
+                  <div role="cell" className="pf-usd">
+                    <b>{$(r.usd)}</b>
+                    <span className="hint">{pct(r.usd).toFixed(0)}%</span>
+                  </div>
+                  <div role="cell">
+                    <button className="btn line sm" onClick={() => manage(r)} disabled={r.page === 'claim' && busy === 'claim-stuck'}>
+                      {r.page === 'claim' ? 'Claim' : 'Manage'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pf-what">
+              <h3>If NEAR moves</h3>
+              <div className="scen">
+                {[-20, -10, 10, 20].map((mv) => {
+                  const ch = rows.reduce((a, r) => a + r.usd * r.lev * (mv / 100), 0);
+                  return (
+                    <div key={mv} className="scen-cell">
+                      <div className="l">If NEAR {mv > 0 ? 'rises' : 'falls'} {Math.abs(mv)}%</div>
+                      <div className={`n ${ch >= 0 ? 'up' : 'down'}`}>
+                        {ch >= 0 ? '+' : ''}
+                        {$(ch)}
+                      </div>
+                      <div className="l">about {ch >= 0 ? '+' : ''}{pct(ch).toFixed(1)}%</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="hint">Rough guide at today's leverage. bxUSD stays at $1 either way.</p>
+            </div>
+          </>
+        ) : (
+          <div className="pf-empty">
+            <p>Nothing in Bexley yet.</p>
+            <button className="btn go" onClick={() => go('trade')}>
+              Make your first trade
+            </button>
+          </div>
+        )}
+      </section>
+      <RiskCheck pool={pool} me={me} accountId={accountId} run={run} busy={busy} onOrders={onOrders} stopOnly />
+      <Orders pool={pool} me={me} accountId={accountId} onConnect={onConnect} run={run} busy={busy} />
+    </>
+  );
+}
+
 function Earn({ pool, me, accountId, onConnect, run, busy }) {
   const [text, setText] = useState('');
   const s = pool?.state;
@@ -1689,7 +1880,7 @@ function Orders({ pool, me, accountId, onConnect, run, busy }) {
 
   const orders = [...(me?.orders || [])].sort((a, b) => b.id - a.id);
   return (
-    <section className="page">
+    <section className="page" id="orders">
       <div className="pagehead">
         <h2>Stop-loss and take-profit</h2>
         <p>Park xNEAR with a NEAR price to sell at. When NEAR gets there, the Guardian sells it and sends {IS_MAINNET ? 'wNEAR' : 'tNEAR'} to your wallet. The pool checks the price itself, so nobody can sell early.</p>
@@ -1802,7 +1993,7 @@ function useVolatility() {
 
 const MOVES = [-20, -10, 10, 20];
 
-export function RiskCheck({ pool, me, accountId, run, busy, onOrders }) {
+export function RiskCheck({ pool, me, accountId, run, busy, onOrders, stopOnly = false }) {
   const vol = useVolatility();
   if (!accountId || !me || !pool) return null;
   const p = poolNumbers(pool.state);
@@ -1819,8 +2010,11 @@ export function RiskCheck({ pool, me, accountId, run, busy, onOrders }) {
   const openStops = (me.orders || []).filter((o) => o.status === 'Open' && o.stop_price);
   const $ = (v) => `${v < 0 ? '-' : ''}$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+  if (stopOnly && x <= 0) return null;
   return (
-    <section className="risk" aria-label="Your risk">
+    <section className={`risk${stopOnly ? ' stop-only' : ''}`} aria-label={stopOnly ? 'Suggested stop-loss' : 'Your risk'}>
+      {!stopOnly && (
+      <>
       <div className="risk-head">
         <div>
           <h2>Your risk</h2>
@@ -1842,6 +2036,8 @@ export function RiskCheck({ pool, me, accountId, run, busy, onOrders }) {
           );
         })}
       </div>
+      </>
+      )}
       {x > 0 && (
         <div className="note good stopnote">
           <div>
