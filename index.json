@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794022491679,
+  "id": "1b941ddf81c2492eaa5d3a3dcd7de1c7",
+  "file": "2026-11-07/1b941ddf81c2492eaa5d3a3dcd7de1c7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 178.8% and leverage only 2.27, so savers are still needed and the 20% rate stays. Volatility is low at 3.03%, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794020463975,
   "id": "550d402bbcea43e1bd11f3d2a5c9f457",
   "file": "2026-11-07/550d402bbcea43e1bd11f3d2a5c9f457.json",
