@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794088844583,
+  "id": "abe833312cbe4724b429c8a4311ca470",
+  "file": "2026-11-07/abe833312cbe4724b429c8a4311ca470.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 184% and leverage 2.19x, so we keep the 20% savings rate to attract savers and add bxUSD. NEAR moved only 2.49% in a day, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794086821463,
   "id": "e54917aba8a048cab6391f50fb7814fd",
   "file": "2026-11-07/e54917aba8a048cab6391f50fb7814fd.json",
