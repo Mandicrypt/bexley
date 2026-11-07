@@ -1,0 +1,22 @@
+name: Voice-over
+on:
+  push:
+    branches: [media]
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng >/dev/null
+      - run: pip install -q "kokoro>=0.9.4" soundfile
+      - run: python voice/make.py voice/lines.json "$(cat voice/voices.txt)" out
+        env:
+          SPEED: ${{ '1.0' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voice
+          path: out
