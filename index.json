@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794051940433,
+  "id": "dd8e83b06c604beb9d9cc57a23c828b7",
+  "file": "2026-11-07/dd8e83b06c604beb9d9cc57a23c828b7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 185.3% so bxUSD is scarce, and the 20% savings rate is already the maximum to attract savers. Volatility of 3.1% is moderate, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794049922702,
   "id": "6e46b4b319e3448ba1391c80a81631ed",
   "file": "2026-11-07/6e46b4b319e3448ba1391c80a81631ed.json",
