@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794166500356,
+  "id": "060766ebfdef434a95788963b212c76f",
+  "file": "2026-11-08/060766ebfdef434a95788963b212c76f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 184%, well above the 150% healthy line, so the 20% rate stays to attract savers and add bxUSD. NEAR moved under 1% with about 4% volatility, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794164465980,
   "id": "47b7458ba91741bfb31a4434109448cc",
   "file": "2026-11-08/47b7458ba91741bfb31a4434109448cc.json",

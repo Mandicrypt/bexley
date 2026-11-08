@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794166500356,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "060766ebfdef434a95788963b212c76f",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.663,\\n  \\\"near_change_24h_pct\\\": -0.13,\\n  \\\"near_volatility_24h_pct\\\": 4.34,\\n  \\\"near_range_24h_pct\\\": 5.01,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 184.4,\\n  \\\"xnear_leverage\\\": 2.18,\\n  \\\"pool_value_usd\\\": 1392.23,\\n  \\\"bxusd_supply\\\": 755.02,\\n  \\\"stability_pool_usd\\\": 607.33,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 2000\\n}\"}]}",
+  "response": "{\"id\":\"060766ebfdef434a95788963b212c76f\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 0, \\\"savings_rate_bps\\\": 2000, \\\"reason\\\": \\\"Backing is 184%, well above the 150% healthy line, so the 20% rate stays to attract savers and add bxUSD. NEAR moved under 1% with about 4% volatility, so normal fees remain.\\\", \\\"status\\\": \\\"Pool is healthy at 184% backing, paying savers 20% with normal fees.\\\"}\",\"reasoning_content\":\"Let me analyze the data:\\n\\n- NEAR price: $3.663, essentially flat (-0.13% 24h)\\n- Volatility: 4.34% 24h, range 5.01% — moderate, not extreme\\n- Pool mode: Healthy\\n- Backing: 184.4% — well above 150%, so bxUSD is scarce relative to pool value; xNEAR leverage is 2.18x, which is quite low leverage (pool value 1392.23, bxUSD owed 755.02, so xNEAR owns 1392.23 - 755.02 = 637.21; leverage = 1392.23/637.21 ≈ 2.18). Wait, actually leverage 2.18 means... hmm, the formula says leverage = pool value / (pool value - bxUSD) = 1392.23 / 637.21 = 2.185. Yes.\\n\\nBacking 184.4% means pool value / bxUSD = 1392.23/755.02 = 1.844. So xNEAR is barely levered — high backing means there's room to add more bxUSD (more savers) which would increase leverage toward the healthy target of 150% backing.\\n\\nGuidance: \\\"When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage.\\\"\\n\\nCurrent rate is already 2000 bps (20%), the maximum. So we can't raise it. Can't change by more than 400 bps anyway. Rate is at max 2000. Should we lower it? Backing is 184.4%, well above 150% — xNEAR is barely levered, so we want to attract savers, not discourage them. Lowering the rate would push backing even higher (less bxUSD). So keep at 2000.\\n\\nFees: volatility 4.34% is moderate. Current fee level 0. NEAR change -0.13%, calm. No clear evidence to raise fees. Keep fee_level 0.\\n\\nSo: no changes. fee_level 0, savings_rate_bps 2000.\\n\\nReason: must explain any change — there is no change, but we can explain why we're holding. \\\"Backing is 184%, well above the 150% healthy line, so savers are still needed and the 20% rate stays to attract them. NEAR moved under 1% with about 4% volatility, so normal fees remain.\\\"\\n\\nStatus: \\\"Pool is healthy at 184% backing with a 20% savings rate and normal fees.\\\"\\n\\nCheck character limits: reason under 240 chars. Let me count roughly:\\n\\n\\\"Backing is 184%, well above the 150% healthy line, so the 20% rate stays to attract savers and add bxUSD. NEAR moved under 1% with about 4% volatility, so normal fees remain.\\\" — that's about 175 chars. Good.\\n\\nStatus: \\\"Pool is healthy at 184% backing, paying savers 20% with normal fees.\\\" Short.\\n\\nWrite rates as percents like 9%, never bps. 2000 bps = 20%. Good.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794166477,\"usage\":{\"prompt_tokens\":627,\"total_tokens\":1417,\"completion_tokens\":790,\"prompt_tokens_details\":null,\"reasoning_tokens\":694,\"completion_tokens_details\":{\"reasoning_tokens\":694}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:35c8c8027244e89084449d31c23b9990ffee23f9268f9f5757e9a298c64c45c0:e4408a28df73c765f7a27244bba54a5e53c410b5bab774c4a7829d3496a73609",
+    "signature": "0x24af91321853a708f8d750550ff68f85e82fdb81d74bf873165f832256b245b4775ed05fce912363b58c58778bfb25e31558e24e4ef90b6581d126f849d889e21b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "b33fa9326851b856ef6221263a0437327f7a9c1a61e9cb5795416b4d10f04a19",
+    "fetched_at": 1794166476812,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "36bc99168c280100eb0dcd4c1931ad23be3174b9733b75291337df883f990ec4"
+  },
+  "decision": {
+    "level": 0,
+    "rate": 2000,
+    "reason": "Backing is 184%, well above the 150% healthy line, so the 20% rate stays to attract savers and add bxUSD. NEAR moved under 1% with about 4% volatility, so normal fees remain."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 35c8c80272… and e4408a28df… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
