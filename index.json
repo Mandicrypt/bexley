@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794122675612,
+  "id": "gen-1794122669-RaMaw28mENPLB5CpKjYS",
+  "file": "2026-11-08/gen-1794122669-RaMaw28mENPLB5CpKjYS.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is a high 187%, so bxUSD is scarce and the savers' rate stays at 20%. NEAR moved only -1.3% with low volatility, so fees stay normal.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794120617046,
   "id": "fba9ac92c85a43cda97a6745d1480ff2",
   "file": "2026-11-08/fba9ac92c85a43cda97a6745d1480ff2.json",
