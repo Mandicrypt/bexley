@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794111795700,
+  "id": "3507794a935f44f4b58ccfeb2bae2d6f",
+  "file": "2026-11-08/3507794a935f44f4b58ccfeb2bae2d6f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 186% and xNEAR leverage is only 2.16, so bxUSD is scarce; we keep the 20% savings rate to attract savers. Volatility is low at 3.11%, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794109777498,
   "id": "68d0f4ca79714b9db18377603b93f5eb",
   "file": "2026-11-08/68d0f4ca79714b9db18377603b93f5eb.json",
