@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794128741690,
+  "id": "f01949f10a3e47e29e01c75eca7e782f",
+  "file": "2026-11-08/f01949f10a3e47e29e01c75eca7e782f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. Backing is 186% and xNEAR leverage is only 2.16, so the pool still needs savers and keeps the 20% rate. NEAR moved just 1.07% with 3.17% volatility, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794126708730,
   "id": "5120dace4c7e4441a5f5f26d69bbe81b",
   "file": "2026-11-08/5120dace4c7e4441a5f5f26d69bbe81b.json",
