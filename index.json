@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794181469331,
+  "id": "e12c68edc78a4078ab2a1f33ae862baa",
+  "file": "2026-11-08/e12c68edc78a4078ab2a1f33ae862baa.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 181%, so savers are still scarce and the 20% rate stays at its maximum to attract them. NEAR fell 2.6% with 5.5% volatility, not enough to justify raising fees.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794179421820,
   "id": "a1433941a5b7439782ca46cc1e7b7995",
   "file": "2026-11-08/a1433941a5b7439782ca46cc1e7b7995.json",
