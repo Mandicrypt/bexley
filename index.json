@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794242064002,
+  "id": "3ad70d30dcc047adb4a1c97e0812539d",
+  "file": "2026-11-09/3ad70d30dcc047adb4a1c97e0812539d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 170.9% and the 20% saver rate is already the maximum to attract more bxUSD. NEAR volatility near 7% justifies keeping fees at 3x.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794240019931,
   "id": "085cf8bf58974e7ab6beda9581e2273e",
   "file": "2026-11-09/085cf8bf58974e7ab6beda9581e2273e.json",
