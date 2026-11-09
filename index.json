@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794237982958,
+  "id": "7fde6014835d4129b454da3ca4040e46",
+  "file": "2026-11-09/7fde6014835d4129b454da3ca4040e46.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 171.6% and the pool is healthy, so we keep the maximum 20% savings rate to attract more savers. NEAR volatility near 7% keeps fees at 3x.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794237604289,
   "id": "c5a0ceaa016a4decb9035960b79bd706",
   "file": "2026-11-09/c5a0ceaa016a4decb9035960b79bd706.json",
