@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794198235227,
+  "id": "a7950b1822a34a629588fcb11dc50f62",
+  "file": "2026-11-09/a7950b1822a34a629588fcb11dc50f62.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 171.2%, comfortably above the 150% healthy line, and the 20% savings rate is already at its cap. NEAR slipped 2.11% with mild 5.35% volatility, so normal fees still fit the market.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794196202065,
   "id": "c3178948bc4645208b3df82ecd6e3c03",
   "file": "2026-11-09/c3178948bc4645208b3df82ecd6e3c03.json",
