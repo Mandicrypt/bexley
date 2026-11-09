@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794183519877,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "52a464e39b244a69ac9d068051f24b90",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.6168,\\n  \\\"near_change_24h_pct\\\": -2.04,\\n  \\\"near_volatility_24h_pct\\\": 5.41,\\n  \\\"near_range_24h_pct\\\": 8.36,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 182.1,\\n  \\\"xnear_leverage\\\": 2.22,\\n  \\\"pool_value_usd\\\": 1374.67,\\n  \\\"bxusd_supply\\\": 755.09,\\n  \\\"stability_pool_usd\\\": 607.4,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 2000\\n}\"}]}",
+  "response": "{\"id\":\"52a464e39b244a69ac9d068051f24b90\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 0, \\\"savings_rate_bps\\\": 2000, \\\"reason\\\": \\\"Backing is 182% and the savings rate is already 20%, the maximum, so it stays to keep attracting savers. Volatility of 5.4% is not extreme, so fees stay normal.\\\", \\\"status\\\": \\\"The pool is healthy at 182% backing, paying savers 20% with normal fees.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- Pool mode: Healthy (backing 182.1%, well above 150%)\\n- Backing: 182.1% — high backing means bxUSD is scarce relative to pool value, xNEAR leverage is 2.22\\n- Current savings rate: 2000 bps (20%)\\n- NEAR price: $3.6168, down 2.04% in 24h\\n- Volatility: 5.41% over 24h, range 8.36% — moderately volatile\\n- Current fee level: 0\\n\\nRules:\\n- Outside Healthy mode rate must be 0 — we're Healthy, so rate can be nonzero.\\n- Change rate by at most 400 bps per decision.\\n- Prefer stability: don't change for small moves.\\n\\nCurrent rate is 2000 bps (20%), the max. Backing is 182.1%, which is high — bxUSD is scarce, xNEAR barely levered? Actually leverage 2.22 means pool value / (pool value - bxUSD) = 2.22. Pool value 1374.67, bxUSD 755.09. 1374.67 / (1374.67 - 755.09) = 1374.67 / 619.58 = 2.219. Yes.\\n\\nBacking 182.1% = 1374.67 / 755.09 = 1.8207. Yes.\\n\\nGuidance: \\\"When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers.\\\" Backing at 182% is high-ish but leverage 2.22 is decent. The rate is already at max 2000. So we can't raise it. Should we lower it? Backing 182% is above 150% comfortably — Healthy. The guidance says when backing near 150% (well levered), lower rate eases cost. At 182%, backing is high, so keeping a high rate to attract savers makes sense. Rate is already at 20% max. So keep at 2000.\\n\\nFees: volatility 5.41% 24h, range 8.36%, price down 2%. Is that volatile enough for 2x fees? Moderate. Prefer stability — current fee level 0. A 5.4% daily volatility is somewhat elevated but not extreme. The rule says only change when evidence is clear. 5.41% volatility with 8.36% range — hmm. For NEAR, 5% daily vol is moderately high. But is it \\\"clear\\\" evidence? I'd lean toward keeping fee level 0 since volatility isn't extreme, and prefer stability. Actually, let me think: typical calm days might be 2-4% vol. 5.41% with an 8.36% range suggests some churn. But the instruction says prefer stability, don't change for small moves. A -2% move is small. I'll keep fees at 0.\\n\\nSo decision: no changes. fee_level 0, savings_rate_bps 2000.\\n\\nReason: explain no change — backing 182% healthy, rate already at 20% max to attract savers; volatility modest so fees stay normal.\\n\\nStatus: one short sentence summarizing pool.\\n\\nReason must cite numbers that drove it, under 240 chars, rates as percents like 9%.\\n\\nReason: \\\"Backing is 182% and the savings rate is already 20%, the maximum, so it stays to attract savers. Volatility of 5.4% is not extreme, so fees stay normal.\\\"\\n\\nCharacter count: let me check. \\\"Backing is 182% and the savings rate is already 20%, the maximum, so it stays to attract savers. Volatility of 5.4% is not extreme, so fees stay normal.\\\" That's about 155 chars. Good.\\n\\nStatus: \\\"The pool is healthy at 182% backing with a 20% savings rate and normal fees.\\\"\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794183496,\"usage\":{\"prompt_tokens\":628,\"total_tokens\":1571,\"completion_tokens\":943,\"prompt_tokens_details\":null,\"reasoning_tokens\":852,\"completion_tokens_details\":{\"reasoning_tokens\":852}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:bca6ed437162fa809548f0126ed9b76ad7cc91969a15e6e2773935c9a69464a4:79980630f829037ae7c3027a4d788ba966115bc10016b0d4f648378afe19942a",
+    "signature": "0x012cb9d409d9804b6447b053ef991a50d1b96a5304e32b994a80f959cc996a2447827698bd1f51f8f395748167249fa6de92c5d0343f61d6d3414e6a4811cbd51c",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "841b5ec54a3cf788c87d432f326839dfed7c8f71eba9d589a6a4292db3aa89c9",
+    "fetched_at": 1794175301282,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "d139c8ab469137f92c8af1b3da4d27af5f921a8af356947d1f5394c48f81503f"
+  },
+  "decision": {
+    "level": 0,
+    "rate": 2000,
+    "reason": "Backing is 182% and the savings rate is already 20%, the maximum, so it stays to keep attracting savers. Volatility of 5.4% is not extreme, so fees stay normal."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints bca6ed4371… and 79980630f8… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
