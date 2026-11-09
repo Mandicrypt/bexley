@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794185608430,
+  "id": "gen-1794185600-8EtdRkPmhtxZu1SeaOYq",
+  "file": "2026-11-09/gen-1794185600-8EtdRkPmhtxZu1SeaOYq.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 171.7% and xNEAR leverage is 2.39, so the pool is well backed. NEAR fell 2.3% with 5.4% volatility, so fees stay normal and the 20% savings rate holds.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794183519877,
   "id": "52a464e39b244a69ac9d068051f24b90",
   "file": "2026-11-09/52a464e39b244a69ac9d068051f24b90.json",
