@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794216762717,
+  "id": "07b04e2556d143a4aea82478e03e044f",
+  "file": "2026-11-09/07b04e2556d143a4aea82478e03e044f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. NEAR volatility of 6.21% and an 8.36% range keep fees at 3x, and backing of 167.6% keeps the 20% savings rate to attract savers.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794214705083,
   "id": "37248b48299344d798f030f102a78229",
   "file": "2026-11-09/37248b48299344d798f030f102a78229.json",
