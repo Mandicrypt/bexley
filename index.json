@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794250227441,
+  "id": "8cd473285e3146e085a4bcdd4d5ddc6a",
+  "file": "2026-11-09/8cd473285e3146e085a4bcdd4d5ddc6a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 171.6% and bxUSD is scarce, so the 20% savings rate stays to attract savers. NEAR still swings about 6.7% a day, so 3x fees stay to pay the Stability Pool for that risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794248179619,
   "id": "2cce5e67534549e397ead9d037cc269b",
   "file": "2026-11-09/2cce5e67534549e397ead9d037cc269b.json",
