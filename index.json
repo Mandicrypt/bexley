@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794191725409,
+  "id": "f1252141a48c4843b6dde5c62b0fff0c",
+  "file": "2026-11-09/f1252141a48c4843b6dde5c62b0fff0c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing at 173.3% keeps bxUSD scarce, so the 20% saver rate stays at its cap to attract deposits. NEAR volatility of 5.5% is moderate, so normal fees remain.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794189674627,
   "id": "a2fb1519fbe84781bb845991f2a05161",
   "file": "2026-11-09/a2fb1519fbe84781bb845991f2a05161.json",
