@@ -3,7 +3,7 @@
 Bexley splits one pool of NEAR into two tokens:
 
 - **bxUSD**: a stablecoin worth $1, for people who want safety.
-- **xNEAR**: leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes, so it moves more than NEAR in both directions.
+- **xNEAR**: leveraged NEAR without Liquidation. It owns everything the pool is worth above the bxUSD it owes, so it moves more than NEAR in both directions.
 
 On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereum), Bexley adds a **Stability Pool** with a **savings rate paid by xNEAR**, **Steady 2x/3x vaults**, **stop-loss and take-profit orders**, and an **AI Pool Guardian** that runs the pool's safety work, sets the savings rate from demand, and explains every move in public notes.
 
