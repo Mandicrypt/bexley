@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794258899847,
+  "id": "9d82cea13b1f45f08fb7283ebcf68def",
+  "file": "2026-11-09/9d82cea13b1f45f08fb7283ebcf68def.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 171.4%, well above the 150% healthy line, so the pool needs more savers. Raising the rate from 9% to 13% should attract bxUSD and lift xNEAR leverage.",
+  "level": 0,
+  "rate": 1300,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794256800647,
   "id": "gen-1794256784-SsxIzALI9jt3oJd00muT",
   "file": "2026-11-09/gen-1794256784-SsxIzALI9jt3oJd00muT.json",
