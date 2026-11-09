@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794204412643,
+  "id": "59ebc02932e84c7f8484b2caf98ec69e",
+  "file": "2026-11-09/59ebc02932e84c7f8484b2caf98ec69e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 3.87% with an 8.36% daily range, so we doubled fees to slow churn and pay savers for the extra risk. The savings rate stays at 20% since backing is 168.9% and the rate is already at its cap.",
+  "level": 1,
+  "rate": 2000,
+  "kind": null,
+  "signer": null,
+  "verified": false
+ },
+ {
   "at": 1794202335032,
   "id": "3e943cb043a243feaad9453974b6e11a",
   "file": "2026-11-09/3e943cb043a243feaad9453974b6e11a.json",
