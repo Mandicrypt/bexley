@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794240019931,
+  "id": "085cf8bf58974e7ab6beda9581e2273e",
+  "file": "2026-11-09/085cf8bf58974e7ab6beda9581e2273e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Volatility is still 7% over 24h, so 3x fees stay to pay savers for the risk. Backing is 174%, leaving room for more leverage, so the 20% savings rate stays to attract bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794237982958,
   "id": "7fde6014835d4129b454da3ca4040e46",
   "file": "2026-11-09/7fde6014835d4129b454da3ca4040e46.json",
