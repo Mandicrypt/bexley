@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794227372497,
+  "id": "26e23378bb154df2b27cfe3d1ccd2add",
+  "file": "2026-11-09/26e23378bb154df2b27cfe3d1ccd2add.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 4.6% with 6.5% daily swings, so 3x fees stay to pay savers for the risk. Backing is 168% and leverage only 2.47, so we keep the 20% rate to attract more bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794225318555,
   "id": "bd8566d0fd8841ec8d154344d4a13e0c",
   "file": "2026-11-09/bd8566d0fd8841ec8d154344d4a13e0c.json",
