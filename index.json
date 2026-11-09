@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794252269346,
+  "id": "5071d3b23c1d4961a84c017c25c32873",
+  "file": "2026-11-09/5071d3b23c1d4961a84c017c25c32873.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Volatility of 6.7% in the last day keeps fees at 3x to pay savers for the risk. Backing is 171.7%, so bxUSD is scarce; the 20% savings rate stays to attract deposits and give xNEAR more leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794250227441,
   "id": "8cd473285e3146e085a4bcdd4d5ddc6a",
   "file": "2026-11-09/8cd473285e3146e085a4bcdd4d5ddc6a.json",
