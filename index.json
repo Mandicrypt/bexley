@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794296314446,
+  "id": "5e26e724bbe648fc93516469617f0094",
+  "file": "2026-11-10/5e26e724bbe648fc93516469617f0094.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 172.9%, so bxUSD is scarce and the 20% rate is already at its cap to attract savers. Volatility near 5% is not high enough to raise fees.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794294277712,
   "id": "9cace890a80c4a2db18ea9c8b60945ba",
   "file": "2026-11-10/9cace890a80c4a2db18ea9c8b60945ba.json",
