@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794284008328,
+  "id": "36c9b10a20a74bf6b15d0d90dab221ff",
+  "file": "2026-11-10/36c9b10a20a74bf6b15d0d90dab221ff.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 170.7%, well above the 150% healthy line, so we raise savings to 18% to attract savers and add bxUSD. Fees stay normal since NEAR moved only -0.64%.",
+  "level": 0,
+  "rate": 1800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794281953012,
   "id": "a9df301412a8434f838385b27216dcdf",
   "file": "2026-11-10/a9df301412a8434f838385b27216dcdf.json",
