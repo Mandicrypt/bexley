@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794336177659,
+  "id": "5625410cd4fc40d1bfc3c6dfe50c0d40",
+  "file": "2026-11-10/5625410cd4fc40d1bfc3c6dfe50c0d40.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 171.2% and leverage only 2.4x, so savers are still needed and the 20% rate stays at its cap. NEAR moved just -0.45% with 6.65% volatility, so 2x fees remain right.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794334139991,
   "id": "53ddb64733834039b73d0e613170517a",
   "file": "2026-11-10/53ddb64733834039b73d0e613170517a.json",
