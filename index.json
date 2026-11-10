@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794278507921,
+  "id": "gen-1794278495-PsLaww7vWM4pPNWR21am",
+  "file": "2026-11-10/gen-1794278495-PsLaww7vWM4pPNWR21am.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is high at 170%, so bxUSD is scarce and xNEAR has room to grow. We raised the saver rate from 5% to 9% to attract more bxUSD.",
+  "level": 0,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794261430009,
   "id": "gen-1794261414-H6hib84i0b3aEvpQcJqG",
   "file": "2026-11-09/gen-1794261414-H6hib84i0b3aEvpQcJqG.json",
