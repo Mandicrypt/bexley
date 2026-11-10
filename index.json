@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794310912362,
+  "id": "318e3adc8d5243fcb8458a723eb3f8df",
+  "file": "2026-11-10/318e3adc8d5243fcb8458a723eb3f8df.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 170% and leverage 2.43, so the pool still wants more savers; the rate stays at the 20% maximum. NEAR moved 1.92% with 4.46% volatility, too calm to raise fees.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794308888865,
   "id": "c0531ae8d9b34273a5a78a65f98062f8",
   "file": "2026-11-10/c0531ae8d9b34273a5a78a65f98062f8.json",
