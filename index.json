@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794348810947,
+  "id": "44eb2300c9884bb492b053c693839eec",
+  "file": "2026-11-10/44eb2300c9884bb492b053c693839eec.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 170.8% and leverage 2.41x, so we keep the savings rate at the 20% cap to attract savers. NEAR volatility of 6.6% justifies keeping fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794346770335,
   "id": "6afcdca02dbd4736a36a9762cc86e047",
   "file": "2026-11-10/6afcdca02dbd4736a36a9762cc86e047.json",
