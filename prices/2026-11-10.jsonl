@@ -22,3 +22,4 @@
 {"at":1794279886115,"asked":3600700,"accepted":3600700,"median_usd":3.6007,"sources":{"CoinGecko":3.6,"Coinbase":3.60385,"Kraken":3.6007}}
 {"at":1794280248455,"asked":3592500,"accepted":3592500,"median_usd":3.5925,"sources":{"CoinGecko":3.59,"Coinbase":3.59395,"Kraken":3.5925}}
 {"at":1794280587868,"asked":3588050,"accepted":3588050,"median_usd":3.58805,"sources":{"CoinGecko":3.59,"Coinbase":3.58805,"Kraken":3.587}}
+{"at":1794280926872,"asked":3608000,"accepted":3608000,"median_usd":3.608,"sources":{"CoinGecko":3.6,"Coinbase":3.60805,"Kraken":3.608}}
