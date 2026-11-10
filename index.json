@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794298364202,
+  "id": "6d9c0b6424b34e06b623cfcff26abc01",
+  "file": "2026-11-10/6d9c0b6424b34e06b623cfcff26abc01.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes: backing is 172.2% and xNEAR leverage only 2.39x, so the max 20% savings rate stays to attract savers. NEAR volatility of 4.55% is moderate, so fees stay normal.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794296314446,
   "id": "5e26e724bbe648fc93516469617f0094",
   "file": "2026-11-10/5e26e724bbe648fc93516469617f0094.json",
