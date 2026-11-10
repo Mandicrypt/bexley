@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794292214899,
+  "id": "d04aa48ed5ed4b1daa664bdad1b9ca39",
+  "file": "2026-11-10/d04aa48ed5ed4b1daa664bdad1b9ca39.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 171.9% and the pool is Healthy, so the 18% savings rate stays to keep drawing savers. Volatility near 5% is moderate, so normal fees remain.",
+  "level": 0,
+  "rate": 1800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794290169190,
   "id": "0dce4d46a4274cab8f2aff7d801ef5f9",
   "file": "2026-11-10/0dce4d46a4274cab8f2aff7d801ef5f9.json",
