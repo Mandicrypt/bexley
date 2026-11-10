@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794281953012,
+  "id": "a9df301412a8434f838385b27216dcdf",
+  "file": "2026-11-10/a9df301412a8434f838385b27216dcdf.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 170.7%, well above the 150% healthy line, so bxUSD is scarce; raising the rate to 14% should attract savers. Fees stay normal since NEAR moved only -0.45% with about 5.7% volatility.",
+  "level": 0,
+  "rate": 1400,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794279899912,
   "id": "46e27407541349c7b06d9ff53559babe",
   "file": "2026-11-10/46e27407541349c7b06d9ff53559babe.json",
