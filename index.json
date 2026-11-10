@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794317016183,
+  "id": "0400061ffc5740aba31804192e2d1e7d",
+  "file": "2026-11-10/0400061ffc5740aba31804192e2d1e7d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is a strong 172.2% and the savings rate is already at the 20% cap, which keeps attracting savers. NEAR moved just 2.13% with 4.26% volatility, so normal fees remain right.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794314979165,
   "id": "576b59afb0174850850ce6483cd9ebc6",
   "file": "2026-11-10/576b59afb0174850850ce6483cd9ebc6.json",
