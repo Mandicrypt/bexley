@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794404922217,
+  "id": "9abc042681024afb973bfe8446d24a3a",
+  "file": "2026-11-11/9abc042681024afb973bfe8446d24a3a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: NEAR volatility is still 8.27% with a 9.97% range, so 3x fees stay to pay savers for the risk. Backing is high at 178.1%, so the 20% rate stays to attract more bxUSD and give xNEAR more leverage.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794402882419,
   "id": "ba1707dd7c224397a5a206d1bc831664",
   "file": "2026-11-11/ba1707dd7c224397a5a206d1bc831664.json",
