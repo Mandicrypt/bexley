@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794356977600,
+  "id": "abb6a855f3bc462c9f2fff7021fda1d5",
+  "file": "2026-11-11/abb6a855f3bc462c9f2fff7021fda1d5.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 171.2%, so we keep the top 20% savings rate to attract savers, and 6.8% volatility keeps fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794354951305,
   "id": "2a58f09d81634334bea0c3ef43664a6a",
   "file": "2026-11-10/2a58f09d81634334bea0c3ef43664a6a.json",
