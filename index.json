@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794394684497,
+  "id": "248ecd3b08894d179177097ab22e6817",
+  "file": "2026-11-11/248ecd3b08894d179177097ab22e6817.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is strong at 172.6%, so we keep the top savings rate of 20% to attract more savers. NEAR moved 8.42% in a day, so 3x fees stay to pay the Stability Pool for the risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794392629870,
   "id": "025580bff9a94a58bbcacf0ec7d0809f",
   "file": "2026-11-11/025580bff9a94a58bbcacf0ec7d0809f.json",
