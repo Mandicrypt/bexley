@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794382039454,
+  "id": "c63632b03b214e4195efd8d250cf1eb0",
+  "file": "2026-11-11/c63632b03b214e4195efd8d250cf1eb0.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR volatility is 7% over 24h, so 3x fees stay to pay savers for the risk. Backing is 171%, leaving room for more bxUSD, so the 20% savings rate stays to attract savers.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794379976621,
   "id": "05c3b66b63f3469a9a729a1f5f6df627",
   "file": "2026-11-11/05c3b66b63f3469a9a729a1f5f6df627.json",
