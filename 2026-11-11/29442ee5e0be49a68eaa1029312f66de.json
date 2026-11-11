@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794386484184,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "29442ee5e0be49a68eaa1029312f66de",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.6075,\\n  \\\"near_change_24h_pct\\\": -0.58,\\n  \\\"near_volatility_24h_pct\\\": 7.07,\\n  \\\"near_range_24h_pct\\\": 8.42,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 171.1,\\n  \\\"xnear_leverage\\\": 2.41,\\n  \\\"pool_value_usd\\\": 1912.26,\\n  \\\"bxusd_supply\\\": 1117.34,\\n  \\\"stability_pool_usd\\\": 1044.2,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 2000\\n}\"}]}",
+  "response": "{\"id\":\"29442ee5e0be49a68eaa1029312f66de\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 2000, \\\"reason\\\": \\\"No change: NEAR volatility is 7.07% over 24h, so 3x fees stay to pay savers for risk. Backing is 171.1%, so the 20% rate stays to attract more bxUSD and deepen xNEAR leverage.\\\", \\\"status\\\": \\\"The pool is healthy at 171.1% backing with NEAR steady near $3.61.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- NEAR price: $3.6075, down -0.58% in 24h\\n- Volatility 24h: 7.07%, range 8.42% — moderately volatile\\n- Pool mode: Healthy\\n- Backing: 171.1% — well above 150%, so bxUSD is scarce relative to pool value, xNEAR leverage is 2.41\\n- Current fee level: 2 (3x fees)\\n- Current savings rate: 2000 bps (20%)\\n\\nRules:\\n- Outside Healthy mode rate must be 0 — we're Healthy, so rate can be nonzero.\\n- Change rate by at most 400 bps per decision.\\n- Prefer stability; only change when evidence is clear.\\n\\nConsiderations:\\n\\nFee level: Volatility is 7.07% over 24h. Is that high? Moderate. Current fee level is 2 (3x). The rule says raise fees when NEAR is volatile, lower when calm. 7% daily volatility with 8.4% range is somewhat elevated but not extreme. Price change is small (-0.58%). Should I lower fees from 2 to 1? The evidence: volatility 7.07% is moderate. Hmm. \\\"Prefer stability: do not change settings for small moves.\\\" The volatility isn't extreme; 3x fees might be choking churn. But is evidence clear to lower? Volatility of 7% daily is still meaningful. I'd lean to keep fee_level at 2? Or lower to 1?\\n\\nLet me think: 7% daily volatility is fairly high for NEAR. Range 8.42% also elevated. Keeping fees at 3x seems justified to pay the Stability Pool for risk. I'll keep fee_level = 2.\\n\\nSavings rate: Backing is 171.1%, well into Healthy. High backing means bxUSD is scarce; xNEAR leverage 2.41 — wait, leverage = pool value / (pool value - bxUSD owed). Pool value $1912.26, bxUSD supply 1117.34. Pool value - bxUSD = 794.92. 1912.26/794.92 = 2.405. Yes, 2.41.\\n\\nBacking = pool/bxUSD = 1912.26/1117.34 = 1.711. Right.\\n\\nHigh backing (171%) means xNEAR is barely levered relative to max? Actually leverage 2.41 is decent. At backing 150%, leverage = 1/(1-1/1.5) = 3.0. So at 171% backing, max leverage would be 1/(1 - 1/1.711) = 1/(0.4155) = 2.407. So xNEAR is at full leverage given current bxUSD supply. To increase leverage, more bxUSD savers needed — higher rate attracts savers.\\n\\nCurrent rate is 20% (2000 bps), the max. Can't raise. Should we lower? The rule: when backing near 150%, lower rate. Backing is 171%, not near 150%. High backing suggests keeping rate high to attract savers. Rate is already at max 2000. So keep at 2000.\\n\\nAlternatively, could lower rate to ease xNEAR cost? But backing is high, xNEAR wants more leverage... actually xNEAR is fully levered at current bxUSD supply; adding savers increases bxUSD, lowers backing toward 150%, increases leverage. High rate attracts savers. So keep 2000.\\n\\nSo no changes: fee_level 2, savings_rate_bps 2000.\\n\\nReason: explain no change — volatility 7% justifies 3x fees; backing 171% keeps rate at 20% to attract savers. Under 240 chars.\\n\\nStatus: one short sentence summarizing pool: \\\"Pool is healthy at 171% backing with NEAR steady near $3.61.\\\"\\n\\nWrite JSON only.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794386461,\"usage\":{\"prompt_tokens\":629,\"total_tokens\":1592,\"completion_tokens\":963,\"prompt_tokens_details\":null,\"reasoning_tokens\":857,\"completion_tokens_details\":{\"reasoning_tokens\":857}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:630c9528629ffbe2b6bf123261d6c538d8a1a92b9a64871effa4eedfad6188a3:9deafda611c75fdf25bd9313fc8b8228af3a9cbae5e88a1a04966e2ed9202c8c",
+    "signature": "0xc034341d732b67e170791e5142698334510c3bcbfba1592bba87c764e177dc6f1e0daf57c3d7448632cdf58b27d1170c536fbdee0b3302987de41a974e57e0881b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "818302f02ac264411eab164da34e487d7132c590f26e810547122479923ad007",
+    "fetched_at": 1794384416365,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "0e92de3fb29d2e316f283b234acb3a63222ecb017a047954d5085b658ca63ca7"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 2000,
+    "reason": "No change: NEAR volatility is 7.07% over 24h, so 3x fees stay to pay savers for risk. Backing is 171.1%, so the 20% rate stays to attract more bxUSD and deepen xNEAR leverage."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 630c952862… and 9deafda611… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
