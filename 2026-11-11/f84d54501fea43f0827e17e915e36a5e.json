@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794369669573,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "f84d54501fea43f0827e17e915e36a5e",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.687,\\n  \\\"near_change_24h_pct\\\": 2.65,\\n  \\\"near_volatility_24h_pct\\\": 6.87,\\n  \\\"near_range_24h_pct\\\": 8.42,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 174.9,\\n  \\\"xnear_leverage\\\": 2.33,\\n  \\\"pool_value_usd\\\": 1954.4,\\n  \\\"bxusd_supply\\\": 1117.24,\\n  \\\"stability_pool_usd\\\": 1044.09,\\n  \\\"current_fee_level\\\": 1,\\n  \\\"current_savings_rate_bps\\\": 2000\\n}\"}]}",
+  "response": "{\"id\":\"f84d54501fea43f0827e17e915e36a5e\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 1, \\\"savings_rate_bps\\\": 2000, \\\"reason\\\": \\\"No change. Backing is strong at 174.9%, so we keep the savings rate at the maximum 20% to attract savers, and 24h volatility near 6.9% keeps fees at 2x.\\\", \\\"status\\\": \\\"The pool is healthy with 174.9% backing and a 20% savings rate for savers.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- Pool mode: Healthy (backing 174.9% ≥ 150%)\\n- Backing: 174.9% — quite high, meaning bxUSD is scarce relative to pool value\\n- xNEAR leverage: 2.33 — decent leverage\\n- Current savings rate: 2000 bps (20%) — the maximum\\n- NEAR price: $3.687, up 2.65% in 24h\\n- Volatility: 6.87% over 24h, range 8.42% — moderately volatile\\n- Current fee level: 1 (2x fees)\\n\\nRules:\\n- Rate can change by at most 400 bps per decision\\n- Outside Healthy mode rate must be 0 — we're in Healthy, so rate can be nonzero\\n- Prefer stability: don't change settings for small moves\\n\\nAnalysis:\\n- Backing at 174.9% is high. When backing is high (bxUSD scarce, xNEAR barely levered), a higher rate attracts savers. But the rate is already at max 2000 bps (20%). Can't go higher.\\n- Actually, backing 174.9% means xNEAR leverage is 2.33. The system says when backing near 150%, lower rate eases cost. At 174.9%, backing is well above 150%, so bxUSD is scarce — high rate is appropriate. Rate is already at 20% max, so keep it.\\n- Fees: volatility 6.87% over 24h with range 8.42%. Is that volatile enough for elevated fees? Current fee level is 1 (2x). The market moved 2.65% up with ~6.9% volatility. That's moderate. Rule says prefer stability, only change when evidence is clear. 6.87% volatility isn't extreme but isn't calm either. I'd keep fee level at 1.\\n\\nSo: no changes. fee_level: 1, savings_rate_bps: 2000.\\n\\nReason: explain no change — backing 174.9% keeps rate at 20% max to attract savers; volatility ~6.9% justifies keeping 2x fees.\\n\\nStatus: pool healthy, backing strong at 174.9%.\\n\\nJSON only.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794369660,\"usage\":{\"prompt_tokens\":627,\"total_tokens\":1209,\"completion_tokens\":582,\"prompt_tokens_details\":null,\"reasoning_tokens\":484,\"completion_tokens_details\":{\"reasoning_tokens\":484}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:1a2dd83d557b43f35a253f9c88c41b39eade7d8d4a75ff889b463b9d9cc7c437:831619b56f20c7b023c5f3f9189c6c543f20caf840655b9a317cfd8dd10592e5",
+    "signature": "0x8d31de727f3082c3567256b489196b3b97776ad2e89aa0453158f48473f2f9d33bc5daf9e18ef68ea1c7bba22d04900601047590d03c60b86731eb56690593801b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "c16c2417e291e6cc28e9b4acd6f15fe051304e226fb5096b532ae2131d4a2b34",
+    "fetched_at": 1794363513728,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "ee3837c1062656fc2a79a1c360a7ea4f50fcfa2e0e28316981ece6170fc3d797"
+  },
+  "decision": {
+    "level": 1,
+    "rate": 2000,
+    "reason": "No change. Backing is strong at 174.9%, so we keep the savings rate at the maximum 20% to attract savers, and 24h volatility near 6.9% keeps fees at 2x."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 1a2dd83d55… and 831619b56f… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
