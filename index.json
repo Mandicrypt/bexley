@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794411912344,
+  "id": "gen-1794411896-W7O1Adg3ypHeDYqMuq4o",
+  "file": "2026-11-11/gen-1794411896-W7O1Adg3ypHeDYqMuq4o.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR volatility is 6.8% and range 10%, so fees rise to 2x. Backing is high at 177.9%, so the savings rate rises to 9% to attract more bxUSD and add leverage.",
+  "level": 1,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794409401977,
   "id": "82ae1d7b419a44e4a3ed05207cb766f5",
   "file": "2026-11-11/82ae1d7b419a44e4a3ed05207cb766f5.json",
