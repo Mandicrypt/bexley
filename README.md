@@ -9,7 +9,7 @@ On top of that core (the idea behind Hylo on Solana and f(x) Protocol on Ethereu
 
 **Try it:** [bexley-sigma.vercel.app](https://bexley-sigma.vercel.app) (NEAR testnet; get free tNEAR in the app). No wallet? Click **Demo** for a pretend wallet with example positions and live prices; nothing is sent.
 
-Built for the NEAR Hackathon (Nov 2026).
+Built for the NEAR Hackathon (Nov. 2026).
 
 ## Try it step by step
 
