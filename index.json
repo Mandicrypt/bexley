@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794440798030,
+  "id": "gen-1794440789-pwp3Nfqgazxhy4fvKzc1",
+  "file": "2026-11-11/gen-1794440789-pwp3Nfqgazxhy4fvKzc1.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change. NEAR volatility at 6.5% and strong backing of 169% do not call for higher fees or a lower savings rate.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794438729490,
   "id": "gen-1794438717-G5avGbG3MGNF0wRmT2O2",
   "file": "2026-11-11/gen-1794438717-G5avGbG3MGNF0wRmT2O2.json",
