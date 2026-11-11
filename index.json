@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794373797219,
+  "id": "de42d203ed2b4fabb2bb4b31de2aa62c",
+  "file": "2026-11-11/de42d203ed2b4fabb2bb4b31de2aa62c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is a healthy 173.2% and the savings rate is already at the 20% cap, so no change is needed. NEAR volatility of 6.9% keeps fees at the 2x level.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794371736608,
   "id": "b2c242207c6f48ff90a0b7b99f03d207",
   "file": "2026-11-11/b2c242207c6f48ff90a0b7b99f03d207.json",
