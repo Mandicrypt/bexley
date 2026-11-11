@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794367633648,
+  "id": "af5072399ae94679bd554eff5560b681",
+  "file": "2026-11-11/af5072399ae94679bd554eff5560b681.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 176% and the pool is Healthy, so the 20% saver rate stays to draw more bxUSD and lift leverage. Daily volatility near 7% keeps fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794365606499,
   "id": "275ef34e143f4db3ba92a8d31eadaf1e",
   "file": "2026-11-11/275ef34e143f4db3ba92a8d31eadaf1e.json",
