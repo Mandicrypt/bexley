@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794432514159,
+  "id": "840b6fd638ab4879879af14fbc36c9a8",
+  "file": "2026-11-11/840b6fd638ab4879879af14fbc36c9a8.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is a healthy 175% and the 19% savings rate is already near its 20% cap, so no change is warranted. NEAR's 6.21% volatility and 8.22% range are moderate, not enough to raise fees.",
+  "level": 0,
+  "rate": 1900,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794430460422,
   "id": "c72d3635bc3441609f8321a66ac4f0ba",
   "file": "2026-11-11/c72d3635bc3441609f8321a66ac4f0ba.json",
