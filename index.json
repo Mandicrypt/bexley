@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794396742326,
+  "id": "b5312a33c0c64a979e5ef5a3468d3329",
+  "file": "2026-11-11/b5312a33c0c64a979e5ef5a3468d3329.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 173.3% and leverage only 2.36x, so the pool still needs savers and keeps the max 20% rate. Volatility near 7% over 24h justifies keeping fees at 3x.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794394684497,
   "id": "248ecd3b08894d179177097ab22e6817",
   "file": "2026-11-11/248ecd3b08894d179177097ab22e6817.json",
