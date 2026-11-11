@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794407349498,
+  "id": "bd5d0b38f18a4f91835df30325b87ad6",
+  "file": "2026-11-11/bd5d0b38f18a4f91835df30325b87ad6.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 177.8% and leverage only 2.29x, so savers are scarce and the 20% rate stays to attract bxUSD. NEAR volatility is 8% with a 10% daily range, so 3x fees stay to pay the Stability Pool for that risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794405296381,
   "id": "e87eb8788a38460c8186cdad96282002",
   "file": "2026-11-11/e87eb8788a38460c8186cdad96282002.json",
