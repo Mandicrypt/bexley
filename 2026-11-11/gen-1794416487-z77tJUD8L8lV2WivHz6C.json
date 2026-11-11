@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1794416495913,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1794416487-z77tJUD8L8lV2WivHz6C",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.783,\\n  \\\"near_change_24h_pct\\\": 8.43,\\n  \\\"near_volatility_24h_pct\\\": 6.3,\\n  \\\"near_range_24h_pct\\\": 9.78,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 179.4,\\n  \\\"xnear_leverage\\\": 2.26,\\n  \\\"pool_value_usd\\\": 2005.29,\\n  \\\"bxusd_supply\\\": 1117.53,\\n  \\\"stability_pool_usd\\\": 1044.38,\\n  \\\"current_fee_level\\\": 1,\\n  \\\"current_savings_rate_bps\\\": 900\\n}\"}]}",
+  "response": "{\"id\":\"gen-1794416487-z77tJUD8L8lV2WivHz6C\",\"object\":\"chat.completion\",\"created\":1794416487,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 1, \\\"savings_rate_bps\\\": 1300, \\\"reason\\\": \\\"Backing is high at 179% and xNEAR leverage is 2.26, so I raised the saver rate to 13% to attract more bxUSD. Fees stay at 2x as NEAR volatility is moderate.\\\", \\\"status\\\": \\\"The pool is healthy with 179% backing and low leverage.\\\"}\",\"reasoning\":\"We need answer JSON only. Need decide fee_level, savings_rate_bps, reason, status.\\n\\nWe have data. Need follow rules. Current fee 1, rate 900 bps = 9%. Pool Healthy, backing 179.4% (high, xNEAR barely levered? leverage 2.26). NEAR change 24h +8.43%, volatility 6.3%, range 9.78%. Volatility moderate? Fee_level maybe keep 1? Or lower to 0 if calm? Current fee level 1 (2x fees) due to volatility? 24h change 8.43 and range 9.78, vol 6.3. Might be volatile enough to keep 1, not raise to 2? Evidence: not extreme. Prefer stability. So keep fee_level 1.\\n\\nSavings rate: Healthy mode. Backing high 179.4%, xNEAR leverage 2.26. High backing means bxUSD scarce? Actually backing = pool value / bxUSD. High backing means pool overcollateralized, xNEAR barely levered. Need attract savers to add bxUSD and give xNEAR more leverage? Wait if backing high, there is excess pool value relative to bxUSD, so xNEAR leverage low. To increase leverage, need more bxUSD supply, so higher savings rate attracts savers. Current rate 9%. Could raise to 13%? Max change 400 bps. From 900 to 1300. Is evidence clear? Backing 179.4% far above 150%, so yes. But prefer stability: only change when evidence clear. High backing clear. Raise savings rate to attract more savers. But maybe 9% already high. Could increase by 400 to 1300? The rule: change at most 400 bps. We can choose 1300. But maybe too aggressive? \\\"When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers\\\". 179.4% is high. So increase rate. Maybe to 12%? 400 bps max. 13% = 1300 bps. Since max allowed, but does evidence justify max? Could do 1200 (12%) or 1300. But we need integer. Let's think.\\n\\nCurrent rate 900. We can raise to 1300. Is that too much? The pool is Healthy, backing 179.4. High backing means xNEAR leverage low. To increase leverage, attract savers. The current rate 9% might be enough? But data says high backing. I think raise to 1300 bps (13%). Or maybe 1100? The rule: \\\"Prefer stability: do not change settings for small moves. Only change when evidence is clear.\\\" Backing is 179.4, very high. So clear. Max change 400. So 1300.\\n\\nFee level: current 1. NEAR change +8.43%, volatility 6.3%, range 9.78. This is moderately volatile. Could keep 1. Or raise to 2 if high volatility. But 6.3% 24h volatility, range 9.78% is not extreme. So keep 1.\\n\\nStatus: one short plain sentence. \\\"The pool is healthy with 179% backing and low leverage.\\\" Maybe mention 179% backing.\\n\\nReason: at most two short plain sentences under 240 chars. Explain change: \\\"Backing is high at 179%, so bxUSD is scarce and xNEAR is not very levered. Raising the savings rate to 13% should attract more savers and add bxUSD.\\\" Fee unchanged? Could mention fees stay at 2x because volatility is moderate. But reason for change. Should cite numbers. \\\"Backing is 179% and xNEAR leverage is 2.26, so I raised the saver rate to 13% to attract more bxUSD. Fees stay at 2x as NEAR volatility is moderate.\\\" That's under 240.\\n\\nCheck: rates as percents like 9%, never bps. So say 13%, not 1300. Fee level: 1 means 2x fees. Could say \\\"2x fees\\\".\\n\\nJSON: {\\\"fee_level\\\": 1, \\\"savings_rate_bps\\\": 1300, \\\"reason\\\": \\\"...\\\", \\\"status\\\": \\\"...\\\"}\\n\\nEnsure valid JSON, no extra text. Use double quotes.\\n\\nLet's final.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":675,\"completion_tokens\":1032,\"total_tokens\":1707,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":941,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "86cb14dc9275ae2077c8983e859843dab807c129b3d9af2fa6e8bfd4301b5039:c57eaeef567e174001502fd9543a6bad3a85b094b1c2583426f4ee12b63927e4",
+    "signature": "0x6a5b0c7bb549a56f06371a8f2d600fe6126c90e140fd92a2ff26d01e8c2de3f2060adbeca56e0d25d8bc23746c2b2ddbc3397c79d80b60f588a1ddac9dbc102d1c",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 1,
+    "rate": 1300,
+    "reason": "Backing is high at 179% and xNEAR leverage is 2.26, so I raised the saver rate to 13% to attract more bxUSD. Fees stay at 2x as NEAR volatility is moderate."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 86cb14dc92… and c57eaeef56… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}
