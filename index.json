@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794379976621,
+  "id": "05c3b66b63f3469a9a729a1f5f6df627",
+  "file": "2026-11-11/05c3b66b63f3469a9a729a1f5f6df627.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 170.8% with leverage 2.41x, so bxUSD stays scarce and the 20% rate keeps attracting savers. NEAR swung 8.4% in a day with 7.1% volatility, so 3x fees remain to pay savers for the risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794377922741,
   "id": "145f2069dbe54ea2b64ba3347049ea5b",
   "file": "2026-11-11/145f2069dbe54ea2b64ba3347049ea5b.json",
