@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794434592822,
+  "id": "gen-1794434576-dwqASofZVIfTotqSiDIJ",
+  "file": "2026-11-11/gen-1794434576-dwqASofZVIfTotqSiDIJ.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No changes. Backing is 174.5% and volatility is 6.1%, so conditions are steady.",
+  "level": 0,
+  "rate": 1900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794432514159,
   "id": "840b6fd638ab4879879af14fbc36c9a8",
   "file": "2026-11-11/840b6fd638ab4879879af14fbc36c9a8.json",
