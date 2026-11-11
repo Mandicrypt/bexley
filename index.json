@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794388529803,
+  "id": "7c86ff5abdb146fb822c8c9c3b452b3f",
+  "file": "2026-11-11/7c86ff5abdb146fb822c8c9c3b452b3f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing at 169.8% means bxUSD is scarce, so the 20% savings rate stays to attract savers. NEAR volatility of 7.14% keeps fees at 3x to pay the Stability Pool for the extra risk.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794386484184,
   "id": "29442ee5e0be49a68eaa1029312f66de",
   "file": "2026-11-11/29442ee5e0be49a68eaa1029312f66de.json",
