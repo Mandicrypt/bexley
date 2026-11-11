@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794361063895,
+  "id": "92df0dde5277488393c40701c4f567da",
+  "file": "2026-11-11/92df0dde5277488393c40701c4f567da.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 174.9% and leverage 2.34, so we keep the 20% saver rate to attract more bxUSD and add leverage. NEAR volatility of 7% over 24h justifies keeping 2x fees.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794358997793,
   "id": "39c63147c07b4005804aa0fe7042f48e",
   "file": "2026-11-11/39c63147c07b4005804aa0fe7042f48e.json",
