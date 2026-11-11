@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794419003967,
+  "id": "gen-1794418995-tcJyXFqxrMat3MMk8hMz",
+  "file": "2026-11-11/gen-1794418995-tcJyXFqxrMat3MMk8hMz.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is high at 179% and xNEAR is lightly levered at 2.27x, so we raised the saver rate to 9% to bring in more bxUSD. Fees stay at 2x as NEAR moved 7% today.",
+  "level": 1,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794416495913,
   "id": "gen-1794416487-z77tJUD8L8lV2WivHz6C",
   "file": "2026-11-11/gen-1794416487-z77tJUD8L8lV2WivHz6C.json",
