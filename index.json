@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794484824214,
+  "id": "8638435ab9754746bb3a07a24d77d0c4",
+  "file": "2026-11-12/8638435ab9754746bb3a07a24d77d0c4.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 8.19% with an 11.48% range, so 2x fees stay to pay savers for the extra churn. Backing is a healthy 163.2% and 93% of bxUSD already earns, so the 7% rate stays unchanged.",
+  "level": 1,
+  "rate": 700,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794482762382,
   "id": "b58ea1aa0d4643b29ff7e9518629de02",
   "file": "2026-11-12/b58ea1aa0d4643b29ff7e9518629de02.json",
