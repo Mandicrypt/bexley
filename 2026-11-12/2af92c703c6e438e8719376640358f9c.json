@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794499484317,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "2af92c703c6e438e8719376640358f9c",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.4075,\\n  \\\"near_change_24h_pct\\\": -9.58,\\n  \\\"near_volatility_24h_pct\\\": 3.59,\\n  \\\"near_range_24h_pct\\\": 14.12,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 161.6,\\n  \\\"xnear_leverage\\\": 2.62,\\n  \\\"pool_value_usd\\\": 1806.25,\\n  \\\"bxusd_supply\\\": 1117.85,\\n  \\\"stability_pool_usd\\\": 1044.71,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 400\\n}\"}]}",
+  "response": "{\"id\":\"2af92c703c6e438e8719376640358f9c\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 400, \\\"reason\\\": \\\"NEAR fell 9.58% with a 14.12% range, so 3x fees stay to pay savers for the extra risk. Backing is a healthy 161.6%, so the 4% savings rate stays unchanged.\\\", \\\"status\\\": \\\"The pool is healthy at 161.6% backing even after NEAR's 9.58% drop.\\\"}\",\"reasoning_content\":\"Let me analyze the data:\\n\\n- NEAR price: $3.4075, down 9.58% in 24h\\n- Volatility 24h: 3.59%\\n- Range 24h: 14.12% — that's a big range, indicating volatility\\n- Pool mode: Healthy, backing 161.6% (above 150%, so Healthy)\\n- xNEAR leverage: 2.62\\n- Current fee level: 2 (3x fees)\\n- Current savings rate: 400 bps (4%)\\n\\nRules:\\n- Outside Healthy mode, rate must be 0. We're Healthy, so rate can be nonzero.\\n- Change rate by at most 400 bps per decision.\\n- Prefer stability: don't change for small moves.\\n\\nMarket: NEAR dropped 9.58% in 24h with a 14.12% range. That's significant volatility. Fee level 2 (3x) seems justified given the volatility. Should I keep fee level 2? The volatility is high (range 14.12%), so keeping fees at 3x makes sense to slow churn and pay the Stability Pool.\\n\\nSavings rate: backing is 161.6%, above 150% Healthy threshold. Leverage 2.62. Backing is comfortably above 150%. When backing is high (bxUSD scarce relative to pool), a higher rate attracts savers. But backing at 161.6% is moderately above 150% — not extremely high. Current rate is 4%.\\n\\nHmm, backing 161.6% means pool value / bxUSD = 1806.25 / 1117.85 = 1.6157, yes 161.6%.\\n\\nLeverage = pool / (pool - bxUSD) = 1806.25 / 688.40 = 2.62. Correct.\\n\\nWith backing at 161.6%, xNEAR is fairly well levered already (2.62x). The guidance: when backing near 150%, lower rate eases cost. At 161.6%, we're above 150% but not hugely. A modest rate could be fine.\\n\\nGiven NEAR dropped sharply, there's risk backing falls. Keeping the rate steady at 400 bps seems prudent — prefer stability. The drop of 9.58% is significant though. But backing is still healthy at 161.6%.\\n\\nShould I raise the rate to attract savers? Backing 161.6% is decent. The rule says prefer stability, only change when evidence is clear. The market moved a lot (-9.58%, range 14.12%), but backing remains healthy. I'd keep rate at 400 bps.\\n\\nFee level: volatility is high (range 14.12%), so keep fee level 2. Actually, volatility_24h_pct is 3.59 — is that high? For NEAR, 3.59% daily volatility is elevated. The range of 14.12% is definitely wide. Keep fees at 2.\\n\\nSo: no changes. fee_level: 2, savings_rate_bps: 400.\\n\\nReason: explain no change — volatility keeps fees at 3x, backing healthy at 161.6% keeps rate at 4%.\\n\\nStatus: pool healthy despite NEAR drop.\\n\\nReason must cite numbers, under 240 chars, rates as percents.\\n\\nReason: \\\"NEAR fell 9.58% with a 14.12% range, so 3x fees stay to pay savers for risk. Backing is a healthy 161.6%, so the 4% savings rate stays put.\\\"\\n\\nThat's under 240 chars. Good.\\n\\nStatus: \\\"The pool is healthy at 161.6% backing even after NEAR's 9.58% drop.\\\"\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794499458,\"usage\":{\"prompt_tokens\":627,\"total_tokens\":1525,\"completion_tokens\":898,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":796,\"completion_tokens_details\":{\"reasoning_tokens\":796}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:8bfa2a2423dbe69fef102625bae0b582772953dbb045bd9a831339dbfcd598b8:36a4c91cbcd54ffbaf05a0cd3d0798add753b0662c9bb84f3039849c71f066a7",
+    "signature": "0x5c5ca46b255799fa54beb8133756b89827ff9d127ebc960f27883ec09cb6c50e0757274fa79649fd7de8f30bfb5bf82afdbe5c9f3ecfd25c53878d4073e89f301b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "ec1db90e989a11301d4167c44fff192b0cd2106304eeb2962c016ace635fb97a",
+    "fetched_at": 1794489273059,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "e8e533d1ddbb67560ce6f2ba5c8658c6abca0f1f783920762c27b6acd3658a6f"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 400,
+    "reason": "NEAR fell 9.58% with a 14.12% range, so 3x fees stay to pay savers for the extra risk. Backing is a healthy 161.6%, so the 4% savings rate stays unchanged."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 8bfa2a2423… and 36a4c91cbc… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}

@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794499484317,
+  "id": "2af92c703c6e438e8719376640358f9c",
+  "file": "2026-11-12/2af92c703c6e438e8719376640358f9c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 9.58% with a 14.12% range, so 3x fees stay to pay savers for the extra risk. Backing is a healthy 161.6%, so the 4% savings rate stays unchanged.",
+  "level": 2,
+  "rate": 400,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794497436997,
   "id": "abcb4b6c68a14b7ba68812f7a02623dd",
   "file": "2026-11-12/abcb4b6c68a14b7ba68812f7a02623dd.json",
