@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794464539931,
+  "id": "048481fe0e904873bd8c724a7a50b054",
+  "file": "2026-11-12/048481fe0e904873bd8c724a7a50b054.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 167.3%, safely above the 150% healthy line, and NEAR volatility of 6.22% is not high enough to justify raising fees or the 7% savings rate.",
+  "level": 0,
+  "rate": 700,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794462500051,
   "id": "3331ad301e5b49f0934aacb2c92cd1e1",
   "file": "2026-11-12/3331ad301e5b49f0934aacb2c92cd1e1.json",
