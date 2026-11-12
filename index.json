@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794477439464,
+  "id": "489f90e738e6457faf83b7b70caa7568",
+  "file": "2026-11-12/489f90e738e6457faf83b7b70caa7568.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165.3%, well above the 150% healthy line, so we raised savings from 9% to 13% to attract more bxUSD and give xNEAR more leverage. Fees stay at 2x since 6.24% volatility is moderate.",
+  "level": 1,
+  "rate": 1300,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794475378998,
   "id": "gen-1794475364-20fOuvpITVexa2JEceMC",
   "file": "2026-11-12/gen-1794475364-20fOuvpITVexa2JEceMC.json",
