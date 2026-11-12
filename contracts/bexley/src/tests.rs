@@ -572,6 +572,25 @@ fn quick_posts_move_at_most_1_percent() {
 }
 
 #[test]
+#[should_panic(expected = "Too soon")]
+fn posts_less_than_a_minute_apart_are_refused() {
+    let mut c = setup();
+    ctx("feeder.test", START + 30 * NS, 0);
+    c.set_price(U128(P * 99 / 100));
+}
+
+#[test]
+fn spamming_posts_cannot_crash_the_price_fast() {
+    // One post a minute (the fastest allowed) for 10 minutes: at most ~1% each.
+    let mut c = setup();
+    for i in 1..=10u64 {
+        ctx("feeder.test", START + i * 60 * NS, 0);
+        c.set_price(U128(1));
+    }
+    assert!(c.price >= P * 90 / 100, "fell more than 10% in 10 minutes");
+}
+
+#[test]
 fn small_moves_pass_unchanged() {
     let mut c = setup();
     ctx("feeder.test", START + 5 * 60 * NS, 0);

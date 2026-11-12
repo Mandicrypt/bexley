@@ -354,6 +354,10 @@ impl Contract {
             "Only the price feeder can post prices"
         );
         require!(price.0 > 0, "Price must be above zero");
+        require!(
+            self.price == 0 || now().saturating_sub(self.price_at) >= PRICE_MIN_GAP_NS,
+            "Too soon: price posts must be at least 1 minute apart"
+        );
         self.accrue();
         let accepted = capped_price(self.price, self.price_at, price.0, now());
         if accepted != price.0 {
@@ -550,6 +554,9 @@ pub const PRICE_STEP_BPS: u128 = 500;
 pub const PRICE_STEP_FAST_BPS: u128 = 100;
 /// Posts closer together than this get the smaller step.
 pub const PRICE_FAST_GAP_NS: u64 = 4 * 60 * 1_000_000_000;
+/// Posts closer together than this are refused, so many small posts in a row
+/// can't add up to a fast crash: the price moves at most about 1% a minute.
+pub const PRICE_MIN_GAP_NS: u64 = 60 * 1_000_000_000;
 
 /// The price a post is allowed to set (see `set_price`).
 pub fn capped_price(old: u128, old_at: u64, new: u128, at: u64) -> u128 {

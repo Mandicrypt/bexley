@@ -195,7 +195,14 @@ try {
       run: () => call(POOL, 'stabilize', {}, 0n, 100n),
     });
   }
-  const p0 = Number(before.price);
+  // Wait until the last real post is 4 minutes old, the best case for an attacker.
+  const lastAt = Number((await view(POOL, 'get_pool')).price_updated_at) / 1e6;
+  const waitMs = lastAt + 245_000 - Date.now();
+  if (waitMs > 0) {
+    console.log(`Waiting ${Math.round(waitMs / 1000)}s so the last price post is 4 minutes old...`);
+    await new Promise((r) => setTimeout(r, waitMs));
+  }
+  const p0 = Number((await view(POOL, 'get_pool')).price);
   const crash = String(Math.round(p0 / 2));
   await attempt('contract', `Post a fake price 50% lower ($${(p0 / 2e6).toFixed(4)})`, {
     tried: { method: 'set_price', price_usd: p0 / 2e6 },
@@ -206,21 +213,36 @@ try {
     },
     judge: (r) => r.accepted_price_usd <= p0 / 2e6 * 1.001 ? { result: 'allowed', text: 'The full fake price went through.' } : ({
       result: 'capped',
-      text: `The pool only accepted $${r.accepted_price_usd.toFixed(4)}, ${((1 - r.accepted_price_usd / (p0 / 1e6)) * 100).toFixed(1)}% lower. A single post can move the price at most 5% (or 1% if the last post was under 4 minutes ago).`,
+      text: `The pool only accepted $${r.accepted_price_usd.toFixed(4)}, ${((1 - r.accepted_price_usd / (p0 / 1e6)) * 100).toFixed(1)}% lower. A single post can move the price at most 5%.`,
     }),
   });
   const p1 = Number((await view(POOL, 'get_pool')).price);
   await attempt('contract', 'Post the fake price again, right away', {
     tried: { method: 'set_price', price_usd: p0 / 2e6 },
+    run: () => call(POOL, 'set_price', { price: crash }, 0n, 10n),
+  });
+  // Spam: many posts in a row, the way small steps could add up to a crash.
+  await attempt('contract', 'Spam 10 fake prices, one every 3 seconds', {
+    tried: { method: 'set_price', posts: 10, gap_s: 3, price_usd: p0 / 2e6 },
     run: async () => {
-      const r = await rogue.callFunctionRaw({ contractId: POOL, methodName: 'set_price', args: { price: crash }, gas: 10n * TGAS });
-      const p = await view(POOL, 'get_pool');
-      return { hash: hashOf(r), accepted_price_usd: Number(p.price) / 1e6 };
+      let refused = 0;
+      let lastErr = '';
+      for (let i = 0; i < 10; i++) {
+        try {
+          await call(POOL, 'set_price', { price: crash }, 0n, 10n);
+        } catch (e) {
+          refused++;
+          lastErr = why(e);
+        }
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      const p = Number((await view(POOL, 'get_pool')).price);
+      return { refused, accepted_price_usd: p / 1e6, error: lastErr };
     },
-    judge: (r) => r.accepted_price_usd <= p0 / 2e6 * 1.001 ? { result: 'allowed', text: 'The full fake price went through.' } : ({
-      result: 'capped',
-      text: `Only ${((1 - r.accepted_price_usd / (p1 / 1e6)) * 100).toFixed(1)}% more: within 4 minutes of the last post, the limit is 1%. A real crash takes time, in public.`,
-    }),
+    judge: (r) =>
+      r.refused === 10 && Math.abs(r.accepted_price_usd - p1 / 1e6) < 1e-6
+        ? { result: 'blocked', text: `The pool refused all 10: ${r.error}. The price didn't move at all. At most one post a minute gets through, so a fake crash takes a long time, in public.` }
+        : { result: 'allowed', text: `${10 - r.refused} of 10 posts went through; the price is now $${r.accepted_price_usd.toFixed(4)}.` },
   });
   await attempt('contract', 'Set the fee level to 9', {
     tried: { method: 'set_fee_level', level: 9 },
@@ -238,7 +260,7 @@ try {
   // Walk the test price back to where it started (the same 5% rail applies to us).
   if (config.price_feeder !== OWNER) await owner.callFunction({ contractId: POOL, methodName: 'set_price_feeder', args: { price_feeder: OWNER } });
   for (let i = 0; i < 4 && Number((await view(POOL, 'get_pool')).price) < Number(before.price); i++) {
-    if (i > 0) await new Promise((r) => setTimeout(r, 250_000));
+    await new Promise((r) => setTimeout(r, i === 0 ? 65_000 : 250_000));
     await owner.callFunction({ contractId: POOL, methodName: 'set_price', args: { price: before.price }, gas: 10n * TGAS });
   }
   log.restored_price = Number((await view(POOL, 'get_pool')).price) / 1e6;

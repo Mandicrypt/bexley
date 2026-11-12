@@ -27,11 +27,24 @@ jobs:
         with:
           ref: proofs
           path: proofs-repo
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-near
+        run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install
-        run: cd agent && npm ci
+        run: |
+          (cd scripts && npm ci)
+          (cd agent && npm ci)
+      - name: Put the latest pool code on the test pool (keeps its data)
+        run: |
+          (cd contracts/bexley && cargo near build non-reproducible-wasm)
+          PW=$(find target/near -name 'bexley.wasm' | head -1)
+          node scripts/deploy.mjs crash "$PW" -
       - name: Run the attacks
         working-directory: agent
         env:
