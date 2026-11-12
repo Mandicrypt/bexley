@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794451473819,
+  "id": "170c3503474a4812bee64758494ef40d",
+  "file": "2026-11-12/170c3503474a4812bee64758494ef40d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 169.2%, so savers are still needed, and the 20% rate is already at the maximum we can offer. NEAR volatility of 6.35% is moderate, so normal fees stay.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794449407382,
   "id": "2602be2e328c40e189ebf4043251975e",
   "file": "2026-11-12/2602be2e328c40e189ebf4043251975e.json",
