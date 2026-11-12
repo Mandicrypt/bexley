@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794514354407,
+  "id": "96d785749803417897c51291fe4c1f79",
+  "file": "2026-11-12/96d785749803417897c51291fe4c1f79.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 8.3% with an 11.8% range, so 3x fees stay to pay savers for the risk. Backing is 162.4% and leverage only 2.6x, so bxUSD is scarce; raising the rate to 8% to attract savers.",
+  "level": 2,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794512296813,
   "id": "gen-1794512284-b0hpmHpfwS3jIgiZGwJj",
   "file": "2026-11-12/gen-1794512284-b0hpmHpfwS3jIgiZGwJj.json",
