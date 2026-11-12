@@ -130,6 +130,16 @@ log.keys = keys.keys.map((k) => ({ public_key: k.public_key, permission: k.acces
 if (log.keys.some((k) => k.permission === 'FullAccess')) throw new Error(`${ROGUE} has a full-access key; stopping.`);
 
 let config = await view(POOL, 'get_config');
+// The test pool may sit idle for days. Refresh its price (same value) so every
+// attack below is judged by its own rule, not by "price out of date".
+{
+  const p = await view(POOL, 'get_pool');
+  if (!p.price_fresh) {
+    if (config.price_feeder !== OWNER) await owner.callFunction({ contractId: POOL, methodName: 'set_price_feeder', args: { price_feeder: OWNER } });
+    await owner.callFunction({ contractId: POOL, methodName: 'set_price', args: { price: p.price }, gas: 10n * TGAS });
+    config = await view(POOL, 'get_config');
+  }
+}
 if (config.guardian !== ROGUE) await owner.callFunction({ contractId: POOL, methodName: 'set_guardian', args: { guardian: ROGUE } });
 if (config.price_feeder !== ROGUE) await owner.callFunction({ contractId: POOL, methodName: 'set_price_feeder', args: { price_feeder: ROGUE } });
 const rogue = new Account(ROGUE, provider, key.privateKey);
