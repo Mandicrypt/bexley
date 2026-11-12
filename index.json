@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794456404707,
+  "id": "gen-1794456387-zYdX6cUFfrDg5IVtcGKV",
+  "file": "2026-11-12/gen-1794456387-zYdX6cUFfrDg5IVtcGKV.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 168.7%, so bxUSD is scarce. Raised savings from 5% to 9% to attract more bxUSD; fees stay at normal as volatility is moderate.",
+  "level": 0,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794453532351,
   "id": "gen-1794453518-wnCx1eJQz48P9PkE1z38",
   "file": "2026-11-12/gen-1794453518-wnCx1eJQz48P9PkE1z38.json",
