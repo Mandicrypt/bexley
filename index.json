@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794516452183,
+  "id": "gen-1794516434-URm8csCcbU3zsni0vpTU",
+  "file": "2026-11-12/gen-1794516434-URm8csCcbU3zsni0vpTU.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 7.22% in 24h and range was 11.8%, so fees stay at 3x. Backing is 163.2% with 2.58x leverage, so I raised the savings rate from 8% to 12% to attract more bxUSD.",
+  "level": 2,
+  "rate": 1200,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794514354407,
   "id": "96d785749803417897c51291fe4c1f79",
   "file": "2026-11-12/96d785749803417897c51291fe4c1f79.json",
