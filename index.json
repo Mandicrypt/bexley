@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794473284583,
+  "id": "f54b7485711e4addbf6aabf6b78bc0d7",
+  "file": "2026-11-12/f54b7485711e4addbf6aabf6b78bc0d7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 4.14% with a 10.21% daily range, so fees go to 2x to slow churn and pay savers for the risk. Backing is 164.1%, so bxUSD is scarce; raising the rate from 5% to 9% attracts savers and gives xNEAR more leverage.",
+  "level": 1,
+  "rate": 900,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794470827080,
   "id": "gen-1794470809-oqcvYtw9eu6kbSLMHhnH",
   "file": "2026-11-12/gen-1794470809-oqcvYtw9eu6kbSLMHhnH.json",
