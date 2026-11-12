@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794507784546,
+  "id": "gen-1794507773-ixAcNDuKmlzZYQwSZBvZ",
+  "file": "2026-11-12/gen-1794507773-ixAcNDuKmlzZYQwSZBvZ.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 9% and swung 12% in a day, so fees stay at the highest level. Backing is a healthy 161%, so the savings rate stays at 4%.",
+  "level": 2,
+  "rate": 400,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794505695463,
   "id": "6e6423a6de1b4ada9b6bdb908a3c3c7d",
   "file": "2026-11-12/6e6423a6de1b4ada9b6bdb908a3c3c7d.json",
