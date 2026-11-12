@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794505695463,
+  "id": "6e6423a6de1b4ada9b6bdb908a3c3c7d",
+  "file": "2026-11-12/6e6423a6de1b4ada9b6bdb908a3c3c7d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 10.3% with a 14.12% daily range, so 3x fees stay to slow churn and pay savers for the risk. Backing is a healthy 160.5%, so the 4% savings rate stays unchanged.",
+  "level": 2,
+  "rate": 400,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794503633048,
   "id": "gen-1794503617-jCp20dwjnTueWOjdJLZQ",
   "file": "2026-11-12/gen-1794503617-jCp20dwjnTueWOjdJLZQ.json",
