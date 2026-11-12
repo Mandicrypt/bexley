@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794453532351,
+  "id": "gen-1794453518-wnCx1eJQz48P9PkE1z38",
+  "file": "2026-11-12/gen-1794453518-wnCx1eJQz48P9PkE1z38.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 168.6% and leverage is 2.46, so bxUSD is still scarce and the 20% savings rate stays to attract savers. NEAR's 24h move of -4.11% and 6.35% volatility are not enough to change fees.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794451473819,
   "id": "170c3503474a4812bee64758494ef40d",
   "file": "2026-11-12/170c3503474a4812bee64758494ef40d.json",
