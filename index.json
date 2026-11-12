@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794493345270,
+  "id": "4b63c7783b2f436a99a2040138caafde",
+  "file": "2026-11-12/4b63c7783b2f436a99a2040138caafde.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 10.6% in a day and backing is 159.2%, close to the 150% line, so I cut savings from 7% to 4% to ease xNEAR's cost. Fees stay at 3x while volatility is high.",
+  "level": 2,
+  "rate": 400,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794491312312,
   "id": "7194b153626447a789db0395672e79af",
   "file": "2026-11-12/7194b153626447a789db0395672e79af.json",
