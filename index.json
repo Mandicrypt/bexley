@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794470827080,
+  "id": "gen-1794470809-oqcvYtw9eu6kbSLMHhnH",
+  "file": "2026-11-12/gen-1794470809-oqcvYtw9eu6kbSLMHhnH.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change. NEAR moved -3% with 6.11% volatility, which is moderate, and backing is strong at 166.3%.",
+  "level": 0,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794468738539,
   "id": "14ed0b52879f4eccb05f7750b8ba9d51",
   "file": "2026-11-12/14ed0b52879f4eccb05f7750b8ba9d51.json",
