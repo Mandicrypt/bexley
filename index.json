@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794486861830,
+  "id": "1ce5d79e387646ad8a5ca816df1f604c",
+  "file": "2026-11-12/1ce5d79e387646ad8a5ca816df1f604c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: NEAR fell 7.88% with an 11.48% range, so 2x fees stay to pay the Stability Pool for the risk. Backing is a comfortable 162.5% and the 7% saver rate still fits, so we hold.",
+  "level": 1,
+  "rate": 700,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794484824214,
   "id": "8638435ab9754746bb3a07a24d77d0c4",
   "file": "2026-11-12/8638435ab9754746bb3a07a24d77d0c4.json",
