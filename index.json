@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794503633048,
+  "id": "gen-1794503617-jCp20dwjnTueWOjdJLZQ",
+  "file": "2026-11-12/gen-1794503617-jCp20dwjnTueWOjdJLZQ.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 10.3% in 24 hours and volatility is still high, so fees stay at 3x. Backing is healthy at 160.5%, so the saver rate stays at 4%.",
+  "level": 2,
+  "rate": 400,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794501542324,
   "id": "7aecdb81d1d8436ca834acd7a9c05d89",
   "file": "2026-11-12/7aecdb81d1d8436ca834acd7a9c05d89.json",
