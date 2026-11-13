@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794560897563,
+  "id": "d7edf237fb264746b3f0590c4c3f0956",
+  "file": "2026-11-13/d7edf237fb264746b3f0590c4c3f0956.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 166.7%, well above the 150% healthy line, so we raised the savings rate from 5% to 8% to attract savers and give xNEAR more leverage. Fees stay normal since volatility is moderate at 6.6%.",
+  "level": 0,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794558020736,
   "id": "bffdd731e7e84a31a677f3d213d542ef",
   "file": "2026-11-13/bffdd731e7e84a31a677f3d213d542ef.json",
