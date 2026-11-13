@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794534764784,
+  "id": "0cd71b39a781453d86405e94c19a7d50",
+  "file": "2026-11-13/0cd71b39a781453d86405e94c19a7d50.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 4.15% with an 8.5% range, so fees double to slow churn and pay savers for the risk. Backing is 162.5%, well above the 150% healthy line, so raising savings to 8% should attract bxUSD and add leverage.",
+  "level": 1,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794532321451,
   "id": "53213471a9234c908bc0b22bfe5ce3a6",
   "file": "2026-11-13/53213471a9234c908bc0b22bfe5ce3a6.json",
