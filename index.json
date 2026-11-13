@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794569609962,
+  "id": "gen-1794569597-Aweafp6CZcg18FmKv5Q9",
+  "file": "2026-11-13/gen-1794569597-Aweafp6CZcg18FmKv5Q9.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 167% and leverage is low at 2.49, so we raised the saver rate to 13% to attract more bxUSD.",
+  "level": 0,
+  "rate": 1300,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794567526604,
   "id": "gen-1794567516-bpUmA2LbjxDida4anVyH",
   "file": "2026-11-13/gen-1794567516-bpUmA2LbjxDida4anVyH.json",
