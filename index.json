@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794589289955,
+  "id": "502d1bf627ab473c90429569e2dd738a",
+  "file": "2026-11-13/502d1bf627ab473c90429569e2dd738a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR swung 11.5% in a day, so 2x fees stay to pay savers for the extra risk. Backing is 165%, well above the 150% target, so the 20% rate stays to attract savers and give xNEAR more leverage.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794587232518,
   "id": "gen-1794587222-2vnEBdSOPmDdc80m3ZA0",
   "file": "2026-11-13/gen-1794587222-2vnEBdSOPmDdc80m3ZA0.json",
