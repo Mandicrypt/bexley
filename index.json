@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794574770144,
+  "id": "6da331feec8b48f69bdca1c0b97a5505",
+  "file": "2026-11-13/6da331feec8b48f69bdca1c0b97a5505.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 167.5%, well above the 150% healthy line, so bxUSD is scarce and xNEAR leverage is 2.48. Raising savings to 20% should attract savers and lift leverage. Volatility of 6.58% does not justify higher fees.",
+  "level": 0,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794572734186,
   "id": "f4b2d183b5f64293a0287bfbcd06ffb7",
   "file": "2026-11-13/f4b2d183b5f64293a0287bfbcd06ffb7.json",
