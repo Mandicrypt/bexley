@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794563400974,
+  "id": "01e8d55bf0a24046b066354cc34b6bb4",
+  "file": "2026-11-13/01e8d55bf0a24046b066354cc34b6bb4.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165.5%, well above the 150% healthy line, so raising the savings rate from 5% to 7% should attract savers and add bxUSD. Fees stay normal since NEAR is flat with moderate volatility.",
+  "level": 0,
+  "rate": 700,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794560897563,
   "id": "d7edf237fb264746b3f0590c4c3f0956",
   "file": "2026-11-13/d7edf237fb264746b3f0590c4c3f0956.json",
