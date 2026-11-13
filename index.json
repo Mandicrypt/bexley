@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794593472790,
+  "id": "2a4e6d2236104c29a16b51b12afc1b17",
+  "file": "2026-11-13/2a4e6d2236104c29a16b51b12afc1b17.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Savings rate stays at 20%, the maximum, because backing at 165.2% shows more savers are still needed to add bxUSD. Fees stay at 2x with NEAR volatility at 6.8% in 24h.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794591377143,
   "id": "gen-1794591368-k3JRp0nAgTEboPXDa8Bj",
   "file": "2026-11-13/gen-1794591368-k3JRp0nAgTEboPXDa8Bj.json",
