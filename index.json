@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794567526604,
+  "id": "gen-1794567516-bpUmA2LbjxDida4anVyH",
+  "file": "2026-11-13/gen-1794567516-bpUmA2LbjxDida4anVyH.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR is calm and backing is strong at 166%, so fees stay normal and the saver rate stays at 9%.",
+  "level": 0,
+  "rate": 900,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794565450005,
   "id": "48519f7178624ad9a70087d07a369766",
   "file": "2026-11-13/48519f7178624ad9a70087d07a369766.json",
