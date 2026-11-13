@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794532321451,
+  "id": "53213471a9234c908bc0b22bfe5ce3a6",
+  "file": "2026-11-13/53213471a9234c908bc0b22bfe5ce3a6.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 162.6%, safely above the 150% healthy line, so a modest raise from 5% to 7% can attract savers and lift xNEAR leverage from 2.6 toward 3. Fees stay normal since volatility is moderate.",
+  "level": 0,
+  "rate": 700,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794530724482,
   "id": "c78ecb57b8494d92a9da07b1249409ca",
   "file": "2026-11-13/c78ecb57b8494d92a9da07b1249409ca.json",
