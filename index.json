@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794555990413,
+  "id": "3d8cd6c7b26947e7ab3241e70a2017ee",
+  "file": "2026-11-13/3d8cd6c7b26947e7ab3241e70a2017ee.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 166.7%, well above the 150% healthy line, so bxUSD is scarce and xNEAR sits at only 2.5x. I raised the savings rate from 14% to 18% to attract savers. Fees stay normal since NEAR moved just 0.37%.",
+  "level": 0,
+  "rate": 1800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794553940303,
   "id": "7a88e34c7bc94d28aacceb08ac304a14",
   "file": "2026-11-13/7a88e34c7bc94d28aacceb08ac304a14.json",
