@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794541728073,
+  "id": "gen-1794541714-T8Wkyue3NgVWQWJBAeQI",
+  "file": "2026-11-13/gen-1794541714-T8Wkyue3NgVWQWJBAeQI.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 5.2% and moved over a 7.3% range, so fees rise to 3x to steady the pool. The 5% savings rate stays because backing is healthy at 159%.",
+  "level": 2,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794538836433,
   "id": "70f7515198e2484e817046a95ee880a3",
   "file": "2026-11-13/70f7515198e2484e817046a95ee880a3.json",
