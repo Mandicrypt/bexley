@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794587232518,
+  "id": "gen-1794587222-2vnEBdSOPmDdc80m3ZA0",
+  "file": "2026-11-13/gen-1794587222-2vnEBdSOPmDdc80m3ZA0.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: backing is 165% and leverage 2.53, so the 20% savings rate stays to attract bxUSD. Fees stay at 2x because 24h volatility is 6.9% and range 11.5%.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794585154177,
   "id": "22725d787cde42869a650ef252771d7f",
   "file": "2026-11-13/22725d787cde42869a650ef252771d7f.json",
