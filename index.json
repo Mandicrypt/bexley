@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794578942870,
+  "id": "gen-1794578929-VjafjdWW7XsGkXINrQGt",
+  "file": "2026-11-13/gen-1794578929-VjafjdWW7XsGkXINrQGt.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR swung 11.5% today with 6.7% volatility, so fees double to steady the pool. Savings rate stays at 20% to attract bxUSD while backing is high at 169%.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794576855628,
   "id": "9f028614d3954010b950b9ca25ad0f2e",
   "file": "2026-11-13/9f028614d3954010b950b9ca25ad0f2e.json",
