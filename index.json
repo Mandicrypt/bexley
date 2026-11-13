@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794591377143,
+  "id": "gen-1794591368-k3JRp0nAgTEboPXDa8Bj",
+  "file": "2026-11-13/gen-1794591368-k3JRp0nAgTEboPXDa8Bj.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Volatility at 6.9% is moderate, so fees stay at 2x. Backing is 165%, so the savings rate stays at 20%.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794589289955,
   "id": "502d1bf627ab473c90429569e2dd738a",
   "file": "2026-11-13/502d1bf627ab473c90429569e2dd738a.json",
