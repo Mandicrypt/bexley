@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794548294100,
+  "id": "gen-1794548280-X2fudEg51iZ4OHdZGyjY",
+  "file": "2026-11-13/gen-1794548280-X2fudEg51iZ4OHdZGyjY.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Holding settings steady: NEAR's 6.1% drop is within normal range and backing is healthy at 157.3%, so no change to fees or the 5% savings rate.",
+  "level": 1,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794544627006,
   "id": "gen-1794544613-opDxklxBqsRTe11bsETM",
   "file": "2026-11-13/gen-1794544613-opDxklxBqsRTe11bsETM.json",
