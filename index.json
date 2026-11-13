@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794610144657,
+  "id": "52cd7eba69eb4e52bc432aa643267d48",
+  "file": "2026-11-13/52cd7eba69eb4e52bc432aa643267d48.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165%, well above the 150% Healthy line, so the 20% rate stays to attract savers and add leverage. Volatility near 7% with an 11.5% daily range keeps fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794608049792,
   "id": "7f5d9cca3abb4c529fa1914755bc006e",
   "file": "2026-11-13/7f5d9cca3abb4c529fa1914755bc006e.json",
