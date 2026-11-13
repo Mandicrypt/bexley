@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794536787587,
+  "id": "959e7c970b0d4419a8f3bf98c6fa5d8a",
+  "file": "2026-11-13/959e7c970b0d4419a8f3bf98c6fa5d8a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 162.7% and leverage 2.59x, both comfortable, so the 8% savings rate stays. NEAR's 8.5% daily range keeps fees at 2x to pay savers for the extra risk.",
+  "level": 1,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794534764784,
   "id": "0cd71b39a781453d86405e94c19a7d50",
   "file": "2026-11-13/0cd71b39a781453d86405e94c19a7d50.json",
