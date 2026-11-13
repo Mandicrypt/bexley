@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794571672685,
+  "id": "4deee0b6232745adacd973dc1a687e79",
+  "file": "2026-11-13/4deee0b6232745adacd973dc1a687e79.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 168.8%, well above the 150% healthy line, so we raised the savings rate from 13% to 16% to attract savers and add bxUSD. Fees stay normal since volatility is moderate at 6.55%.",
+  "level": 0,
+  "rate": 1600,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794569609962,
   "id": "gen-1794569597-Aweafp6CZcg18FmKv5Q9",
   "file": "2026-11-13/gen-1794569597-Aweafp6CZcg18FmKv5Q9.json",
