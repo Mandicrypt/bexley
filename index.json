@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794551131605,
+  "id": "1e8697cbed9b476db9cf0395f1652371",
+  "file": "2026-11-13/1e8697cbed9b476db9cf0395f1652371.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 162.5%, well above the 150% healthy line, so bxUSD is scarce. I raised savings from 5% to 8% to attract savers and give xNEAR more leverage. Fees stay normal since volatility is a moderate 5.88%.",
+  "level": 0,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794548294100,
   "id": "gen-1794548280-X2fudEg51iZ4OHdZGyjY",
   "file": "2026-11-13/gen-1794548280-X2fudEg51iZ4OHdZGyjY.json",
