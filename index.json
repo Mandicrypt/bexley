@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794652422871,
+  "id": "2c004081330c4fd8a6a00c13fc5f8bb2",
+  "file": "2026-11-14/2c004081330c4fd8a6a00c13fc5f8bb2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. Backing at 165% means bxUSD is scarce, so the rate stays at the 20% maximum to attract savers. Fees stay at 2x since NEAR fell 4.3% with a 10% daily range.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794650349270,
   "id": "bf71930c0c364848b009eec73a4264b8",
   "file": "2026-11-14/bf71930c0c364848b009eec73a4264b8.json",
