@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794691790597,
+  "id": "gen-1794691784-TqRVAi5QxnprGogQkFxF",
+  "file": "2026-11-14/gen-1794691784-TqRVAi5QxnprGogQkFxF.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 16% and moved in a 23% range, so we raised fees to 3x to protect the pool. Savings rate stays at 20% to keep attracting bxUSD while backing is a healthy 165%.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794689673454,
   "id": "51eb0066a8f141a3b34a73a49893e964",
   "file": "2026-11-14/51eb0066a8f141a3b34a73a49893e964.json",

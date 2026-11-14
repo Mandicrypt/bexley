@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1794691790597,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1794691784-TqRVAi5QxnprGogQkFxF",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.4841,\\n  \\\"near_change_24h_pct\\\": -16.01,\\n  \\\"near_volatility_24h_pct\\\": 6.55,\\n  \\\"near_range_24h_pct\\\": 23.43,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 165.2,\\n  \\\"xnear_leverage\\\": 2.53,\\n  \\\"pool_value_usd\\\": 1846.85,\\n  \\\"bxusd_supply\\\": 1118.15,\\n  \\\"stability_pool_usd\\\": 1045.01,\\n  \\\"current_fee_level\\\": 1,\\n  \\\"current_savings_rate_bps\\\": 2000\\n}\"}]}",
+  "response": "{\"id\":\"gen-1794691784-TqRVAi5QxnprGogQkFxF\",\"object\":\"chat.completion\",\"created\":1794691784,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 2000, \\\"reason\\\": \\\"NEAR fell 16% and moved in a 23% range, so we raised fees to 3x to protect the pool. Savings rate stays at 20% to keep attracting bxUSD while backing is a healthy 165%.\\\", \\\"status\\\": \\\"Pool is healthy at 165% backing with xNEAR leverage at 2.53.\\\"}\",\"reasoning\":\"We need decide fee_level and savings_rate_bps.\\n\\nData: NEAR price $3.4841, 24h change -16.01%, volatility 24h 6.55%, range 23.43%. So big drop, high volatility/range. That suggests raise fees to level 2 (3x) to slow churn and pay stability pool. Current fee_level is 1. We can change to 2.\\n\\nBacking 165.2%, Healthy mode. xNEAR leverage 2.53. Current savings_rate 2000 bps = 20%, which is max. Rule: change by at most 400 bps. Backing high (165.2%) — xNEAR barely levered? Actually leverage = pool value / (pool value - bxUSD). Backing 165.2% means equity = 65.2% of bxUSD. Leverage 2.53. That's fairly high leverage? Wait leverage = pool value / equity = 1846.85 / (1846.85 - 1118.15) = 1846.85 / 728.7 = 2.53. Backing 165.2% means equity/bxusd = 65.2%. Leverage 2.53. The rule says: when bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers. But here backing is 165.2% which is healthy but not extremely high? Actually Healthy is 150%+. 165% is above 150. Higher rate attracts savers. But current rate is already at max 2000 bps (20%). Can't go higher. Should we lower? The rule: \\\"When xNEAR is already well levered (backing near 150%) a lower rate eases its cost\\\". Backing is 165.2%, not near 150%. So maybe keep rate high? But we can't increase. The current rate is max. So keep at 2000? But the instruction says prefer stability, only change when evidence clear. Given high volatility, we might want to keep savings rate high to attract savers? But it's already max. So no change possible upward. Could lower to reduce cost? But backing is high, so no need to lower. So likely keep savings_rate at 2000.\\n\\nBut wait: \\\"Outside Healthy mode it must be 0.\\\" We are in Healthy, so 2000 is allowed.\\n\\nFee level: current is 1. Given NEAR dropped 16% and volatility 6.55%, range 23.43%, that's high. Raise to 2. So fee_level 2.\\n\\nReason: \\\"NEAR fell 16% and moved in a 23% range, so we raised fees to 3x to protect the pool. Savings rate stays at 20% to keep attracting bxUSD while backing is a healthy 165%.\\\"\\n\\nStatus: \\\"Pool is healthy at 165% backing with xNEAR leverage at 2.53.\\\"\\n\\nCheck character limits: reason under 240 chars. Count: \\\"NEAR fell 16% and moved in a 23% range, so we raised fees to 3x to protect the pool. Savings rate stays at 20% to keep attracting bxUSD while backing is a healthy 165%.\\\" That's about 160 chars. Good.\\n\\nFee level change from 1 to 2. Rate unchanged. So JSON.\\n\\nMake sure no jargon? \\\"3x fees\\\" is fine. \\\"bxUSD\\\" is a token name. \\\"backing\\\" is fine.\\n\\nStatus: \\\"Pool is healthy at 165% backing with xNEAR leverage at 2.53.\\\" That's fine.\\n\\nOutput JSON only.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":677,\"completion_tokens\":875,\"total_tokens\":1552,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":778,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "926912ea671970f6e58e73ecce31974a3ee8b59a8eceedd90375017e97c19b87:49a9f4406ce567893c76022e50659220b2b0235fb559a3ba50ea016f3f833149",
+    "signature": "0x946a207aa99d2ad34b98ce8cb3e9e98885206207935534998e935f9a85abf58e4381c3c606adf583eee543617c0ec8bcb7d6b9f775d88d9004cd3bc2cd40c6f51c",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 2,
+    "rate": 2000,
+    "reason": "NEAR fell 16% and moved in a 23% range, so we raised fees to 3x to protect the pool. Savings rate stays at 20% to keep attracting bxUSD while backing is a healthy 165%."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 926912ea67… and 49a9f4406c… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}
