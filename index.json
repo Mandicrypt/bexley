@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794693872756,
+  "id": "b39af201c0184996ac94bd7fde921ebf",
+  "file": "2026-11-14/b39af201c0184996ac94bd7fde921ebf.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 15% with a 22% daily range, so 2x fees stay to pay savers for the extra churn. Backing is 165.2%, well above the 150% healthy line, so the 20% rate stays to attract savers and lift leverage.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794691790597,
   "id": "gen-1794691784-TqRVAi5QxnprGogQkFxF",
   "file": "2026-11-14/gen-1794691784-TqRVAi5QxnprGogQkFxF.json",
