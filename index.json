@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794642023954,
+  "id": "gen-1794642018-5I0SoK9DYEEYUXX43CwF",
+  "file": "2026-11-14/gen-1794642018-5I0SoK9DYEEYUXX43CwF.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 4.9% and is moving within a normal range, so fees stay at the current level. Backing is a strong 165%, and the saver rate is already at its 20% cap, so both settings stay put.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794639504510,
   "id": "acdc194e9c474fcc9a98ef336a3e67af",
   "file": "2026-11-14/acdc194e9c474fcc9a98ef336a3e67af.json",
