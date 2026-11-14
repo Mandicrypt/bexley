@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794629091714,
+  "id": "b9244ecf40464f858d880f8d4ea8d416",
+  "file": "2026-11-14/b9244ecf40464f858d880f8d4ea8d416.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165.2% and the pool is Healthy, so the 20% saver rate stays to attract deposits and lift leverage. Volatility near 6.9% with an 11.5% range keeps fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794627007458,
   "id": "ca9f08cf7450470c8a11145b3ea25a37",
   "file": "2026-11-14/ca9f08cf7450470c8a11145b3ea25a37.json",
