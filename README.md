@@ -232,6 +232,10 @@ node scripts/smoke.mjs           # live check of the real site and chain (after 
 
 GitHub Actions → **Deploy to NEAR testnet** → Run workflow. It needs the owner's key in the `NEAR_PRIVATE_KEY` repository secret.
 
+## Coming soon: deposit any token through NEAR Intents
+
+Bexley's pool takes NEAR today. Next, you will be able to start with SOL, ETH, BTC, USDC and other tokens from other chains: NEAR Intents swaps them into NEAR and deposits straight into Bexley, with no bridging. The live quotes already work in the app (Trade page, **Deposit from another chain**); deposits open with the mainnet beta, because NEAR Intents has no testnet.
+
 ## Built with
 
 - **Contracts:** Rust, [near-sdk](https://github.com/near/near-sdk-rs) and near-contract-standards (NEP-141 tokens), [uint](https://crates.io/crates/uint).
