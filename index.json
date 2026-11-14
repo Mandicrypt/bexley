@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794620768432,
+  "id": "5ad6a4b9e2b3439d86f6fa9ed49fde5f",
+  "file": "2026-11-14/5ad6a4b9e2b3439d86f6fa9ed49fde5f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: NEAR volatility of 7.25% justifies keeping fees at 2x, and backing at 165.2% is healthy with the savings rate already at the 20% maximum to attract savers.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794618684889,
   "id": "04ab5debcd02486aaeb562676500e512",
   "file": "2026-11-14/04ab5debcd02486aaeb562676500e512.json",
