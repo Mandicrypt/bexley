@@ -236,6 +236,8 @@ GitHub Actions → **Deploy to NEAR testnet** → Run workflow. It needs the own
 
 Bexley's pool takes NEAR today. Next, you will be able to start with SOL, ETH, BTC, USDC and other tokens from other chains: NEAR Intents swaps them into NEAR and deposits straight into Bexley, with no bridging. The live quotes already work in the app (Trade page, **Deposit from another chain**); deposits open with the mainnet beta, because NEAR Intents has no testnet.
 
+**Coming next: more leveraged tokens.** xBTC, xETH and xSOL: each a new Bexley pool with no liquidations, filled from any chain through NEAR Intents. These are plans, not built yet.
+
 ## Built with
 
 - **Contracts:** Rust, [near-sdk](https://github.com/near/near-sdk-rs) and near-contract-standards (NEP-141 tokens), [uint](https://crates.io/crates/uint).
