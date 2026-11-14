@@ -1,0 +1,25 @@
+name: Top up the Guardian
+
+# Sends testnet NEAR from the owner to the Guardian so it can keep paying gas.
+on:
+  workflow_dispatch:
+    inputs:
+      amount:
+        description: NEAR to send
+        default: '5'
+
+jobs:
+  topup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEAR_ACCOUNT_ID: bexley.testnet
+      NEAR_PRIVATE_KEY: ${{ secrets.NEAR_PRIVATE_KEY }}
+      NEAR_RPC_URL: https://test.rpc.fastnear.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cd scripts && npm ci
+      - run: node scripts/topup.mjs guardian.bexley.testnet "${{ inputs.amount }}"
