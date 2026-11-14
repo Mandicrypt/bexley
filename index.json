@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794668777234,
+  "id": "1331a8d7936c4b53ad05e04aa970eb1c",
+  "file": "2026-11-14/1331a8d7936c4b53ad05e04aa970eb1c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: NEAR fell 8.68% with an 11.13% daily range, so 2x fees still match the volatility, and backing at 165.2% keeps the 20% saver rate well supported.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794666674143,
   "id": "088d165a493a488bb5f9ab71bc0c2c34",
   "file": "2026-11-14/088d165a493a488bb5f9ab71bc0c2c34.json",
