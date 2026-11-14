@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794695954402,
+  "id": "1d6f4f46eefb4be991114e2abb868ce5",
+  "file": "2026-11-14/1d6f4f46eefb4be991114e2abb868ce5.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 14% in a day with a 22% range, so fees rise to 3x to slow churn and pay savers for the risk. Backing is a healthy 165%, so the 20% savings rate stays to keep attracting bxUSD.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794693872756,
   "id": "b39af201c0184996ac94bd7fde921ebf",
   "file": "2026-11-14/b39af201c0184996ac94bd7fde921ebf.json",
