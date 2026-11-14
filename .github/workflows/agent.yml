@@ -32,9 +32,10 @@ permissions:
 env:
   NEAR_ACCOUNT_ID: bexley.testnet
   APP_ID: pool.bexley.testnet
-  AGENT_ID: guardian.bexley.testnet
+  AGENT_ID: guardian2.bexley.testnet
+  AGENT_FUND_NEAR: "1.2"
   POOL_ID: pool.bexley.testnet
-  GUARDIAN_ID: guardian.bexley.testnet
+  GUARDIAN_ID: guardian2.bexley.testnet
 
 jobs:
   keepalive:
