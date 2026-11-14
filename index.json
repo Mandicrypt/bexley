@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794662506980,
+  "id": "9aabe723c4434fe9a814b76c5a7b8d14",
+  "file": "2026-11-14/9aabe723c4434fe9a814b76c5a7b8d14.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 6.14% with a 10.15% daily range, so fees rise to 3x to pay savers for the extra risk. The rate stays at 20%, its maximum, since backing of 165.2% shows bxUSD is scarce.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794660416443,
   "id": "c82145218faa4bc2aad3c85cf55312e7",
   "file": "2026-11-14/c82145218faa4bc2aad3c85cf55312e7.json",
