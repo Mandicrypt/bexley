@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794624936221,
+  "id": "3dfeb3d43a184525a6355111720730f4",
+  "file": "2026-11-14/3dfeb3d43a184525a6355111720730f4.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165.2%, well above the 150% healthy line, and the 20% savings rate is already at its cap, so it stays. Volatility of 7.2% over 24h keeps fees at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794622858266,
   "id": "9e5e5b3523c2473291462e7a5a82a2a8",
   "file": "2026-11-14/9e5e5b3523c2473291462e7a5a82a2a8.json",
