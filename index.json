@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794637430771,
+  "id": "098cb26ad0f54f7b9fcb178adf52c33a",
+  "file": "2026-11-14/098cb26ad0f54f7b9fcb178adf52c33a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 165.2%, well above the 150% healthy line, so the 20% saver rate stays to draw more bxUSD. Volatility near 4.8% is unchanged, so fees stay at 2x.",
+  "level": 1,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794635338842,
   "id": "df125510888d43ea968abf17f2503ed1",
   "file": "2026-11-14/df125510888d43ea968abf17f2503ed1.json",
