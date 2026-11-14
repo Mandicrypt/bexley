@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794689673454,
+  "id": "51eb0066a8f141a3b34a73a49893e964",
+  "file": "2026-11-14/51eb0066a8f141a3b34a73a49893e964.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 15% in a day with a 20% price range, so fees rise to 3x to slow churn and pay savers for the risk. The 20% savings rate stays, keeping savers in the pool while backing is a healthy 165%.",
+  "level": 2,
+  "rate": 2000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794687584980,
   "id": "f403be3306dc4891bdc9172405fd279c",
   "file": "2026-11-14/f403be3306dc4891bdc9172405fd279c.json",
