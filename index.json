@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794786224105,
+  "id": "42838aa7988549bbb06963c167d85425",
+  "file": "2026-11-15/42838aa7988549bbb06963c167d85425.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR is still volatile (up 8.35% with 7.26% swings), so 3x fees stay to pay savers for the risk. Backing is 152.5%, barely above Healthy, so the savings rate stays 0% to avoid pulling backing down.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794784170967,
   "id": "1e0ee0dd506a446aa88235bda7e5570f",
   "file": "2026-11-15/1e0ee0dd506a446aa88235bda7e5570f.json",
