@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794748275062,
+  "id": "f1aafd034bd44381b517d0ce87f25178",
+  "file": "2026-11-15/f1aafd034bd44381b517d0ce87f25178.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR swung 17% in a day and fell 4%, so 3x fees stay on to pay savers for the risk. Backing is 150.9%, barely Healthy, so the savings rate stays 0% to avoid adding bxUSD and pushing backing under 150%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794746243398,
   "id": "29a2bd23d4f94be0baf60a1b693c027e",
   "file": "2026-11-15/29a2bd23d4f94be0baf60a1b693c027e.json",
