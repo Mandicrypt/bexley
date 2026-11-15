@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794784170967,
+  "id": "1e0ee0dd506a446aa88235bda7e5570f",
+  "file": "2026-11-15/1e0ee0dd506a446aa88235bda7e5570f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR moved 9.31% with 7.28% volatility and an 11.11% range, so 3x fees stay. Backing is 151.7%, just above the 150% healthy line, so the 0% saver rate stays to avoid pulling backing down.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794782431084,
   "id": "ad5ae542b7c94cfe8a4e82ecadb60442",
   "file": "2026-11-15/ad5ae542b7c94cfe8a4e82ecadb60442.json",
