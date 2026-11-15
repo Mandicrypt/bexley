@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794776269809,
+  "id": "54651759e7024557ac82cc3c2514d49f",
+  "file": "2026-11-15/54651759e7024557ac82cc3c2514d49f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing at 151.6% sits just above the 150% healthy line, so the 0% saver rate stays to avoid adding leverage. NEAR volatility of 7.6% and an 8% daily move keep fees at 3x.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794774206517,
   "id": "905289eb3d8a477b985184bf12cadc60",
   "file": "2026-11-15/905289eb3d8a477b985184bf12cadc60.json",
