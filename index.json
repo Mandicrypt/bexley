@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794772415982,
+  "id": "64ba864bed394a19a86716ba07a2915c",
+  "file": "2026-11-15/64ba864bed394a19a86716ba07a2915c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.5%, right at the Healthy edge, and NEAR swung 12.42% in a day. We keep 3x fees to pay savers for that risk and hold the rate at 0% so new bxUSD does not push backing under 150%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794770345753,
   "id": "8bc306e32c2243a782b9ada3148b349b",
   "file": "2026-11-15/8bc306e32c2243a782b9ada3148b349b.json",
