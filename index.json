@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794778307329,
+  "id": "bace94d307f747c8b56c83f68dcd3093",
+  "file": "2026-11-15/bace94d307f747c8b56c83f68dcd3093.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is at 150% with 3x leverage, so xNEAR is fully levered and a 0% rate keeps backing from slipping. NEAR's 12.42% daily range justifies keeping fees at 3x to pay savers for the risk.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794776269809,
   "id": "54651759e7024557ac82cc3c2514d49f",
   "file": "2026-11-15/54651759e7024557ac82cc3c2514d49f.json",
