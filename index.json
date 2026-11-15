@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794742160505,
+  "id": "81d7de593f9f4522990faa48cbd23dfe",
+  "file": "2026-11-15/81d7de593f9f4522990faa48cbd23dfe.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 4.25% with 9.67% volatility, so 3x fees stay on. Backing is 150.8%, right at the Healthy edge, so the savings rate stays 0% to avoid adding bxUSD and lowering backing further.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794741134481,
   "id": "bcddb4a740e946d0a4d0375ad3507884",
   "file": "2026-11-15/bcddb4a740e946d0a4d0375ad3507884.json",
