@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794763140462,
+  "id": "bd992eff8d604b819f8d51300482e542",
+  "file": "2026-11-15/bd992eff8d604b819f8d51300482e542.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 148.3%, still in Caution, so the saver rate stays 0%. NEAR swung 12.42% in a day with 8.82% volatility, so 3x fees stay to pay savers for the risk.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794761426213,
   "id": "69f7f7e4b6fd4d5b8953ad8170d72358",
   "file": "2026-11-15/69f7f7e4b6fd4d5b8953ad8170d72358.json",
