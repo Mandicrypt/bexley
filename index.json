@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794744201904,
+  "id": "6e92f0cd1cf1408195cf5e75d68012f7",
+  "file": "2026-11-15/6e92f0cd1cf1408195cf5e75d68012f7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. NEAR volatility is high at 9.7% with a 17.2% range, so 3x fees stay to protect savers. Backing is 150.2%, right at the Healthy edge with 2.99x leverage, so the savings rate stays 0% to avoid adding bxUSD and lowering backing.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794742160505,
   "id": "81d7de593f9f4522990faa48cbd23dfe",
   "file": "2026-11-15/81d7de593f9f4522990faa48cbd23dfe.json",
