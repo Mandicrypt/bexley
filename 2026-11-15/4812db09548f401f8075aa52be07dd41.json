@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794736014891,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "4812db09548f401f8075aa52be07dd41",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.1759,\\n  \\\"near_change_24h_pct\\\": -4.38,\\n  \\\"near_volatility_24h_pct\\\": 9.69,\\n  \\\"near_range_24h_pct\\\": 17.45,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 150.4,\\n  \\\"xnear_leverage\\\": 2.98,\\n  \\\"pool_value_usd\\\": 1683.45,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"4812db09548f401f8075aa52be07dd41\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Holding steady. NEAR volatility of 9.69% and a 17.45% daily range justify keeping fees at 3x, and backing at 150.4% sits right at the Healthy edge, so the savings rate stays 0% to avoid pushing it lower.\\\", \\\"status\\\": \\\"Pool is Healthy at 150.4% backing while NEAR falls and volatility stays high.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- NEAR price: $3.1759, down 4.38% in 24h\\n- Volatility 24h: 9.69%, range 17.45% — that's quite volatile\\n- Pool mode: Healthy (backing 150.4%)\\n- Backing: 150.4% — right at the edge of Healthy (150%+)\\n- xNEAR leverage: 2.98 — very high leverage\\n- Current fee level: 2 (3x fees)\\n- Current savings rate: 0 bps\\n\\nRules:\\n- Outside Healthy mode, savings rate must be 0. We're in Healthy mode (barely, 150.4% ≥ 150%), so rate can be non-zero.\\n- Change rate by at most 400 bps from current rate (0), so max 400 bps.\\n- Prefer stability: don't change settings for small moves.\\n\\nConsiderations:\\n- Backing is 150.4%, right at the Healthy boundary. If backing dips below 130%, we go to Stabilize. At 150.4%, we're barely Healthy. Raising the savings rate attracts savers, which adds bxUSD and increases leverage for xNEAR — but that pushes backing DOWN. Wait, let me think.\\n\\nBacking = pool value / bxUSD supply. If savers add bxUSD (mint more bxUSD), bxUSD supply increases, backing decreases. So attracting savers lowers backing. With backing at 150.4%, already at the edge of Healthy, raising the rate would push backing down toward Caution territory.\\n\\nThe guidance says: \\\"When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down.\\\"\\n\\nBacking is 150.4%, xNEAR leverage 2.98 — extremely levered. So we should keep the rate low. Current rate is 0. Keep at 0.\\n\\nFees: volatility is 9.69% over 24h with a 17.45% range and NEAR down 4.38%. That's elevated volatility. Current fee level is 2 (3x). Should we keep at 2? The volatility seems high — 9.69% volatility and 17.45% range in 24h is significant. Keep fee level at 2 to pay the Stability Pool for extra risk and slow churn.\\n\\nActually, is 9.69% volatility high enough for 3x fees? The rule says raise fees when NEAR is volatile. With -4.38% daily move and 17.45% range, yes, that's volatile. Keep at 2. Changing down to 1 would be premature given the market is clearly choppy.\\n\\nSo decision: fee_level 2, savings_rate_bps 0, no changes.\\n\\nReason: no change, so explain why we're holding. Cite numbers: backing 150.4% near the Healthy edge, volatility 9.69% justifies 3x fees. Rate stays 0 because backing is at the top of Healthy and raising it would push backing down.\\n\\nReason must be under 240 characters, at most two short sentences, rates as percents.\\n\\nSomething like: \\\"Holding steady: NEAR volatility of 9.69% keeps fees at 3x, and backing at 150.4% is right at the Healthy edge, so the savings rate stays 0% to avoid pushing it lower.\\\"\\n\\nStatus: \\\"Pool is Healthy at 150.4% backing with high leverage and elevated NEAR volatility.\\\"\\n\\nLet me check character count for reason: \\\"Holding steady: NEAR volatility of 9.69% keeps fees at 3x, and backing at 150.4% is right at the Healthy edge, so the savings rate stays 0% to avoid pushing it lower.\\\" — roughly 165 characters. Good.\\n\\nStatus: \\\"Pool is Healthy with 150.4% backing while NEAR drops and volatility stays high.\\\"\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794735992,\"usage\":{\"prompt_tokens\":626,\"total_tokens\":1569,\"completion_tokens\":943,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":838,\"completion_tokens_details\":{\"reasoning_tokens\":838}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:7ee719e8664c33f02fc99a386521505921440bbad2abdd7425c8efc85e1b8a44:f13ea67ad57b3c1c1adb2043ecbce261e27046ad91fab6255a454822dd625909",
+    "signature": "0x74b84fa70ce96c29027e9250db1895cbe22f5d8591d2bb03cdbec432072a56d87d22b42f992400e403fbce45d77df15c11457dfd476bb7f7c25d057d23995d221c",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "8a7a7ef11b0b1dd84f77f68f2c29859f52f9f8492a66b721340f932ea70e04a4",
+    "fetched_at": 1794733564826,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "34add3f969e9fbed6a04957e0682c434ef5a52ce137b8517c9d3907bd022eb23"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "Holding steady. NEAR volatility of 9.69% and a 17.45% daily range justify keeping fees at 3x, and backing at 150.4% sits right at the Healthy edge, so the savings rate stays 0% to avoid pushing it lower."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 7ee719e866… and f13ea67ad5… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}

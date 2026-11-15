@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794736014891,
+  "id": "4812db09548f401f8075aa52be07dd41",
+  "file": "2026-11-15/4812db09548f401f8075aa52be07dd41.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady. NEAR volatility of 9.69% and a 17.45% daily range justify keeping fees at 3x, and backing at 150.4% sits right at the Healthy edge, so the savings rate stays 0% to avoid pushing it lower.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794735305779,
   "id": "f737b24060de494aa387ba30cbff92ae",
   "file": "2026-11-15/f737b24060de494aa387ba30cbff92ae.json",
