@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794733601925,
+  "id": "835193d507a14ef9959b55e4c4daa081",
+  "file": "2026-11-15/835193d507a14ef9959b55e4c4daa081.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR is still choppy with 9.66% volatility, so 3x fees stay. Backing is 150.3%, right at the Healthy edge, so the savings rate stays 0% to avoid pulling backing lower.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794731539944,
   "id": "b787e589673749a7925dccb6052b403a",
   "file": "2026-11-15/b787e589673749a7925dccb6052b403a.json",
