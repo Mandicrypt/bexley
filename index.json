@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794774206517,
+  "id": "905289eb3d8a477b985184bf12cadc60",
+  "file": "2026-11-15/905289eb3d8a477b985184bf12cadc60.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing sits at 150.2%, right at the healthy limit, so raising the 0% savings rate could tip it below 150%. NEAR's 12.42% daily range keeps fees at 3x.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794773474439,
   "id": "f3cc2660398e42e2b2d3ec09ed588129",
   "file": "2026-11-15/f3cc2660398e42e2b2d3ec09ed588129.json",
