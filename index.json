@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794761426213,
+  "id": "69f7f7e4b6fd4d5b8953ad8170d72358",
+  "file": "2026-11-15/69f7f7e4b6fd4d5b8953ad8170d72358.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 148.6%, just under the 150% Healthy line, and NEAR still moved 12.66% in a day, so 3x fees stay to support the pool. The rate stays 0 in Caution mode.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794759416932,
   "id": "67a2ebba6ff64933922d9a967cef6f1a",
   "file": "2026-11-15/67a2ebba6ff64933922d9a967cef6f1a.json",
