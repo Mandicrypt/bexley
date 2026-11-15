@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794770345753,
+  "id": "8bc306e32c2243a782b9ada3148b349b",
+  "file": "2026-11-15/8bc306e32c2243a782b9ada3148b349b.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR's 12.42% daily range keeps fees at 3x to pay savers for the risk. Backing is 149.6%, just under the 150% Healthy line, so the savings rate stays 0% in Caution mode.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794769977624,
   "id": "1a73b495e8a2497ea13e2b551ace44b3",
   "file": "2026-11-15/1a73b495e8a2497ea13e2b551ace44b3.json",
