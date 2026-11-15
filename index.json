@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794757405962,
+  "id": "e094b11831bb4fc58eefdbd7fdebf396",
+  "file": "2026-11-15/e094b11831bb4fc58eefdbd7fdebf396.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR moved in a 13.26% range over 24h, so 3x fees stay on to pay savers for the extra risk. Backing is 148.4%, just under Healthy, so the savings rate stays 0% until the pool recovers.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794755393092,
   "id": "781c7d0dd9034273a940fa276ea5b08a",
   "file": "2026-11-15/781c7d0dd9034273a940fa276ea5b08a.json",
