@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794737064473,
+  "id": "d87ec4063a254261929872f4c0a950b3",
+  "file": "2026-11-15/d87ec4063a254261929872f4c0a950b3.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: NEAR fell 5.45% with 9.65% volatility, so 3x fees stay to slow churn and pay savers for the risk. Backing is 150.3%, right at the Healthy edge, so the 0% rate avoids adding bxUSD and pushing backing down.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794736374495,
   "id": "497351b9f0664b05a003076b32b41239",
   "file": "2026-11-15/497351b9f0664b05a003076b32b41239.json",
