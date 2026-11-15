@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794753363218,
+  "id": "f78c1df9788e43888d0a68bdee04db57",
+  "file": "2026-11-15/f78c1df9788e43888d0a68bdee04db57.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR dropped 3.4% with 9.4% volatility, so 3x fees stay to slow churn and pay savers for the risk. Backing is 148.2%, just under the 150% Healthy line, so the savings rate stays 0% until the pool recovers.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794751329338,
   "id": "fcb5d0b3606c4f72bda59211926bdb6e",
   "file": "2026-11-15/fcb5d0b3606c4f72bda59211926bdb6e.json",
