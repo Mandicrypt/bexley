@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794791055691,
+  "id": "92b4df718a1a480f8a698a7ab4623990",
+  "file": "2026-11-16/92b4df718a1a480f8a698a7ab4623990.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 149.6%, just under the 150% Healthy line, so the savings rate must stay 0. With 7.1% volatility and an 11.1% price range, 3x fees remain warranted.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794790367605,
   "id": "988d3765e4b840b6b05f35a0fb428106",
   "file": "2026-11-16/988d3765e4b840b6b05f35a0fb428106.json",
