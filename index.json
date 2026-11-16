@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794822168950,
+  "id": "a0b4f5ab9cb848bfb693c1f6d4f25554",
+  "file": "2026-11-16/a0b4f5ab9cb848bfb693c1f6d4f25554.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.9%, right at the Healthy edge, so I cut the savings rate from 5% to 2% to ease xNEAR's cost and avoid pulling backing below 150%. Markets are calm, so fees stay normal.",
+  "level": 0,
+  "rate": 200,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794820011591,
   "id": "a8132ce435a34d80918390f4e32f60fc",
   "file": "2026-11-16/a8132ce435a34d80918390f4e32f60fc.json",
