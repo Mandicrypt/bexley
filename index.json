@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794825613470,
+  "id": "3d4716098fe6463b8810adb28306ac58",
+  "file": "2026-11-16/3d4716098fe6463b8810adb28306ac58.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 150.7%, right at the Healthy edge, and xNEAR already carries 2.97x leverage. With calm markets (4.4% volatility), keeping the savings rate at 0% avoids pushing backing lower.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794823566211,
   "id": "81f69d12c1c24a66b69e25d4eda71516",
   "file": "2026-11-16/81f69d12c1c24a66b69e25d4eda71516.json",
