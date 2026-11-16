@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794805994170,
+  "id": "6080d8e758fd409dbc5f340dd0362cb2",
+  "file": "2026-11-16/6080d8e758fd409dbc5f340dd0362cb2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady. Backing is 150.1%, right at the healthy edge, so keeping the rate at 0% stops new savers from pushing it under 150%. NEAR still swings about 5% a day, so 3x fees stay.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794805605298,
   "id": "0cccaef8017a40e6b98f1d05c975c244",
   "file": "2026-11-16/0cccaef8017a40e6b98f1d05c975c244.json",
