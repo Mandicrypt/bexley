@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794823566211,
+  "id": "81f69d12c1c24a66b69e25d4eda71516",
+  "file": "2026-11-16/81f69d12c1c24a66b69e25d4eda71516.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.8%, right at the 150% line, with xNEAR levered 2.97x. I cut the saver rate from 2% to 0% to ease xNEAR's cost and hold backing above 150%. Fees stay normal since NEAR moved just 0.39%.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794822168950,
   "id": "a0b4f5ab9cb848bfb693c1f6d4f25554",
   "file": "2026-11-16/a0b4f5ab9cb848bfb693c1f6d4f25554.json",

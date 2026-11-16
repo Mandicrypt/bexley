@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794823566211,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "81f69d12c1c24a66b69e25d4eda71516",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.1844,\\n  \\\"near_change_24h_pct\\\": 0.39,\\n  \\\"near_volatility_24h_pct\\\": 4.43,\\n  \\\"near_range_24h_pct\\\": 4.49,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 150.8,\\n  \\\"xnear_leverage\\\": 2.97,\\n  \\\"pool_value_usd\\\": 1687.99,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 200\\n}\"}]}",
+  "response": "{\"id\":\"81f69d12c1c24a66b69e25d4eda71516\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 0, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Backing is 150.8%, right at the 150% line, with xNEAR levered 2.97x. I cut the saver rate from 2% to 0% to ease xNEAR's cost and hold backing above 150%. Fees stay normal since NEAR moved just 0.39%.\\\", \\\"status\\\": \\\"Pool is healthy with backing just above 150% and calm markets.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- Pool mode: Healthy (backing 150.8%, just above 150%)\\n- Backing: 150.8% — right at the top of Healthy mode\\n- xNEAR leverage: 2.97 — very high leverage, near max\\n- Current savings rate: 200 bps (2%)\\n- Current fee level: 0\\n- NEAR volatility 24h: 4.43%, range 4.49% — moderate volatility\\n- NEAR price change: +0.39% — calm\\n\\nRules:\\n- When backing near 150% (xNEAR well levered), lower rate eases its cost and avoids pushing backing down.\\n- Outside Healthy mode rate must be 0 — we're in Healthy, so rate can be nonzero.\\n- Change rate by at most 400 bps per decision.\\n- Prefer stability: don't change for small moves.\\n\\nBacking is 150.8%, right at the Healthy threshold edge. xNEAR leverage 2.97 is very high. The guidance says when backing near 150%, a lower rate eases cost and avoids pushing backing down. Current rate is 200 bps (2%). Lowering it would help keep backing at/above 150%.\\n\\nShould I lower? The rate is already low at 2%. Lowering to 0 would ease cost. But \\\"prefer stability: do not change settings for small moves.\\\" Backing at 150.8% is barely above threshold — that's a clear signal that leverage is maxed and any drift could push into Caution. Lowering the rate by, say, 200 bps to 0 would ease xNEAR's cost.\\n\\nActually, let me think. The savings rate is the price of leverage. When backing is near 150%, xNEAR is already well levered, so a lower rate eases its cost and avoids pushing backing down. Backing 150.8% is essentially at the boundary. So lowering the rate makes sense — from 200 to 0 (a 200 bps change, within the 400 limit).\\n\\nAlternatively, keep at 200 since it's already low and prefer stability. But the evidence seems clear: backing is right at the 150% edge, leverage 2.97 near max. Lowering to 0 reduces the drag on backing.\\n\\nFees: volatility 4.43% over 24h — moderate. Current fee level 0. Is that volatile enough to raise fees? 4.43% daily volatility for NEAR is fairly normal/moderate. Prefer stability — keep fees at 0. The price change is +0.39%, calm. I'll keep fee_level 0.\\n\\nDecision:\\n- fee_level: 0 (keep)\\n- savings_rate_bps: 0 (lower from 200, change of 200 bps, allowed)\\n- Reason: backing at 150.8% right at the Healthy edge with 2.97x leverage, so cutting the saver rate to 0% eases xNEAR's cost and helps hold backing above 150%.\\n- Status: pool healthy with backing just above 150%.\\n\\nReason must cite numbers, rates as percents. Under 240 chars.\\n\\n\\\"Backing is 150.8%, right at the 150% line with 2.97x leverage. I cut the saver rate from 2% to 0% to ease xNEAR's cost and keep backing above 150%. Fees stay normal as NEAR moved only 0.39%.\\\"\\n\\nThat's under 240 chars. Let me count roughly: ~200 chars. Good.\\n\\nStatus: \\\"Pool is healthy with backing just above 150% and calm markets.\\\"\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794823555,\"usage\":{\"prompt_tokens\":626,\"total_tokens\":1506,\"completion_tokens\":880,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":771,\"completion_tokens_details\":{\"reasoning_tokens\":771}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:d7f80e4cfbd925c4f851a39d1467bee2ada8b52579f20f75b019fbe557424482:7807576a6f211b6088364cace815ea816c727c3379853f3ad348b087a71a2417",
+    "signature": "0xa08e6be1b29b4a9770946f8c061cb13a975c6745959907097c224e6926b17b7342dd7b4916058d95ee08b0b512ad0401f36e64b0f8ebb73556c658f61e4c43871b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "35326b4ade7418f4404a9d0ce6d3f67b8e35bfefc146d2b1633acc1df545160c",
+    "fetched_at": 1794823555554,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "e5c2fadb627ee84d599cc06a203bd861059ec976d99d08e0b64c21f20f6a3b47"
+  },
+  "decision": {
+    "level": 0,
+    "rate": 0,
+    "reason": "Backing is 150.8%, right at the 150% line, with xNEAR levered 2.97x. I cut the saver rate from 2% to 0% to ease xNEAR's cost and hold backing above 150%. Fees stay normal since NEAR moved just 0.39%."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints d7f80e4cfb… and 7807576a6f… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
