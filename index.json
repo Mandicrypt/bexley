@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794864649470,
+  "id": "af6135e73ce14360941c5f5f170d1be3",
+  "file": "2026-11-16/af6135e73ce14360941c5f5f170d1be3.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady. Backing is 150.5%, right at the healthy edge, so a higher savings rate could add bxUSD and push it below 150%. Volatility of 5.69% is not high enough to raise fees.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794862909093,
   "id": "ea296b04df3746929f31998f3e1368cb",
   "file": "2026-11-16/ea296b04df3746929f31998f3e1368cb.json",
