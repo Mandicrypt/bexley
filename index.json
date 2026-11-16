@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794852619419,
+  "id": "a841d92357f94b82b06b743a61351859",
+  "file": "2026-11-16/a841d92357f94b82b06b743a61351859.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes: backing is 148.8%, just under the 150% healthy line, and NEAR moved only 0.32% with moderate 5.79% volatility. The savings rate stays 0% because the pool is in Caution mode.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794850568615,
   "id": "2b29d0b3ee9740f7bf18df126f752163",
   "file": "2026-11-16/2b29d0b3ee9740f7bf18df126f752163.json",
