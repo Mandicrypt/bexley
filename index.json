@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794804188314,
+  "id": "gen-1794804179-28vYCNWGW9m7rp6LtwwL",
+  "file": "2026-11-16/gen-1794804179-28vYCNWGW9m7rp6LtwwL.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 150.4%, close to the 150% healthy floor, so fees stay high to protect the pool and the savings rate stays at 0% to avoid adding more bxUSD.",
+  "level": 2,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794802074149,
   "id": "0eaf9027807e4116b7c1b856ba8514c2",
   "file": "2026-11-16/0eaf9027807e4116b7c1b856ba8514c2.json",
