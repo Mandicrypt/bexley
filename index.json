@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794793101638,
+  "id": "992142da8456433bbc37650a3a8bbba0",
+  "file": "2026-11-16/992142da8456433bbc37650a3a8bbba0.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. NEAR moved 6% with an 11% daily range, so 3x fees stay to pay savers for the risk. Caution mode requires a 0% savings rate until backing clears 150%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794791055691,
   "id": "92b4df718a1a480f8a698a7ab4623990",
   "file": "2026-11-16/92b4df718a1a480f8a698a7ab4623990.json",
