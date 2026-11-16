@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794843720901,
+  "id": "1ec7b3da10ce4fbd9e226b533f338f3f",
+  "file": "2026-11-16/1ec7b3da10ce4fbd9e226b533f338f3f.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 147.8%, close to Healthy, and NEAR moved only -0.35% with 5.68% volatility, not enough to justify changes. The savings rate stays 0% until the pool returns to Healthy mode.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794841672021,
   "id": "07f4db8d18474eb2a86349429abecb3c",
   "file": "2026-11-16/07f4db8d18474eb2a86349429abecb3c.json",
