@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794807701574,
+  "id": "a43dfc81d868411a9a36dd0f4976b8e2",
+  "file": "2026-11-16/a43dfc81d868411a9a36dd0f4976b8e2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 149.9%, just under Healthy, and NEAR volatility of 4.59% keeps fees at 3x to protect savers. The savings rate stays 0% until the pool is Healthy again.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794805994170,
   "id": "6080d8e758fd409dbc5f340dd0362cb2",
   "file": "2026-11-16/6080d8e758fd409dbc5f340dd0362cb2.json",
