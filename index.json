@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794788277945,
+  "id": "f28c9646c94d46359e9c7f1f862a6453",
+  "file": "2026-11-16/f28c9646c94d46359e9c7f1f862a6453.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR volatility stays high at 7.35% with an 11.11% range, so 3x fees remain. Backing is 150.9%, just above the 150% Healthy line, so the savings rate stays 0% to avoid pushing it into Caution.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794786224105,
   "id": "42838aa7988549bbb06963c167d85425",
   "file": "2026-11-15/42838aa7988549bbb06963c167d85425.json",
