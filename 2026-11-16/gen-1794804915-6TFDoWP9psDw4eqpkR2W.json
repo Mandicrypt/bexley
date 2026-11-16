@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1794804923447,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1794804915-6TFDoWP9psDw4eqpkR2W",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.1673,\\n  \\\"near_change_24h_pct\\\": 1.41,\\n  \\\"near_volatility_24h_pct\\\": 4.6,\\n  \\\"near_range_24h_pct\\\": 4.97,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 150,\\n  \\\"xnear_leverage\\\": 3,\\n  \\\"pool_value_usd\\\": 1678.92,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"gen-1794804915-6TFDoWP9psDw4eqpkR2W\",\"object\":\"chat.completion\",\"created\":1794804915,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Backing is 150% and NEAR volatility is moderate, so we keep 3x fees and the 0% savings rate to protect the pool.\\\", \\\"status\\\": \\\"The pool is Healthy, with backing right at 150% and xNEAR leverage at 3x.\\\"}\",\"reasoning\":\"We need answer JSON only. Need decide settings. Data: Healthy, backing 150%, xnear leverage 3, volatility 4.6%, range 4.97%, 24h change +1.41. current fee_level 2, savings 0. Rules: Outside Healthy must rate 0. In Healthy, rate can be set. Prefer stability, only change when evidence clear. Current fee level 2 (3x fees) with volatility 4.6% moderate? Near change small +1.41, range ~5%. Maybe volatility not extreme. Fee level 2 is highest. Should we lower to 1 or 0? Need think.\\n\\nWe are guardian. Backing exactly 150%, which is boundary Healthy at 150% or more. xNEAR leverage 3. Backing near 150% means xNEAR well levered. The instruction: \\\"When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down.\\\" But current rate is 0, can't lower. Maybe keep 0. If backing exactly 150, already at threshold, maybe we should not raise rate. Fee: Raise fees when NEAR volatile, lower when calm. Volatility 4.6% daily, range 4.97% - is that high? For crypto, maybe moderate. Current fee_level 2 (3x). If not extremely volatile, maybe reduce to 1 or 0? But evidence for change? \\\"Prefer stability: do not change settings for small moves. Only change when evidence is clear.\\\" We have near_volatility_24h_pct 4.6, range 4.97. That's not super high. But current fee level 2 was presumably set earlier. Should we change to 1? Need decide if evidence clear. No historical data to compare. Backing at 150 is boundary, but Healthy. Maybe keep fees high due to risk? The rule: raise fees when volatile to slow churn and pay Stability Pool. Lower when calm. 4.6% daily volatility might be moderate. But near_change 1.41% positive, not huge. Range 4.97%. It could be considered normal-ish. However, current fee level 2 is maximum. If volatility is not extreme, maybe lower to 1. But prefer stability, small moves. Change only when evidence clear. Is 4.6% volatility \\\"clear\\\" evidence? It's not clear to me. Maybe keep at 2 to be safe because backing at 150 threshold, so extra fees protect. But fees high might slow churn and pay SP. Since backing is exactly at 150, no buffer. Raising fees would increase revenue to SP, but fee already max 2. So keep 2. Savings rate 0, cannot lower. Could increase? Instruction: When bxUSD scarce (high backing, xNEAR barely levered) higher rate attracts savers. Here backing 150, not high, xNEAR leverage 3, so well levered. So lower rate, but already 0. So keep 0. So settings unchanged: fee_level 2, savings_rate_bps 0. Reason: Backing is at 150% and NEAR volatility is moderate, so we keep fees at 3x and savings at 0% to protect the pool. Status: Pool is Healthy with backing at the 150% line and leverage at 3x. Need JSON only.\\n\\nCheck: \\\"Change the rate by at most 400 bps from current rate\\\" - we keep 0. \\\"Outside Healthy mode it must be 0\\\" - we are Healthy, so can be 0. Fine.\\n\\nNeed ensure reason under 240 chars, plain sentences. Write rates as percents like 9%, never bps. So say \\\"savings at 0%\\\" not bps. \\\"fee level 2 (3x fees)\\\" maybe mention 3x. But \\\"fee_level\\\" is 2. Reason: \\\"Backing is 150% and NEAR volatility is moderate, so we keep 3x fees and the 0% savings rate to protect the pool.\\\" That's fine. Status: \\\"The pool is Healthy, with backing right at 150% and xNEAR leverage at 3x.\\\" status one short sentence.\\n\\nJSON: {\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"...\\\", \\\"status\\\": \\\"...\\\"}\\n\\nEnsure no extra text.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":672,\"completion_tokens\":1022,\"total_tokens\":1694,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":940,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "a309afa18a92bfd84e06a20e5e3ec107c52666153bf33da9bd8442c2a70498ed:1b45247ae0436080a3464080691b6402107f220c851370ab26cdaaa44a748f4d",
+    "signature": "0xd9ee7a41b812f218bc4f6af345dba9a2d6d87f8ba8be6b24abb87e6de6c692e33c3980091e4e949d0b5009a1d552c65a4507ed8b7e2a1c83d76a76cab7ff18241b",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "Backing is 150% and NEAR volatility is moderate, so we keep 3x fees and the 0% savings rate to protect the pool."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints a309afa18a… and 1b45247ae0… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}
