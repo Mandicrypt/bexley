@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794790367605,
+  "id": "988d3765e4b840b6b05f35a0fb428106",
+  "file": "2026-11-16/988d3765e4b840b6b05f35a0fb428106.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR swung 11% in a day with 7.4% volatility, so 3x fees stay to pay savers for the risk. Backing is 150.1%, right at the Healthy edge, so the 0% rate holds to avoid pushing it down.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794789650801,
   "id": "928a3512f5834ea4bc77380b7b8d75b4",
   "file": "2026-11-16/928a3512f5834ea4bc77380b7b8d75b4.json",
