@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794818298774,
+  "id": "5bf4595f98aa4833b9ca76830b593a6e",
+  "file": "2026-11-16/5bf4595f98aa4833b9ca76830b593a6e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.9%, right at the Healthy line, and leverage is 2.96, so the saver rate stays 0% to avoid adding bxUSD and pushing backing down. NEAR volatility near 5% keeps fees at 3x.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794816263922,
   "id": "gen-1794816255-P2sm3syEJD8ugsExcoU8",
   "file": "2026-11-16/gen-1794816255-P2sm3syEJD8ugsExcoU8.json",

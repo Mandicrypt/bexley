@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794818298774,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "5bf4595f98aa4833b9ca76830b593a6e",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.1854,\\n  \\\"near_change_24h_pct\\\": 2.3,\\n  \\\"near_volatility_24h_pct\\\": 4.5,\\n  \\\"near_range_24h_pct\\\": 4.97,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 150.9,\\n  \\\"xnear_leverage\\\": 2.96,\\n  \\\"pool_value_usd\\\": 1688.49,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"5bf4595f98aa4833b9ca76830b593a6e\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Backing is 150.9%, right at the Healthy line, and leverage is 2.96, so the saver rate stays 0% to avoid adding bxUSD and pushing backing down. NEAR volatility near 5% keeps fees at 3x.\\\", \\\"status\\\": \\\"The pool is Healthy at 150.9% backing, with fees at 3x and a 0% saver rate.\\\"}\",\"reasoning_content\":\"Let me analyze the situation.\\n\\nPool mode: Healthy (backing 150.9%, just above 150%).\\nCurrent fee level: 2 (3x fees).\\nCurrent savings rate: 0 bps.\\n\\nMarket: NEAR price $3.1854, +2.3% 24h, volatility 4.5%, range 4.97%.\\n\\nFee level: volatility is 4.5% over 24h — that's moderate. Range ~5%. Current fee level is 2 (3x). Should I lower to 1 or 0? The rules say raise fees when volatile, lower when calm. 4.5% volatility is moderate, not extreme. Price change 2.3% is modest. I could lower fees to level 1 (2x) as markets calm. But \\\"prefer stability: do not change settings for small moves.\\\" Volatility 4.5% — is that calm? Hmm. A 5% daily range is somewhat active. Lowering from 3x to 2x seems reasonable if evidence is clear. The volatility of 4.5% with range ~5% — moderate. I'd say lowering to 1 is justified: volatility has eased (we don't have prior data though). Without prior data, I should be cautious. But keeping 3x fees when volatility is only 4.5% might be excessive. Actually, typical daily volatility of 4.5% is fairly elevated for NEAR. Hmm.\\n\\nGiven no prior data, prefer stability — keep fee level 2? Or lower? The instruction: \\\"Lower them when markets calm down.\\\" 4.5% volatility isn't especially calm. I'll keep fee_level 2. Actually, let me think: 4.5% 24h volatility and ~5% range — that's moderately volatile. 3x fees seem defensible. Keep at 2.\\n\\nSavings rate: current 0. Backing 150.9% — just barely in Healthy mode. xNEAR leverage 2.96, near max (at 150% backing, leverage = 1/(1-1/1.5) = 3.0). So xNEAR is nearly fully levered. Rule: \\\"When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down.\\\" Backing is 150.9%, right at the edge of Healthy/Caution. Raising the rate would attract savers, adding bxUSD, which lowers backing (more bxUSD owed = lower backing). That could push backing below 150% into Caution, where rate must be 0 anyway. So keep rate at 0.\\n\\nAlso rule: outside Healthy mode rate must be 0 — we're in Healthy, but barely. Keeping 0 is safest and consistent with \\\"prefer stability.\\\"\\n\\nSo: fee_level 2, savings_rate_bps 0, no changes.\\n\\nReason: no change, so explain why keeping. Something like: \\\"Backing is 150.9%, right at the Healthy edge, and leverage is 2.96, so savers keep 0% to avoid adding bxUSD and pushing backing down. Volatility near 5% keeps fees at 3x.\\\"\\n\\nStatus: \\\"Pool is Healthy with 150.9% backing; fees stay at 3x while NEAR moves about 5% a day.\\\"\\n\\nCharacter limits: reason under 240 chars, two short sentences. Status one short sentence.\\n\\nReason draft: \\\"Backing sits at 150.9%, right at the Healthy line, and xNEAR leverage is 2.96, so the saver rate stays 0% to keep backing from slipping. With NEAR volatility near 5%, fees stay at 3x.\\\"\\n\\nCount chars: roughly under 240. Fine.\\n\\nStatus: \\\"The pool is Healthy at 150.9% backing with fees at 3x and a 0% saver rate.\\\"\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794818275,\"usage\":{\"prompt_tokens\":626,\"total_tokens\":1558,\"completion_tokens\":932,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":826,\"completion_tokens_details\":{\"reasoning_tokens\":826}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:24838d75d67f3282d073a35d460e9979743cd485aa6a8859dc2fe72f0d91d34f:abc240b1f2b73f1c7067a4c8611e3df2422833080e4a71819547bd58f9c44149",
+    "signature": "0x20470d375a21cdf9ac586aeee6f1366d5a996e04c939b09076735375f81f0ee73fd3845e2ed63b95424327454073ec940bab97f9f0c1dcba9d353d3b8dd11a6f1c",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "08d37416dcf9ccf28201d5afb77808804be87006deb89b753366b107ed37c795",
+    "fetched_at": 1794816210723,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "ef48bcc5d065a43b77a6867bb1d6cb3df7c61d8560e9200aafab689d72334d43"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "Backing is 150.9%, right at the Healthy line, and leverage is 2.96, so the saver rate stays 0% to avoid adding bxUSD and pushing backing down. NEAR volatility near 5% keeps fees at 3x."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 24838d75d6… and abc240b1f2… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
