@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794795136907,
+  "id": "77c0e980cd254938b4d5f343322c1475",
+  "file": "2026-11-16/77c0e980cd254938b4d5f343322c1475.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 149%, just under the 150% Healthy line, and NEAR swung about 10% in a day, so fees stay at 3x. The savings rate stays 0% because it must be zero until the pool is Healthy again.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794793101638,
   "id": "992142da8456433bbc37650a3a8bbba0",
   "file": "2026-11-16/992142da8456433bbc37650a3a8bbba0.json",
