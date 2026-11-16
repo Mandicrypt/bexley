@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794802074149,
+  "id": "0eaf9027807e4116b7c1b856ba8514c2",
+  "file": "2026-11-16/0eaf9027807e4116b7c1b856ba8514c2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.8%, just above the Healthy line, so a higher savings rate would push it down; the rate stays 0%. NEAR volatility is still 4.52%, so 3x fees remain to pay savers for the risk.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794800006381,
   "id": "3866989b35464837b7164c0354027ef2",
   "file": "2026-11-16/3866989b35464837b7164c0354027ef2.json",
