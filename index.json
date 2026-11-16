@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794837500892,
+  "id": "c183b81ad5354777b5dd8209b9803453",
+  "file": "2026-11-16/c183b81ad5354777b5dd8209b9803453.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. Backing is 148%, just under the 150% healthy line, so the savings rate must stay 0% in Caution mode. NEAR volatility of 4.83% is moderate, so normal fees remain right.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794835456821,
   "id": "f8b01d4a27cd4922bb4dae52eeb36787",
   "file": "2026-11-16/f8b01d4a27cd4922bb4dae52eeb36787.json",
