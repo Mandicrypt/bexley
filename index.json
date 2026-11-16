@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794795842814,
+  "id": "b818fc77598a48e9886fcaaf62a973f9",
+  "file": "2026-11-16/b818fc77598a48e9886fcaaf62a973f9.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 150.7%, barely above the 150% Healthy line, so a 0% savings rate keeps xNEAR's cost low. NEAR still swung 10.2% in a day with 4.21% volatility, so 3x fees stay on.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794795136907,
   "id": "77c0e980cd254938b4d5f343322c1475",
   "file": "2026-11-16/77c0e980cd254938b4d5f343322c1475.json",
