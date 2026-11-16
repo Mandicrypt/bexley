@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794849875948,
+  "id": "21ea2d8416474acdb990e035e07a262e",
+  "file": "2026-11-16/21ea2d8416474acdb990e035e07a262e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.3%, right at the Healthy edge, so we keep the savings rate at 0% to avoid pulling backing down. Volatility of 5.6% is not extreme, so fees stay normal.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794847813281,
   "id": "8e28e8bdc6884300a48eb2ced1fe46f2",
   "file": "2026-11-16/8e28e8bdc6884300a48eb2ced1fe46f2.json",
