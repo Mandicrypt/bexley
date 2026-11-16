@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794827650540,
+  "id": "ee3c026a8dba410bb8cedaa57c5ebe2d",
+  "file": "2026-11-16/ee3c026a8dba410bb8cedaa57c5ebe2d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 151.7%, just above the 150% healthy line, and leverage is already 2.94, so a 0% savings rate keeps xNEAR's cost low. Volatility of 4.43% is normal, so fees stay standard.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794825613470,
   "id": "3d4716098fe6463b8810adb28306ac58",
   "file": "2026-11-16/3d4716098fe6463b8810adb28306ac58.json",
