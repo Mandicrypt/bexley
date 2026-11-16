@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794839626913,
+  "id": "1072bd0e7d5d4b68b4ff7340469d7039",
+  "file": "2026-11-16/1072bd0e7d5d4b68b4ff7340469d7039.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. Backing is 150.6%, right at the Healthy limit, so raising the savings rate could tip it into Caution. NEAR moved just 1.39% with modest 5% volatility, so normal fees still fit.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794839251308,
   "id": "1808d59433104d43b69a86c566a0ccc2",
   "file": "2026-11-16/1808d59433104d43b69a86c566a0ccc2.json",
