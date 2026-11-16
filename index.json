@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794855213080,
+  "id": "gen-1794855206-9nEtJOaZcn7VQ1xYxIr3",
+  "file": "2026-11-16/gen-1794855206-9nEtJOaZcn7VQ1xYxIr3.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 150.4% and NEAR is calm at 1.62% up with 5.91% volatility, so fees and savings stay unchanged. The savings rate is 0% because leverage is already near the 150% line.",
+  "level": 0,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794854491882,
   "id": "22b7b09edde94d3484b165f9e63550d4",
   "file": "2026-11-16/22b7b09edde94d3484b165f9e63550d4.json",
