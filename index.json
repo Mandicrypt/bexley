@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794862198299,
+  "id": "cd9afe36d6024ab5b7bea099abfd2a27",
+  "file": "2026-11-16/cd9afe36d6024ab5b7bea099abfd2a27.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing sits at 150.1%, right at the Healthy edge, and xNEAR already has 3x leverage, so raising the 0% savings rate could push backing down. Volatility of 5.7% is moderate, so normal fees stay.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794861491382,
   "id": "ba18e9f4c0534d9caa03e25aa01a5657",
   "file": "2026-11-16/ba18e9f4c0534d9caa03e25aa01a5657.json",
