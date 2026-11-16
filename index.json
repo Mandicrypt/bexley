@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794816263922,
+  "id": "gen-1794816255-P2sm3syEJD8ugsExcoU8",
+  "file": "2026-11-16/gen-1794816255-P2sm3syEJD8ugsExcoU8.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 150.8%, just above the healthy floor, and xNEAR leverage is 2.97x. I am keeping fees high and the savings rate at 0% to protect the pool.",
+  "level": 2,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794814174491,
   "id": "gen-1794814162-CWhkpVDewMZWqnO6alGM",
   "file": "2026-11-16/gen-1794814162-CWhkpVDewMZWqnO6alGM.json",
