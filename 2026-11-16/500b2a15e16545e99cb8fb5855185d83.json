@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1794833409285,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "500b2a15e16545e99cb8fb5855185d83",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.1422,\\n  \\\"near_change_24h_pct\\\": -1.4,\\n  \\\"near_volatility_24h_pct\\\": 4.73,\\n  \\\"near_range_24h_pct\\\": 4.49,\\n  \\\"pool_mode\\\": \\\"Caution\\\",\\n  \\\"backing_pct\\\": 148.9,\\n  \\\"xnear_leverage\\\": 3.05,\\n  \\\"pool_value_usd\\\": 1665.62,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"500b2a15e16545e99cb8fb5855185d83\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 0, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Backing is 148.9%, just under the 150% Healthy line, so the savings rate stays 0 in Caution mode. Volatility of 4.73% is moderate, so normal fees remain.\\\", \\\"status\\\": \\\"The pool is in Caution at 148.9% backing, close to returning to Healthy.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- Pool mode: Caution (backing 148.9%, which is in 130-150% range)\\n- Backing is 148.9%, close to Healthy threshold of 150%\\n- Current savings rate: 0 bps\\n- Current fee level: 0\\n- NEAR volatility 24h: 4.73%, range 4.49% — moderately volatile\\n- NEAR price down 1.4% in 24h\\n\\nRules:\\n- Outside Healthy mode, savings rate must be 0. Pool is in Caution mode, so savings_rate_bps must be 0.\\n- Fee level: volatility is 4.73% over 24h. Is that high enough to raise fees? Normal fees currently. The rule says raise fees when NEAR is volatile. 4.73% volatility is moderate. The price moved -1.4% in 24h. Hmm.\\n\\n\\\"Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\\"\\n\\nVolatility of 4.73% — is that clearly volatile? It's moderate. A 4.5% range in 24h isn't extreme. I'd say keep fee_level at 0. The evidence isn't clearly pointing to high volatility.\\n\\nSavings rate must be 0 in Caution mode. Current is 0, so no change.\\n\\nSo answer: fee_level 0, savings_rate_bps 0, no changes.\\n\\nReason: explain no change — backing 148.9% near healthy, but in Caution mode rate stays 0; volatility moderate so fees stay normal.\\n\\nStatus: pool in Caution, backing 148.9%, close to Healthy.\\n\\nJSON only.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1794833401,\"usage\":{\"prompt_tokens\":627,\"total_tokens\":1081,\"completion_tokens\":454,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":363,\"completion_tokens_details\":{\"reasoning_tokens\":363}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:834b87eee931d985c4ff8e1b144a700d64c90fee6cb1da5b35f451be21596c57:8e9f5db3246b7d03ac594fda7a2d6f85121175911ab45464d7a83c8191093d21",
+    "signature": "0xf95e01e1dc48b28dc51c26818153d1c4b6936783f25d8d18031fc2bb764c9d36728ae43d15f49b6fa46921ee082a5f6b5463e29e8f31245ae6b4517ff78d37ff1c",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "35326b4ade7418f4404a9d0ce6d3f67b8e35bfefc146d2b1633acc1df545160c",
+    "fetched_at": 1794823555554,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "e5c2fadb627ee84d599cc06a203bd861059ec976d99d08e0b64c21f20f6a3b47"
+  },
+  "decision": {
+    "level": 0,
+    "rate": 0,
+    "reason": "Backing is 148.9%, just under the 150% Healthy line, so the savings rate stays 0 in Caution mode. Volatility of 4.73% is moderate, so normal fees remain."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 834b87eee9… and 8e9f5db324… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
