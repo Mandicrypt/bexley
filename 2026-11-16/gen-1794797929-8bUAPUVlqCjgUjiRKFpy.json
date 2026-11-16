@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1794797938179,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1794797929-8bUAPUVlqCjgUjiRKFpy",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.2004,\\n  \\\"near_change_24h_pct\\\": 2.18,\\n  \\\"near_volatility_24h_pct\\\": 4.49,\\n  \\\"near_range_24h_pct\\\": 10.2,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 151.6,\\n  \\\"xnear_leverage\\\": 2.94,\\n  \\\"pool_value_usd\\\": 1696.47,\\n  \\\"bxusd_supply\\\": 1118.91,\\n  \\\"stability_pool_usd\\\": 1045.76,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"gen-1794797929-8bUAPUVlqCjgUjiRKFpy\",\"object\":\"chat.completion\",\"created\":1794797929,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Backing is 151.6%, close to the 150% floor, so I keep savings at 0% to avoid adding leverage. Volatility is 4.5%, so fees stay high at 3x to slow churn.\\\", \\\"status\\\": \\\"Pool is Healthy with backing at 151.6% and leverage at 2.94x.\\\"}\",\"reasoning\":\"We need answer JSON only. Need decide settings. We have protocol guardian. Data: Healthy, backing 151.6%, leverage 2.94, volatility 4.49, range 10.2, change +2.18. Current fee_level 2, current savings 0. Mode Healthy so savings can be nonzero. Backing just above 150 threshold. Leverage 2.94. bxUSD scarce? Backing high 151.6 but close to 150. Actually Healthy minimum 150. Backing 151.6, near lower bound of Healthy. xNEAR already well levered (backing near 150%) -> lower rate eases cost and avoids pushing backing down. Current rate 0, can't lower. So keep 0. Fee level: volatility 4.49% is moderate? Current fee level 2 (3x fees). NEAR change +2.18, range 10.2. Volatility 4.49 maybe not extreme. Rules: raise fees when volatile, lower when calm. Current fee 2 max. Should we lower? Prefer stability, only change when evidence clear. Existing fee 2 maybe because volatility? 4.49% daily vol is moderate, range 10.2. Not clearly calm? If backing near 150, high fees may slow churn and protect? But fee level 2 is already high. Should we keep or lower to 1? Need decide.\\n\\nWe need be consistent. The current fee level is 2. If we change, must cite numbers. Volatility 4.49% maybe not high enough to warrant max 3x. But backing close to 150 threshold, cautious. Actually mode Healthy at 151.6. We might keep fees high to protect backing? But rule says raise fees when volatile, lower when calm. 4.49% is moderate, range 10.2. Not calm. I'd keep fee_level 2 for stability. Savings rate: outside Healthy must be 0; inside can set. At backing 151.6 near lower Healthy, xNEAR well levered. Higher savings would add bxUSD and increase leverage, pushing backing down. So keep 0 or lower. Current 0, can't lower. So 0.\\n\\nNeed status: Healthy at 151.6% backing. Savings 0%. Fee 3x. Maybe reason: Backing is just above 150% and leverage is near its limit, so I keep the savings rate at 0% to avoid pushing it lower. With volatility at 4.5%, I keep the 3x fee level. But \\\"leverage is near its limit\\\" maybe leverage 2.94? The limit? No explicit max, but backing near 150. It's okay. Ensure under 240 chars. Reason can be two short sentences.\\n\\nNeed JSON only. Check schema: {\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"...\\\", \\\"status\\\": \\\"...\\\"}. Free text under 240. No markdown.\\n\\nLet's craft:\\nfee_level 2, savings_rate_bps 0.\\nReason: \\\"Backing is 151.6%, close to the 150% floor, so I keep savings at 0% to avoid adding leverage. Volatility is 4.5%, so fees stay high at 3x to slow churn.\\\" That's two sentences. Under 240? Count ~ 180. Good. Status: \\\"Pool is Healthy with backing at 151.6% and leverage at 2.94x.\\\" That is short. Use percent? \\\"151.6%\\\" yes. \\\"2.94x\\\" okay? It's a ratio. Fine.\\n\\nNeed ensure fee_level integer 2. savings_rate_bps 0. JSON only.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":676,\"completion_tokens\":890,\"total_tokens\":1566,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":792,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "a3b23c32bef0f0929989c489aca73774d27e0545855362b7f6edf7f33e617da8:38d1f8dde7b98eea90b5c16dee9cd654e6aff321d2400571e1e403aaa346bb8f",
+    "signature": "0xa9e9173159b4ebfeef89429fbf076e97dfba3d7b8a59ead8d78f3169a0796b65061888d5722394fe185f76d38e69b9ad6f1515181d5b92c2834ee6e30dd63e071c",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "Backing is 151.6%, close to the 150% floor, so I keep savings at 0% to avoid adding leverage. Volatility is 4.5%, so fees stay high at 3x to slow churn."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints a3b23c32be… and 38d1f8dde7… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}

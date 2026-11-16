@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794797938179,
+  "id": "gen-1794797929-8bUAPUVlqCjgUjiRKFpy",
+  "file": "2026-11-16/gen-1794797929-8bUAPUVlqCjgUjiRKFpy.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 151.6%, close to the 150% floor, so I keep savings at 0% to avoid adding leverage. Volatility is 4.5%, so fees stay high at 3x to slow churn.",
+  "level": 2,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794795842814,
   "id": "b818fc77598a48e9886fcaaf62a973f9",
   "file": "2026-11-16/b818fc77598a48e9886fcaaf62a973f9.json",
