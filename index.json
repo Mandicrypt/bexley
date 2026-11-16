@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794814174491,
+  "id": "gen-1794814162-CWhkpVDewMZWqnO6alGM",
+  "file": "2026-11-16/gen-1794814162-CWhkpVDewMZWqnO6alGM.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change. Backing is 150.3% and xNEAR leverage is 2.99, so savings rate stays 0% and fees stay at 3x with volatility at 4.5%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794813778877,
   "id": "cd29a157d8dc4f22bef85dce0a5cd381",
   "file": "2026-11-16/cd29a157d8dc4f22bef85dce0a5cd381.json",
