@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794859000374,
+  "id": "62ac2bce33ed45418fb0f0897cdd1746",
+  "file": "2026-11-16/62ac2bce33ed45418fb0f0897cdd1746.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.1%, right at the Healthy edge, so a higher savings rate could push it into Caution. NEAR moved only -0.35% with 5.76% volatility, so normal fees and a 0% rate stay unchanged.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794857958724,
   "id": "62e457f5f432403b8aeed61ac98136d2",
   "file": "2026-11-16/62e457f5f432403b8aeed61ac98136d2.json",
