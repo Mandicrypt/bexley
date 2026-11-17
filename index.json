@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794899223701,
+  "id": "977a6ae460234e60acf094dab470d6d2",
+  "file": "2026-11-17/977a6ae460234e60acf094dab470d6d2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady: backing is 152.8%, just above the 150% Healthy line, so keeping the rate at 0% avoids pulling it down. Volatility near 6% justifies keeping fees at 2x.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794897184485,
   "id": "33051e5f0d0b4b2f956d684f6d2a84c2",
   "file": "2026-11-17/33051e5f0d0b4b2f956d684f6d2a84c2.json",
