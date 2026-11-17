@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794940178335,
+  "id": "72896beb6b9e48eb86a63278fa54bd9c",
+  "file": "2026-11-17/72896beb6b9e48eb86a63278fa54bd9c.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.6%, right at the Healthy edge, so raising the 0% savings rate could pull it into Caution. Volatility of 5.9% is not extreme enough to raise fees.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794939124428,
   "id": "ee77c6af5d134a98b07ead9ab936bc59",
   "file": "2026-11-17/ee77c6af5d134a98b07ead9ab936bc59.json",
