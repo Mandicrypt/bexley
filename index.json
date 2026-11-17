@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794939124428,
+  "id": "ee77c6af5d134a98b07ead9ab936bc59",
+  "file": "2026-11-17/ee77c6af5d134a98b07ead9ab936bc59.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 149.8%, just under the 150% Healthy line, so Caution rules apply and the savings rate must be 0%. The 2% rate is paused until backing recovers.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794937758066,
   "id": "f660b00c647d41809f8e1ff7af1af179",
   "file": "2026-11-17/f660b00c647d41809f8e1ff7af1af179.json",
