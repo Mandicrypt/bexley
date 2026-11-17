@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794878048772,
+  "id": "941cac8c6f704138b827a7b4f17f9cd4",
+  "file": "2026-11-17/941cac8c6f704138b827a7b4f17f9cd4.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 148.3%, just under Healthy, so the savings rate stays 0% and 2x fees continue while NEAR swings 5.37% a day.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794876015785,
   "id": "d74e85e9e720460e8883ca81e206e9aa",
   "file": "2026-11-17/d74e85e9e720460e8883ca81e206e9aa.json",
