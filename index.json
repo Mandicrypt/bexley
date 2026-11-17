@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794949100986,
+  "id": "405c6829669c4580acb3b1c771395add",
+  "file": "2026-11-17/405c6829669c4580acb3b1c771395add.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing at 153.4% sits just above the 150% Healthy line, so raising the savings rate would add bxUSD and push backing down. Volatility near 6% keeps fees at 2x.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794947040051,
   "id": "54eb516f971641b9bb37dfd156759552",
   "file": "2026-11-17/54eb516f971641b9bb37dfd156759552.json",
