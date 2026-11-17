@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794953626855,
+  "id": "gen-1794953616-TBjfdZos4oRXp2prb6RP",
+  "file": "2026-11-17/gen-1794953616-TBjfdZos4oRXp2prb6RP.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 155.9%, near the 150% caution line, so I keep the savings rate at 0% to avoid adding more bxUSD. NEAR volatility is 6.15%, so fees stay at 2x.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794951542595,
   "id": "c8b58ec235cf47e6a9a37003f49c2e3a",
   "file": "2026-11-17/c8b58ec235cf47e6a9a37003f49c2e3a.json",
