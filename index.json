@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794882804463,
+  "id": "321c781bcccd488280eab814530ebf40",
+  "file": "2026-11-17/321c781bcccd488280eab814530ebf40.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes. Backing is 149.9%, just under the 150% Healthy line, so the savings rate stays 0% in Caution mode. With about 5% daily NEAR swings, doubled fees remain appropriate.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794881099752,
   "id": "977c4af9d028446592a37b6fc60288f8",
   "file": "2026-11-17/977c4af9d028446592a37b6fc60288f8.json",
