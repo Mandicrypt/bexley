@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794911986221,
+  "id": "gen-1794911980-v0NRPARJP2cR587NwJfp",
+  "file": "2026-11-17/gen-1794911980-v0NRPARJP2cR587NwJfp.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 151.9%, just above the 150% healthy floor, and 24h volatility is 6.1%. I am keeping fees at 2x and savings at 0% to avoid adding pressure.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794909917332,
   "id": "2a7218daffc9442bbc0509aaf94ce6bb",
   "file": "2026-11-17/2a7218daffc9442bbc0509aaf94ce6bb.json",
