@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794916119607,
+  "id": "gen-1794916110-FRIjXW1nzRxbUxKmihdJ",
+  "file": "2026-11-17/gen-1794916110-FRIjXW1nzRxbUxKmihdJ.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR volatility is moderate at 6.7% and the price is up 2.16%, so fees stay at 2x. Backing is 155% with 2.81x leverage, and the rate is already the 0% minimum, so it stays there.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794914049325,
   "id": "ac2eb547504a437a8e278724878cc9e8",
   "file": "2026-11-17/ac2eb547504a437a8e278724878cc9e8.json",
