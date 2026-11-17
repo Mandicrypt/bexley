@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794927214663,
+  "id": "4a95c925314a4fa1aa146e47eb50cc06",
+  "file": "2026-11-17/4a95c925314a4fa1aa146e47eb50cc06.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 153.1%, only just above the 150% healthy line, so I cut the saver rate from 2% to 1% to ease xNEAR's cost. Volatility is moderate at 6.17%, so fees stay normal.",
+  "level": 0,
+  "rate": 100,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794925163726,
   "id": "d2d56048e6d440d6aaa359ae62efdc93",
   "file": "2026-11-17/d2d56048e6d440d6aaa359ae62efdc93.json",
