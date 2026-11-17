@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794907856636,
+  "id": "gen-1794907851-MnmCJ45dUBN8gKkWKiMH",
+  "file": "2026-11-17/gen-1794907851-MnmCJ45dUBN8gKkWKiMH.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 151.9% and xNEAR leverage is 2.93, so the pool is healthy. Volatility is 6.1%, so fees stay at 2x and savings stays at 0%.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794907440855,
   "id": "e35908cbc4cd4fde8e3ec7f687000f99",
   "file": "2026-11-17/e35908cbc4cd4fde8e3ec7f687000f99.json",
