@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794951542595,
+  "id": "c8b58ec235cf47e6a9a37003f49c2e3a",
+  "file": "2026-11-17/c8b58ec235cf47e6a9a37003f49c2e3a.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 156.2%, so xNEAR is already well levered and a 0% saver rate keeps its cost low. NEAR volatility near 6% over 24h justifies keeping fees at 2x.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794949501767,
   "id": "c2b47503db274331b02181255dce54ee",
   "file": "2026-11-17/c2b47503db274331b02181255dce54ee.json",
