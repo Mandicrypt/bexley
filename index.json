@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794901278867,
+  "id": "gen-1794901273-FO3Deob90x3s4kNpTidv",
+  "file": "2026-11-17/gen-1794901273-FO3Deob90x3s4kNpTidv.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR moved 1.7% with 6% daily swings, so fees stay at 2x. Backing is 154%, close to the 150% healthy floor, so savings stays at 0%.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794899223701,
   "id": "977a6ae460234e60acf094dab470d6d2",
   "file": "2026-11-17/977a6ae460234e60acf094dab470d6d2.json",
