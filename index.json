@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794940877154,
+  "id": "9358030dc5c146ad801043c0f5593f34",
+  "file": "2026-11-17/9358030dc5c146ad801043c0f5593f34.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 149.8%, just under the 150% Healthy line, and NEAR swung 6.85% in a day, so fees double to slow churn and pay savers. The savings rate stays 0% while in Caution mode.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794940178335,
   "id": "72896beb6b9e48eb86a63278fa54bd9c",
   "file": "2026-11-17/72896beb6b9e48eb86a63278fa54bd9c.json",
