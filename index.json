@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794909917332,
+  "id": "2a7218daffc9442bbc0509aaf94ce6bb",
+  "file": "2026-11-17/2a7218daffc9442bbc0509aaf94ce6bb.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 152.1%, just above the 150% healthy line, so we keep the savings rate at 0% to avoid adding bxUSD and lowering it. Volatility near 6% keeps fees at 2x.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794907856636,
   "id": "gen-1794907851-MnmCJ45dUBN8gKkWKiMH",
   "file": "2026-11-17/gen-1794907851-MnmCJ45dUBN8gKkWKiMH.json",
