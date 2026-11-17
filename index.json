@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794935295584,
+  "id": "8456f1db1deb45e7906529b33802a258",
+  "file": "2026-11-17/8456f1db1deb45e7906529b33802a258.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.4%, right at the Healthy limit, so we keep the savings rate at 0% to avoid adding bxUSD and slipping into Caution. NEAR moved only 1.45% down with about 6% volatility, so normal fees stay.",
+  "level": 0,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794933559365,
   "id": "aad3080ab44d449bb6160f55c1c06da3",
   "file": "2026-11-17/aad3080ab44d449bb6160f55c1c06da3.json",
