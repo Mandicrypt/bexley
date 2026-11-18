@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795035582369,
+  "id": "518d3da85b48440fb26bc69386f09990",
+  "file": "2026-11-18/518d3da85b48440fb26bc69386f09990.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change: backing is 154.8%, close to the 150% healthy line, so raising the 5% saver rate could push it down, and 5% price swings are not enough to raise fees.",
+  "level": 0,
+  "rate": 500,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795033118673,
   "id": "gen-1795033109-tiWalLEg2e3kHbdqDcBU",
   "file": "2026-11-18/gen-1795033109-tiWalLEg2e3kHbdqDcBU.json",
