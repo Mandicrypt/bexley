@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795028439862,
+  "id": "gen-1795028425-rm36oMqQ0WaU5v5JRyV2",
+  "file": "2026-11-18/gen-1795028425-rm36oMqQ0WaU5v5JRyV2.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 154%, close to the 150% healthy floor, so we lowered the saver rate from 5% to 4% to ease xNEAR's cost. Fees stay normal because NEAR's moves are moderate.",
+  "level": 0,
+  "rate": 400,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795025899744,
   "id": "gen-1795025887-07cXAxRc50E3XAY44JNH",
   "file": "2026-11-18/gen-1795025887-07cXAxRc50E3XAY44JNH.json",
