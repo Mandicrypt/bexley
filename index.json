@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794981329256,
+  "id": "0cedc7b7e5414e1b8306e7045ce23aa7",
+  "file": "2026-11-18/0cedc7b7e5414e1b8306e7045ce23aa7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 160.5%, well above the 150% healthy line, so we raised the savings rate from 5% to 9% to attract savers and add leverage. NEAR swung 10.66% in a day, so fees double to pay the Stability Pool for the extra risk.",
+  "level": 1,
+  "rate": 900,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794977307393,
   "id": "e8562dc252d1465798d6220dda37e397",
   "file": "2026-11-18/e8562dc252d1465798d6220dda37e397.json",
