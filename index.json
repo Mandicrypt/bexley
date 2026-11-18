@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794960143623,
+  "id": "0f773c9a051c46c9a4e4d1bc5fbe0434",
+  "file": "2026-11-18/0f773c9a051c46c9a4e4d1bc5fbe0434.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR moved 7.51% with a 9.93% range, so fees double to slow churn and pay savers for the extra risk. Backing is a healthy 160.8%, so the 9% savings rate stays unchanged.",
+  "level": 1,
+  "rate": 900,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794958111199,
   "id": "1b52f70bf4c241a19741d65547c56470",
   "file": "2026-11-17/1b52f70bf4c241a19741d65547c56470.json",
