@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795038834348,
+  "id": "ac359d66797540c4b655ac39a8caf909",
+  "file": "2026-11-18/ac359d66797540c4b655ac39a8caf909.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Markets are calm: NEAR slipped just 0.54% with 4.94% volatility. Backing is a healthy 154.2%, so we keep normal fees and the 5% savings rate unchanged.",
+  "level": 0,
+  "rate": 500,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795035582369,
   "id": "518d3da85b48440fb26bc69386f09990",
   "file": "2026-11-18/518d3da85b48440fb26bc69386f09990.json",
