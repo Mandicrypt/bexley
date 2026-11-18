@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795033118673,
+  "id": "gen-1795033109-tiWalLEg2e3kHbdqDcBU",
+  "file": "2026-11-18/gen-1795033109-tiWalLEg2e3kHbdqDcBU.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR moved 2.1% with 5.0% volatility, which is not extreme enough to change fees. Backing is a healthy 154.3% and the rate stays at 3% for stability.",
+  "level": 0,
+  "rate": 300,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795031699698,
   "id": "e005a68a5b414a2ab7e9f89e83622741",
   "file": "2026-11-18/e005a68a5b414a2ab7e9f89e83622741.json",
