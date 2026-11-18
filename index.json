@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795001729217,
+  "id": "1fb8ecd0dc2543b6a45786c3af317d51",
+  "file": "2026-11-18/1fb8ecd0dc2543b6a45786c3af317d51.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Backing is 158% and leverage 2.72, both comfortably healthy, while volatility of 4.61% is moderate, so the 5% savings rate and normal fees remain right.",
+  "level": 0,
+  "rate": 500,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1794998896864,
   "id": "4845d0005a294e09874aee0fc33eabe3",
   "file": "2026-11-18/4845d0005a294e09874aee0fc33eabe3.json",
