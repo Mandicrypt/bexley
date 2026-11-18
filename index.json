@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794963017614,
+  "id": "gen-1794963003-jA8FL4xK6REIT0Ky9H2b",
+  "file": "2026-11-18/gen-1794963003-jA8FL4xK6REIT0Ky9H2b.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: NEAR moved only -0.1% and backing is 160.6%, so fees stay at 2x and the savings rate stays at 5%.",
+  "level": 1,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794960143623,
   "id": "0f773c9a051c46c9a4e4d1bc5fbe0434",
   "file": "2026-11-18/0f773c9a051c46c9a4e4d1bc5fbe0434.json",
