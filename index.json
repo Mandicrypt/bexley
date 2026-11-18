@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795015588286,
+  "id": "gen-1795015574-6ZdOxkKbNlDMXd7w7UcG",
+  "file": "2026-11-18/gen-1795015574-6ZdOxkKbNlDMXd7w7UcG.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change. NEAR's 24-hour volatility is 4.19% and backing is healthy at 155.5%, so fees stay normal and the savings rate stays 5%.",
+  "level": 0,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795012719045,
   "id": "gen-1795012705-7uzY2d7XDf8lfdjCb6EF",
   "file": "2026-11-18/gen-1795012705-7uzY2d7XDf8lfdjCb6EF.json",
