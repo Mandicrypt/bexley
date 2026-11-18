@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795020137978,
+  "id": "gen-1795020130-yyyMQfM8GXAS6rI2jkcS",
+  "file": "2026-11-18/gen-1795020130-yyyMQfM8GXAS6rI2jkcS.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 151%, just above the 150% healthy line, and xNEAR is already well levered. We lowered the savings rate from 5% to 1% to ease its cost.",
+  "level": 0,
+  "rate": 100,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795017663896,
   "id": "gen-1795017658-uzIKFY3qbAYtH5wsKSel",
   "file": "2026-11-18/gen-1795017658-uzIKFY3qbAYtH5wsKSel.json",
