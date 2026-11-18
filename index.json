@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794983815860,
+  "id": "gen-1794983808-WhNyin7HeliugigEjrxO",
+  "file": "2026-11-18/gen-1794983808-WhNyin7HeliugigEjrxO.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is a strong 161% and xNEAR leverage is modest at 2.63x, so we raised the saver rate to 7% to bring in more bxUSD. Fees stay at 2x since the day's swings are moderate, not extreme.",
+  "level": 1,
+  "rate": 700,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794981329256,
   "id": "0cedc7b7e5414e1b8306e7045ce23aa7",
   "file": "2026-11-18/0cedc7b7e5414e1b8306e7045ce23aa7.json",
