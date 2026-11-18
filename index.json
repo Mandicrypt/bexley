@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795023821857,
+  "id": "gen-1795023808-jx3zOoYx2gcWDoNG9qP4",
+  "file": "2026-11-18/gen-1795023808-jx3zOoYx2gcWDoNG9qP4.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR volatility is moderate at 5.3% and the pool is healthy at 154.6% backing, so fees stay normal and the savings rate stays 5%.",
+  "level": 0,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795020137978,
   "id": "gen-1795020130-yyyMQfM8GXAS6rI2jkcS",
   "file": "2026-11-18/gen-1795020130-yyyMQfM8GXAS6rI2jkcS.json",
