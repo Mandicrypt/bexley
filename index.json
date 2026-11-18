@@ -1,5 +1,17 @@
 [
  {
+  "at": 1794966679334,
+  "id": "gen-1794966668-YHXfLzYIrvXr5B5d3NaD",
+  "file": "2026-11-18/gen-1794966668-YHXfLzYIrvXr5B5d3NaD.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR volatility is 6.4% and the 24h range is 10.1%, so fees stay at 2x. Backing is 159% and stable, so the savings rate stays at 5%.",
+  "level": 1,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1794963017614,
   "id": "gen-1794963003-jA8FL4xK6REIT0Ky9H2b",
   "file": "2026-11-18/gen-1794963003-jA8FL4xK6REIT0Ky9H2b.json",
