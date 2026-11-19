@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1795126528240,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1795126519-FLB5KblHn3SmDDqtnHVC",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.16,\\n  \\\"near_change_24h_pct\\\": -2.61,\\n  \\\"near_volatility_24h_pct\\\": 5.45,\\n  \\\"near_range_24h_pct\\\": 10.16,\\n  \\\"pool_mode\\\": \\\"Caution\\\",\\n  \\\"backing_pct\\\": 149.7,\\n  \\\"xnear_leverage\\\": 3.01,\\n  \\\"pool_value_usd\\\": 1675.05,\\n  \\\"bxusd_supply\\\": 1119.26,\\n  \\\"stability_pool_usd\\\": 1046.12,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 100\\n}\"}]}",
+  "response": "{\"id\":\"gen-1795126519-FLB5KblHn3SmDDqtnHVC\",\"object\":\"chat.completion\",\"created\":1795126519,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 1, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"Pool is in Caution with backing at 149.7%, so the savings rate goes to 0%. NEAR's 10.16% daily range and 5.45% volatility justify raising fees to slow trading.\\\", \\\"status\\\": \\\"The pool is in Caution with backing at 149.7% and xNEAR leverage at 3.01x.\\\"}\",\"reasoning\":\"We need answer JSON only. Need follow rules. Pool mode Caution (130-150). Current backing 149.7, leverage 3.01, near volatility 5.45, change -2.61, range 10.16. Current fee 0, savings 100 bps. Outside Healthy mode it must be 0. Caution => savings_rate_bps must be 0. Need change rate at most 400 bps from current. Current 100 -> 0 allowed. Fee level? Raise fees when NEAR volatile. Volatility 5.45 and range 10.16, mode Caution near threshold. Current fee 0. Should we raise to 1? Evidence clear? Backing 149.7 just under Healthy, Caution. Raising fees to 1 (2x) to slow churn and pay Stability Pool for extra risk. But prefer stability; only change when clear. Here mode Caution and near range 10% likely volatile. Also savings must 0 due rule. Fee maybe 1. Let's consider if fee_level change appropriate. Current fee 0. Volatility 5.45% 24h is moderate; range 10.16%. Caution, backing 149.7 close to healthy. Savings rate must 0. Fee level can be raised? Rules: Raise fees when NEAR is volatile, to slow churn and pay Stability Pool for extra risk. Lower when markets calm down. Caution mode implies risk. It says outside Healthy mode it must be 0 for rate. For fee, no mandatory. Could keep 0 to prefer stability? But mode Caution and near_range 10.16% maybe not calm. Need decide.\\n\\nWe need output JSON. Reason under 240 chars, status. Values: fee_level 1, savings_rate_bps 0. Reason: Pool is in Caution with backing 149.7%, so savings rate goes to 0%. NEAR's 10.16% daily range and 5.45% volatility justify raising fees to slow trading. That's under 240? Count: \\\"Pool is in Caution with backing 149.7%, so savings rate goes to 0%. NEAR's 10.16% daily range and 5.45% volatility justify raising fees to slow trading.\\\" ~142 chars. Status: \\\"The pool is slightly under healthy backing and xNEAR is levered about 3x.\\\" Actually Caution. Status one short sentence. \\\"The pool is in Caution with backing at 149.7% and xNEAR leverage at 3.01x.\\\" That's okay.\\n\\nNeed ensure JSON only. Schema type json_object. No markdown. Let's verify rules: Change rate by at most 400 bps: 100 to 0 = -100, ok. Outside Healthy mode it must be 0. Yes. fee_level allowed 0|1|2. We choose 1. Is it clear? Maybe if prefer stability, don't change for small moves. But current mode changed to Caution likely significant. Fee raise to 1 is reasonable. Could choose fee_level 0? The data has volatility 5.45, not huge. But range 10.16. In Caution. The task wants guardian. I'd lean 1. Need reason cite numbers. \\\"NEAR's 10.16% daily range and 5.45% volatility\\\" okay. \\\"backing 149.7%\\\" okay. Savings 0 because Caution.\\n\\nPotential issue: \\\"outside Healthy mode it must be 0\\\" so savings 0. Fee maybe raise due Caution. Good.\\n\\nFinal JSON.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":676,\"completion_tokens\":859,\"total_tokens\":1535,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":759,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "03563a42b1490d70a95b448bde3aea0def0a65f1101c424c0ac35cf15ab62034:d6b85d6b00edbcdf795851078ff1cddbdb4472f71c4ba0329661bee7c6f8a55b",
+    "signature": "0x3a21aa3a5218d1cc0f1bc729b60769b842b256c3a91ea5eb31e8c2efbf9cd26b70b63fe69078212a6f0358f3fbcb5875450cb5592f6d042d51c37c1f5f5ed4c61c",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 1,
+    "rate": 0,
+    "reason": "Pool is in Caution with backing at 149.7%, so the savings rate goes to 0%. NEAR's 10.16% daily range and 5.45% volatility justify raising fees to slow trading."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 03563a42b1… and d6b85d6b00… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}

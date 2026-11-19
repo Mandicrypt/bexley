@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795126528240,
+  "id": "gen-1795126519-FLB5KblHn3SmDDqtnHVC",
+  "file": "2026-11-19/gen-1795126519-FLB5KblHn3SmDDqtnHVC.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Pool is in Caution with backing at 149.7%, so the savings rate goes to 0%. NEAR's 10.16% daily range and 5.45% volatility justify raising fees to slow trading.",
+  "level": 1,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795124776350,
   "id": "gen-1795124764-ODSi2dMqCx4ExBYK9M1u",
   "file": "2026-11-19/gen-1795124764-ODSi2dMqCx4ExBYK9M1u.json",
