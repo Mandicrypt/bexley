@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795047471655,
+  "id": "f1f61b23597b4a27bd392e4fe4d94ff2",
+  "file": "2026-11-19/f1f61b23597b4a27bd392e4fe4d94ff2.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No changes: backing is 156.2%, safely in Healthy mode, and NEAR's 4.92% volatility is not high enough to raise fees. The 3% savings rate stays since leverage at 2.78 is already solid.",
+  "level": 0,
+  "rate": 300,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795045433287,
   "id": "8bd0b1685e584cc9a9e91aa22a58aa42",
   "file": "2026-11-18/8bd0b1685e584cc9a9e91aa22a58aa42.json",
