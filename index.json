@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795122708354,
+  "id": "gen-1795122702-iaydEzeJ0v44TpWO8Ddf",
+  "file": "2026-11-19/gen-1795122702-iaydEzeJ0v44TpWO8Ddf.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 152.6%, close to the 150% line, and xNEAR leverage is 2.9x, so we lowered the savings rate from 5% to 3% to ease its cost. Markets are calm, so fees stay normal.",
+  "level": 0,
+  "rate": 300,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795120236849,
   "id": "gen-1795120230-RAGAyivCU81h2Xpgx9T0",
   "file": "2026-11-19/gen-1795120230-RAGAyivCU81h2Xpgx9T0.json",
