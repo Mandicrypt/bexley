@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "at": 1795098125506,
+  "model": "deepseek/deepseek-v4.1-flash",
+  "id": "gen-1795098117-dFEeVYq10ryMFRDQpVCA",
+  "request": "{\"model\":\"deepseek/deepseek-v4.1-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 3.3873,\\n  \\\"near_change_24h_pct\\\": 1.74,\\n  \\\"near_volatility_24h_pct\\\": 5.37,\\n  \\\"near_range_24h_pct\\\": 9.85,\\n  \\\"pool_mode\\\": \\\"Healthy\\\",\\n  \\\"backing_pct\\\": 160.4,\\n  \\\"xnear_leverage\\\": 2.65,\\n  \\\"pool_value_usd\\\": 1795.54,\\n  \\\"bxusd_supply\\\": 1119.21,\\n  \\\"stability_pool_usd\\\": 1046.06,\\n  \\\"current_fee_level\\\": 0,\\n  \\\"current_savings_rate_bps\\\": 1000\\n}\"}]}",
+  "response": "{\"id\":\"gen-1795098117-dFEeVYq10ryMFRDQpVCA\",\"object\":\"chat.completion\",\"created\":1795098117,\"model\":\"deepseek/deepseek-v4.1-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 0, \\\"savings_rate_bps\\\": 1000, \\\"reason\\\": \\\"Backing is 160% and market moves are modest, so fees stay normal and the savings rate stays at 10%.\\\", \\\"status\\\": \\\"The pool is healthy with 160% backing and moderate market activity.\\\"}\",\"reasoning\":\"We need answer JSON only. Need decide fee_level and savings_rate_bps. We have data. Must follow rules. Pool mode Healthy, backing 160.4, leverage 2.65. Current fee 0, rate 1000 bps (10%). Volatility 24h 5.37%, range 9.85%, near change +1.74%. Is that volatile? Moderate. Rules: Raise fees when NEAR volatile, lower when calm. Current fee 0 normal. Volatility 5.37% maybe moderate, range 9.85. Not extreme. Prefer stability. Could keep fee 0. Savings rate: Healthy mode, backing 160.4 high, xNEAR barely levered? Leverage 2.65. At backing 160%, leverage = pool/(pool-bxUSD) = 160.4/(60.4)=2.65. At 150% leverage = 3.0. So xNEAR is less levered than max? Actually higher backing means more equity, lower leverage. \\\"When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down.\\\" Current backing 160.4, not near 150. So could increase rate to attract savers? But current 10%. Max 20%. Change at most 400 bps. Should we change? Need evidence clear. High backing 160.4 above healthy min 150, but not extremely high. xNEAR leverage 2.65, moderate. Maybe keep rate at 10%? Stability preferred. The current savings rate is 1000. Is there evidence to change? Volatility moderate, no clear. The prompt asks every few minutes decide. But prefer stability. So likely no change: fee 0, rate 1000. Reason: No change; backing 160% and volatility modest. Status: Pool is healthy with 160% backing.\\n\\nBut let's consider if fee should be raised due to volatility 5.37% and range 9.85%. That's not very high. Many protocols might keep normal. If near_change 1.74 positive, range 9.85% intraday maybe moderate. Volatility 5.37% is moderate. Normal fees okay.\\n\\nSavings rate: backing 160.4 > 150, so healthy. It says \\\"When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers\\\". Here backing high, but leverage 2.65. Is that \\\"barely levered\\\"? Max leverage before stabilization at 130%? Actually backing 160% gives leverage 2.65. At 150% leverage 3.0. At 130% leverage 4.33. So 2.65 is relatively low. Could raise savings rate to attract more bxUSD, increasing leverage, but this also pushes backing down toward 150. But we are at 160, healthy. However, raising rate by 400 bps to 14% might be justifiable. But rule: \\\"Prefer stability: do not change settings for small moves. Only change when evidence is clear.\\\" Is high backing evidence clear? 160.4 is not extremely high; it's just healthy. Also no recent change info. I'd keep rate. Also outside Healthy must be 0, but we are Healthy, so can keep 10%.\\n\\nThus final JSON: fee_level 0, savings_rate_bps 1000, reason: \\\"Backing is 160% and volatility is moderate, so fees and savings rate stay steady at 10%.\\\" status: \\\"The pool is healthy with 160% backing and moderate market activity.\\\"\\n\\nNeed ensure reason under 240 chars. Status one short sentence. JSON only. Write rates as percents. \\\"10%\\\" not \\\"1000\\\". Reason maybe: \\\"Backing is 160% and market moves are modest, so fee stays normal and the savings rate stays at 10%.\\\" That's fine. Status: \\\"The pool is healthy with 160% backing and moderate market activity.\\\"\\n\\nCheck if fee_level is integer 0. savings_rate_bps integer 1000.\\n\\nMust output JSON only.\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":677,\"completion_tokens\":976,\"total_tokens\":1653,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":907,\"audio_tokens\":0}},\"provider\":\"Novita\"}",
+  "signature": {
+    "text": "08069c0ad288ff5afd6df8938b8cd3e1818fb492e129fb8edf5e35c0bc7f11f5:bb7c189e83816190ae4a1f8f684fe759814c948b5b04b145ddb037fd6abfa324",
+    "signature": "0xa98b98aa6801ad48b7c588dd32011b4fe9172580c05bcd49be8b7c1381ed70827c8c8eb91591ad0c2cc68deb763333560dce5cc88464bde92ebca8f994a230331c",
+    "signing_address": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+    "signing_algo": "ecdsa",
+    "signature_kind": "gateway"
+  },
+  "attestation": null,
+  "decision": {
+    "level": 0,
+    "rate": 1000,
+    "reason": "Backing is 160% and market moves are modest, so fees stay normal and the savings rate stays at 10%."
+  },
+  "check": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 08069c0ad2… and bb7c189e83… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0xb98a78…57e779."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": false,
+        "detail": "The key is not in the attestation report."
+      }
+    ],
+    "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779"
+  }
+}

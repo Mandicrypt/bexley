@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795098125506,
+  "id": "gen-1795098117-dFEeVYq10ryMFRDQpVCA",
+  "file": "2026-11-19/gen-1795098117-dFEeVYq10ryMFRDQpVCA.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "Backing is 160% and market moves are modest, so fees stay normal and the savings rate stays at 10%.",
+  "level": 0,
+  "rate": 1000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795096055292,
   "id": "8ed7dadfcc6245418eb7102c8c0ecaee",
   "file": "2026-11-19/8ed7dadfcc6245418eb7102c8c0ecaee.json",
