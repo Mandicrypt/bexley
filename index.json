@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795102288477,
+  "id": "gen-1795102283-45DdWbJBIA5gKgpsRN8k",
+  "file": "2026-11-19/gen-1795102283-45DdWbJBIA5gKgpsRN8k.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: backing is 157.5% and 24h volatility is 4.7%, so the current 10% savings rate and normal fees stay.",
+  "level": 0,
+  "rate": 1000,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795100221037,
   "id": "gen-1795100208-ixrD6VY1vfgqERx6T14v",
   "file": "2026-11-19/gen-1795100208-ixrD6VY1vfgqERx6T14v.json",
