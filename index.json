@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795129299079,
+  "id": "cca2fe798faf4b369b85393fe215e439",
+  "file": "2026-11-19/cca2fe798faf4b369b85393fe215e439.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 151.4%, just above the Healthy line, and xNEAR already has 2.94x leverage, so the savings rate stays at 0%. NEAR ranged 10.26% in a day, so 2x fees remain to pay savers for the risk.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795127250521,
   "id": "94d86bd5392a4953b35b73264700da55",
   "file": "2026-11-19/94d86bd5392a4953b35b73264700da55.json",
