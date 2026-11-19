@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795053611448,
+  "id": "gen-1795053604-ogLtMJyOyKKQUlcLQIkN",
+  "file": "2026-11-19/gen-1795053604-ogLtMJyOyKKQUlcLQIkN.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: backing is 156.5% and NEAR's 24-hour move is small at -1.47%, so fees and the 5% savings rate stay.",
+  "level": 0,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795049527641,
   "id": "780c98d54b5f454cb4fee76632f8b3bd",
   "file": "2026-11-19/780c98d54b5f454cb4fee76632f8b3bd.json",
