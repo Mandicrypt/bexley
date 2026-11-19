@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795120236849,
+  "id": "gen-1795120230-RAGAyivCU81h2Xpgx9T0",
+  "file": "2026-11-19/gen-1795120230-RAGAyivCU81h2Xpgx9T0.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR is calm, down 0.14% with 5% daily swings, so fees stay normal and the saver rate stays 5%. Backing is 153.9%, so there is no clear reason to move the rate.",
+  "level": 0,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795117353546,
   "id": "fd1e1a728431410aa910addcd7746a0a",
   "file": "2026-11-19/fd1e1a728431410aa910addcd7746a0a.json",
