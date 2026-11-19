@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795064670086,
+  "id": "gen-1795064658-YmknjLK2tmtajzTa20TE",
+  "file": "2026-11-19/gen-1795064658-YmknjLK2tmtajzTa20TE.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: NEAR is moving moderately and the pool is healthy. Backing is 162% and the savings rate stays 12%.",
+  "level": 0,
+  "rate": 1200,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795062577600,
   "id": "3f575304111a401fa3f965d58ea5e0ce",
   "file": "2026-11-19/3f575304111a401fa3f965d58ea5e0ce.json",
