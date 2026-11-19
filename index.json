@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795092946137,
+  "id": "5d17fa5383b147deac4c6ba73dd27486",
+  "file": "2026-11-19/5d17fa5383b147deac4c6ba73dd27486.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 160.6%, well above the 150% healthy line, so more savers are needed. I raised the savings rate from 5% to 8% to attract them. NEAR moved calmly, so fees stay normal.",
+  "level": 0,
+  "rate": 800,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795088525843,
   "id": "gen-1795088511-16PfNfArkjxOw1SbjUrC",
   "file": "2026-11-19/gen-1795088511-16PfNfArkjxOw1SbjUrC.json",
