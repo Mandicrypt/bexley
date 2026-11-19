@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795081528349,
+  "id": "gen-1795081517-PdbYN0hTgebYdfRGOJeb",
+  "file": "2026-11-19/gen-1795081517-PdbYN0hTgebYdfRGOJeb.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No change: NEAR's 24-hour move is 2.07% and volatility is 5.34%, not enough to raise fees or adjust the 12% savings rate.",
+  "level": 0,
+  "rate": 1200,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795079452725,
   "id": "3e47b00caf3242438e81c8babc8112a0",
   "file": "2026-11-19/3e47b00caf3242438e81c8babc8112a0.json",
