@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795094978107,
+  "id": "584dc09153954221a6e63a043578fdf7",
+  "file": "2026-11-19/584dc09153954221a6e63a043578fdf7.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 161%, well above the 150% healthy line, so raising the savings rate from 8% to 10% should attract savers and add leverage. Fees stay normal since NEAR moved only 1.35% in a day.",
+  "level": 0,
+  "rate": 1000,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795092946137,
   "id": "5d17fa5383b147deac4c6ba73dd27486",
   "file": "2026-11-19/5d17fa5383b147deac4c6ba73dd27486.json",
