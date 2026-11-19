@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795127250521,
+  "id": "94d86bd5392a4953b35b73264700da55",
+  "file": "2026-11-19/94d86bd5392a4953b35b73264700da55.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 150.8%, right at the Healthy limit, so raising the savings rate would add bxUSD and risk dropping into Caution. NEAR volatility of 5.47% keeps 2x fees in place.",
+  "level": 1,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795126528240,
   "id": "gen-1795126519-FLB5KblHn3SmDDqtnHVC",
   "file": "2026-11-19/gen-1795126519-FLB5KblHn3SmDDqtnHVC.json",
