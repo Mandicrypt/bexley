@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795067156977,
+  "id": "gen-1795067146-WsPqig7f3jzHTNm36KiJ",
+  "file": "2026-11-19/gen-1795067146-WsPqig7f3jzHTNm36KiJ.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "No clear move: NEAR is calm (-0.69% day, 5.3% volatility) and backing is comfortable at 160%, so fees and the 5% savings rate stay put.",
+  "level": 0,
+  "rate": 500,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795064670086,
   "id": "gen-1795064658-YmknjLK2tmtajzTa20TE",
   "file": "2026-11-19/gen-1795064658-YmknjLK2tmtajzTa20TE.json",
