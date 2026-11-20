@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795138843533,
+  "id": "ce17a0d0253d46378ae8637d47867a2d",
+  "file": "2026-11-20/ce17a0d0253d46378ae8637d47867a2d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 149.7%, just under Healthy, so the saver rate stays 0%. NEAR fell 3.2% with a 10.3% daily range, so 3x fees stay on to slow churn and pay savers.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795137818489,
   "id": "a2c0627136574ef58add507a5e42e6d5",
   "file": "2026-11-20/a2c0627136574ef58add507a5e42e6d5.json",
