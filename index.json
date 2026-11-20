@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795135439123,
+  "id": "gen-1795135422-vt8mibxDXG9oc4MC1f6R",
+  "file": "2026-11-20/gen-1795135422-vt8mibxDXG9oc4MC1f6R.json",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "reason": "NEAR fell 4% with a 10% daily range, so fees rise to 3x to protect the pool near 151% backing. Savings rate stays 0% because xNEAR is already well levered.",
+  "level": 2,
+  "rate": 0,
+  "kind": "gateway",
+  "signer": "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+  "verified": false
+ },
+ {
   "at": 1795133366369,
   "id": "00aef015029448e0b4be71abeb0fca63",
   "file": "2026-11-20/00aef015029448e0b4be71abeb0fca63.json",
