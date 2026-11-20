@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795166833469,
+  "id": "ad60a94d7e124e11a8abd6197720b33e",
+  "file": "2026-11-20/ad60a94d7e124e11a8abd6197720b33e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 12% in 24h with a 16% range, so fees stay at 3x to slow churn and pay savers for the risk. The pool is in Caution at 142.5% backing, so the savings rate must stay 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795164817032,
   "id": "4828d12a620141d9ac7c4b6dee45614b",
   "file": "2026-11-20/4828d12a620141d9ac7c4b6dee45614b.json",
