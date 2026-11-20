@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795137818489,
+  "id": "a2c0627136574ef58add507a5e42e6d5",
+  "file": "2026-11-20/a2c0627136574ef58add507a5e42e6d5.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 151.1%, right at the Healthy edge, so the 0% saver rate stays to avoid pulling backing under 150%. NEAR's 10.26% daily range and 4.84% volatility justify keeping fees at 3x.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795137458814,
   "id": "2b6269edaaac446dbefc891305bdcd51",
   "file": "2026-11-20/2b6269edaaac446dbefc891305bdcd51.json",
