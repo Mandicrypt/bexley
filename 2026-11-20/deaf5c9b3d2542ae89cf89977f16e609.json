@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1795195992326,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "deaf5c9b3d2542ae89cf89977f16e609",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 2.8232,\\n  \\\"near_change_24h_pct\\\": -14.29,\\n  \\\"near_volatility_24h_pct\\\": 6.76,\\n  \\\"near_range_24h_pct\\\": 18.12,\\n  \\\"pool_mode\\\": \\\"Caution\\\",\\n  \\\"backing_pct\\\": 133.7,\\n  \\\"xnear_leverage\\\": 3.97,\\n  \\\"pool_value_usd\\\": 1496.5,\\n  \\\"bxusd_supply\\\": 1119.26,\\n  \\\"stability_pool_usd\\\": 1046.12,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"deaf5c9b3d2542ae89cf89977f16e609\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"NEAR fell 14% in a day with an 18% range, so 3x fees stay on to slow churn and pay savers for the risk. Backing is 133.7% in Caution mode, so the savings rate must stay 0%.\\\", \\\"status\\\": \\\"Pool is in Caution at 133.7% backing as NEAR drops sharply; fees stay at 3x and the savings rate stays 0%.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- NEAR price: $2.8232, down 14.29% in 24h\\n- Volatility: 6.76% (24h), range 18.12% — quite volatile\\n- Pool mode: Caution (backing 133.7%, between 130-150%)\\n- Backing: 133.7%\\n- xNEAR leverage: 3.97x\\n- Pool value: $1496.5\\n- bxUSD supply: 1119.26\\n- Stability pool: $1046.12 (93.5% of bxUSD supply)\\n- Current fee level: 2 (3x fees)\\n- Current savings rate: 0 bps\\n\\nRules:\\n- Outside Healthy mode, savings_rate must be 0. Pool is in Caution mode, so savings_rate_bps must be 0. Current is 0, so keep 0.\\n- Fee level: NEAR dropped 14.29% in 24h, volatility 6.76%, range 18.12%. That's high volatility. Current fee level is 2 (3x). Should we keep it at 2? The market is volatile — a 14% drop with 18% range suggests keeping fees high to slow churn and pay the Stability Pool. Lowering fees would be premature given the volatility. Keep fee_level at 2.\\n\\nSo the decision: fee_level: 2, savings_rate_bps: 0, no changes.\\n\\nReason: no change, so explain briefly why keeping settings. Something like: \\\"NEAR fell 14% in a day with an 18% range, so 3x fees stay on to protect the pool. Backing is 133.7% in Caution mode, so the savings rate stays 0%.\\\"\\n\\nStatus: \\\"Pool is in Caution at 133.7% backing while NEAR drops sharply; fees stay at 3x and the savings rate stays 0%.\\\"\\n\\nKeep reason under 240 chars, rates as percents.\\n\\nJSON only.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1795195985,\"usage\":{\"prompt_tokens\":628,\"total_tokens\":1178,\"completion_tokens\":550,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":433,\"completion_tokens_details\":{\"reasoning_tokens\":433}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:be8d099213b6534d62c4260a3631276b8d6d790e2ac91e931626d956a33f0000:6ec279f3115a0b9b4bd75ac8b2e6a30659d5940284cb1f9d60777e6f45d17089",
+    "signature": "0xeae2f499cc0360776007031469dd529e0be62a7decffce5e9d8b4e907f1b61d155ed0fc6707d9fb1ac2ab8cbfeb13c04190dca81b1f1084dcbec01fe182ee78c1c",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "00aec9d008d3e1fdd76961216c52c4dc0486eab24311ca64252f043d1fc662b3",
+    "fetched_at": 1795191919639,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "8c6af6d34ac4e355eebe3d0e91dcc18bccc1376762a1ebb83e1c37a398a5a97c"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "NEAR fell 14% in a day with an 18% range, so 3x fees stay on to slow churn and pay savers for the risk. Backing is 133.7% in Caution mode, so the savings rate must stay 0%."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints be8d099213… and 6ec279f311… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
