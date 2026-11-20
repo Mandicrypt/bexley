@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795137458814,
+  "id": "2b6269edaaac446dbefc891305bdcd51",
+  "file": "2026-11-20/2b6269edaaac446dbefc891305bdcd51.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding steady. Backing is 151.9%, just above the 150% Healthy line, and NEAR still swung 10.26% in a day, so fees stay at 3x. A savings rate above 0% would add bxUSD and could push backing into Caution.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795135439123,
   "id": "gen-1795135422-vt8mibxDXG9oc4MC1f6R",
   "file": "2026-11-20/gen-1795135422-vt8mibxDXG9oc4MC1f6R.json",
