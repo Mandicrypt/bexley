@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "at": 1795168865836,
+  "model": "z-ai/glm-5.3-flash",
+  "id": "29bcc281951f46aaafb8f3a8ce861f1e",
+  "request": "{\"model\":\"z-ai/glm-5.3-flash\",\"temperature\":0.2,\"max_tokens\":2000,\"response_format\":{\"type\":\"json_object\"},\"messages\":[{\"role\":\"system\",\"content\":\"You are the Pool Guardian of Bexley, a protocol on NEAR that splits one pool of NEAR into two tokens:\\n- bxUSD, a stablecoin worth $1. Savers who put bxUSD in the Stability Pool earn a savings rate paid by xNEAR holders, plus 80% of fees.\\n- xNEAR, leveraged NEAR. It owns everything the pool is worth above the bxUSD it owes. Its leverage = pool value / (pool value - bxUSD).\\nBacking = pool value / bxUSD. Modes: Healthy at 150% or more, Caution 130-150%, Stabilize under 130%.\\n\\nEvery few minutes you decide two settings:\\n1. fee_level: 0 (normal fees), 1 (2x fees) or 2 (3x fees). Raise fees when NEAR is volatile, to slow churn and pay the Stability Pool for extra risk. Lower them when markets calm down.\\n2. savings_rate_bps: yearly rate for savers in basis points, 0 to 2000 (20%). It is the price of leverage. When bxUSD is scarce (high backing, xNEAR barely levered) a higher rate attracts savers, which adds bxUSD and gives xNEAR more leverage. When xNEAR is already well levered (backing near 150%) a lower rate eases its cost and avoids pushing backing down. Outside Healthy mode it must be 0.\\n\\nRules you must follow:\\n- Change the rate by at most 400 bps from the current rate in one decision.\\n- Prefer stability: do not change settings for small moves. Only change when the evidence is clear.\\n- Never invent numbers. Use only the data given.\\n\\nAnswer with JSON only, no other text:\\n{\\\"fee_level\\\": 0|1|2, \\\"savings_rate_bps\\\": integer, \\\"reason\\\": \\\"at most two short plain sentences (under 240 characters) for users explaining any change, citing the numbers that drove it; write rates as percents like 9%, never bps\\\", \\\"status\\\": \\\"one short plain sentence summarizing the pool right now\\\"}\\nWrite for ordinary users: short sentences, no jargon, no exclamation marks.\"},{\"role\":\"user\",\"content\":\"Pool and market data:\\n{\\n  \\\"near_price_usd\\\": 2.9982,\\n  \\\"near_change_24h_pct\\\": -11.98,\\n  \\\"near_volatility_24h_pct\\\": 5.48,\\n  \\\"near_range_24h_pct\\\": 14.59,\\n  \\\"pool_mode\\\": \\\"Caution\\\",\\n  \\\"backing_pct\\\": 142,\\n  \\\"xnear_leverage\\\": 3.38,\\n  \\\"pool_value_usd\\\": 1589.29,\\n  \\\"bxusd_supply\\\": 1119.26,\\n  \\\"stability_pool_usd\\\": 1046.12,\\n  \\\"current_fee_level\\\": 2,\\n  \\\"current_savings_rate_bps\\\": 0\\n}\"}]}",
+  "response": "{\"id\":\"29bcc281951f46aaafb8f3a8ce861f1e\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"fee_level\\\": 2, \\\"savings_rate_bps\\\": 0, \\\"reason\\\": \\\"NEAR fell 12% in 24h with a 14.6% range, so 3x fees stay to protect the pool. The savings rate stays 0% while backing is 142% in Caution mode.\\\", \\\"status\\\": \\\"Pool is in Caution at 142% backing after a sharp NEAR drop, with high fees and no savings rate.\\\"}\",\"reasoning_content\":\"Let me analyze the situation:\\n\\n- Pool mode: Caution (backing 142%, between 130-150%)\\n- NEAR dropped -11.98% in 24h, volatility 5.48%, range 14.59% — clearly volatile\\n- Current fee level: 2 (3x fees) — appropriate given volatility\\n- Current savings rate: 0 bps — required to be 0 outside Healthy mode\\n\\nRules:\\n- Outside Healthy mode, savings_rate must be 0. So savings_rate_bps = 0.\\n- Fee level: NEAR is volatile (-12% drop, 5.48% volatility, 14.59% range). Keeping fees at 2 (3x) makes sense. No change needed.\\n\\nSo the decision: keep fee_level 2, savings_rate_bps 0. No changes — prefer stability.\\n\\nReason: must cite numbers that drove any change. Since no change, explain why holding: NEAR fell 12% and volatility is high, so 3x fees stay; rate stays 0 in Caution mode.\\n\\nStatus: one short sentence summarizing pool: \\\"Pool is in Caution at 142% backing after NEAR dropped 12%.\\\"\\n\\nJSON only.\"},\"finish_reason\":\"stop\",\"logprobs\":null,\"matched_stop\":154827}],\"model\":\"z-ai/glm-5.3-flash\",\"created\":1795168842,\"usage\":{\"prompt_tokens\":626,\"total_tokens\":983,\"completion_tokens\":357,\"prompt_tokens_details\":{\"cached_tokens\":0},\"reasoning_tokens\":257,\"completion_tokens_details\":{\"reasoning_tokens\":257}}}",
+  "signature": {
+    "text": "z-ai/glm-5.3-flash:9213adc04d5a883d88f546f72fe3880e5b30e00508ada372f386bbd05ef2fc95:aa3b25c908a8eaac7b435847ed991d3013f7c34b04b110b75b03721ee592a668",
+    "signature": "0x6ce20e63aa8216aa0e965e097e74670f457f7488cfc4a4c1b991f0909f0b6c87365fcaef8ccd952ec0e7714403b35824880d5e8a6ad1b4e7cc34ee9821b8b86b1b",
+    "signing_address": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+    "signing_algo": "ecdsa",
+    "signature_kind": "provider_tee"
+  },
+  "attestation": {
+    "nonce": "0e332baf72913a23f5d267b04b1a631fd8bb61c5f731e43951e3c52b7224cf43",
+    "fetched_at": 1795158692016,
+    "signers": [
+      "0xb98a789cdc4817275f5155593ba73ef2a957e779",
+      "0x3b753b4406613c5e70ae640508632b600424fa0c"
+    ],
+    "report_sha256": "7a7312fe379e00bec3d837de8f876aefa747483e08b83473f4b72c7665a57720"
+  },
+  "decision": {
+    "level": 2,
+    "rate": 0,
+    "reason": "NEAR fell 12% in 24h with a 14.6% range, so 3x fees stay to protect the pool. The savings rate stays 0% while backing is 142% in Caution mode."
+  },
+  "check": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "The question and answer are exactly what was signed",
+        "ok": true,
+        "detail": "Fingerprints 9213adc04d… and aa3b25c908… match."
+      },
+      {
+        "name": "The signature is valid",
+        "ok": true,
+        "detail": "Signed by 0x3b753b…24fa0c."
+      },
+      {
+        "name": "That key lives in NEAR AI secure hardware",
+        "ok": true,
+        "detail": "The key is named in NEAR AI's hardware attestation report, fetched before the question was asked."
+      }
+    ],
+    "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c"
+  }
+}
