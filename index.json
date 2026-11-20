@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795185797627,
+  "id": "302f7c318c26429b9435ed9b6d99cd1d",
+  "file": "2026-11-20/302f7c318c26429b9435ed9b6d99cd1d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 12% with a 16% range, so 3x fees stay to pay savers for the extra risk. Backing is 140% in Caution mode, so the savings rate stays 0% until the pool is Healthy again.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795183735556,
   "id": "7acbf8ad6d7e4ece98b2baefd43772a5",
   "file": "2026-11-20/7acbf8ad6d7e4ece98b2baefd43772a5.json",
