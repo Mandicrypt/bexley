@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795151181636,
+  "id": "248b6d60a27a4423b165bcb3b7f19036",
+  "file": "2026-11-20/248b6d60a27a4423b165bcb3b7f19036.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 12% in a day with a 15.6% range, so 3x fees stay on to pay the Stability Pool for the extra risk. Backing is 142.5% in Caution mode, so the savings rate stays 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795149135097,
   "id": "bcdf485312bd4361923dc590f7e6868a",
   "file": "2026-11-20/bcdf485312bd4361923dc590f7e6868a.json",
