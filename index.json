@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795160740361,
+  "id": "692378ec9b30454297fb1873813c8c9e",
+  "file": "2026-11-20/692378ec9b30454297fb1873813c8c9e.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding fees at 3x since NEAR fell 10.88% with a 15.66% range. Backing is 144%, so the pool stays in Caution and the savings rate stays 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795158716022,
   "id": "e8b2e4db83024bf38787563873587467",
   "file": "2026-11-20/e8b2e4db83024bf38787563873587467.json",
