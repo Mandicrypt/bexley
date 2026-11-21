@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795265286552,
+  "id": "bc79f6390d2b4bbbae7beb0f9bd3c0b6",
+  "file": "2026-11-21/bc79f6390d2b4bbbae7beb0f9bd3c0b6.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding fees at 3x while NEAR fell 4.6% with an 18.6% daily range. Savings rate stays 0% because backing is 143%, below the 150% needed to resume paying savers.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795263252572,
   "id": "f9238f20bd004e2985453a264b77cfdb",
   "file": "2026-11-21/f9238f20bd004e2985453a264b77cfdb.json",
