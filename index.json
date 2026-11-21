@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795284153138,
+  "id": "30eefe4580de4228912eac00e90fd934",
+  "file": "2026-11-21/30eefe4580de4228912eac00e90fd934.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Volatility is still high at 9.5% with a 15% daily range, so 3x fees stay to pay savers for the risk. Backing is 144.7% in Caution mode, so the savings rate stays 0% until the pool is Healthy again.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795283467681,
   "id": "f702f68f590a46f6af033444e0453d2d",
   "file": "2026-11-21/f702f68f590a46f6af033444e0453d2d.json",
