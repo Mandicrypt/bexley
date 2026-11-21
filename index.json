@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795223438791,
+  "id": "fd0c6ed07fd744488139ed7e561095af",
+  "file": "2026-11-21/fd0c6ed07fd744488139ed7e561095af.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 12.9% in a day with 7.1% volatility, so 3x fees stay to slow churn and pay savers for the risk. Backing is 132.7% in Caution mode, so the savings rate must stay 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795221412733,
   "id": "8f8048d5785d4d33ac72d9f90f9f2414",
   "file": "2026-11-21/8f8048d5785d4d33ac72d9f90f9f2414.json",
