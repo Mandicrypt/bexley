@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795279433326,
+  "id": "50d2132ada814ca8b35ba1d7c3936165",
+  "file": "2026-11-21/50d2132ada814ca8b35ba1d7c3936165.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Backing is 145.1%, still in Caution, so the savings rate stays 0%. Daily volatility near 10% and a 15% price range keep fees at 3x to pay savers for the risk.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795277417973,
   "id": "20aaaf2a7a0149a3b2346e8bdff13845",
   "file": "2026-11-21/20aaaf2a7a0149a3b2346e8bdff13845.json",
