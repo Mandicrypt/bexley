@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795228530104,
+  "id": "303151093ced4e60a6ff009cd01a0a40",
+  "file": "2026-11-21/303151093ced4e60a6ff009cd01a0a40.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "NEAR fell 9% in a day with 7.2% volatility, so 3x fees stay on to pay savers for the extra risk. Backing is 129.9%, still in Stabilize, so the savings rate stays 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795227513830,
   "id": "3912909429b2492980e86799e20337ef",
   "file": "2026-11-21/3912909429b2492980e86799e20337ef.json",
