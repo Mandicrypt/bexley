@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795269341504,
+  "id": "9ded20ca685946428a83bbba0a2f995d",
+  "file": "2026-11-21/9ded20ca685946428a83bbba0a2f995d.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "No change. Volatility is still high at 10.56% over 24h, so 3x fees stay to protect the pool. Backing is 148.5%, just under the 150% Healthy line, so the savings rate stays 0% until the pool recovers.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795267308330,
   "id": "d88b826379bd4096b94c02ccef081796",
   "file": "2026-11-21/d88b826379bd4096b94c02ccef081796.json",
