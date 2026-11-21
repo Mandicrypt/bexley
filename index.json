@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795273361186,
+  "id": "46bc519b46c64ed38140ab7ddf5503c0",
+  "file": "2026-11-21/46bc519b46c64ed38140ab7ddf5503c0.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding settings. NEAR volatility is still high at 9.6% with a 17.5% range, so 3x fees stay to pay savers for the risk. Backing is 147.8% in Caution mode, so the savings rate must remain 0%.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795271339828,
   "id": "818eb952e0a047cd96a2788e06937c85",
   "file": "2026-11-21/818eb952e0a047cd96a2788e06937c85.json",
