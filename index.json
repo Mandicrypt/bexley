@@ -1,5 +1,17 @@
 [
  {
+  "at": 1795227513830,
+  "id": "3912909429b2492980e86799e20337ef",
+  "file": "2026-11-21/3912909429b2492980e86799e20337ef.json",
+  "model": "z-ai/glm-5.3-flash",
+  "reason": "Holding settings: NEAR swung 7% with a 12% range and backing is 131%, just above Stabilize. Fees stay at 3x to protect savers, and the rate must stay 0% in Caution mode.",
+  "level": 2,
+  "rate": 0,
+  "kind": "provider_tee",
+  "signer": "0x3b753b4406613c5e70ae640508632b600424fa0c",
+  "verified": true
+ },
+ {
   "at": 1795225478093,
   "id": "d1f17b7008ce40ffb23b525dea20c5a3",
   "file": "2026-11-21/d1f17b7008ce40ffb23b525dea20c5a3.json",
